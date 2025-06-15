@@ -2,7 +2,7 @@ import { Product } from "@/types/product";
 
 export const mockProducts: Product[] = [
     {
-        id: "iphone-15-pro-max-gold",
+        id: "iphone-12-pro-max-black",
         title: "Apple iPhone 15 Pro Max (256GB) - Natural Titanium Gold",
         description: "The iPhone 15 Pro Max features a stunning 6.7-inch Super Retina XDR display with ProMotion technology. Built with aerospace-grade titanium and powered by the A17 Pro chip, it delivers exceptional performance and battery life. Capture incredible photos with the advanced Pro camera system featuring 5x telephoto zoom.",
         price: 159900,
