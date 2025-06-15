@@ -1,5 +1,6 @@
 import os
 from flask import Flask, request, jsonify
+from flask_migrate import Migrate
 from models import db, User, Seller, Product, Review, Order, OrderItem, Return, UserSessionLog
 from services import uba_service, pis_service, scs_service
 from ml_integration import analyze_linguistic_authenticity
@@ -10,6 +11,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
+    migrate = Migrate(app, db)
 
     # --- EVENT-DRIVEN API ENDPOINTS (The Triggers) ---
     
@@ -56,7 +58,7 @@ def create_app():
     # --- DATA-FETCHING API ENDPOINTS (For Next.js Frontend) ---
     
     @app.route('/api/product/<int:product_id>', methods=['GET'])
-    def get_product_details():
+    def get_product_details(product_id):
         product = Product.query.get_or_404(product_id)
         seller = Seller.query.get(product.seller_id)
         
@@ -74,7 +76,7 @@ def create_app():
         })
 
     @app.route('/api/review/<int:review_id>', methods=['GET'])
-    def get_review_with_author_trust():
+    def get_review_with_author_trust(review_id):
         review = Review.query.get_or_404(review_id)
         author = User.query.get(review.user_id)
         UBA_THRESHOLD_FOR_TICK = 0.7 # Configurable
