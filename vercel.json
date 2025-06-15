@@ -1,0 +1,28 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "api/index.py",
+        "use": "@vercel/python"
+      },
+      {
+        "src": "package.json",
+        "use": "@vercel/next"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/py/(.*)",
+        "dest": "/api/index.py"
+      },
+      {
+        "src": "/(.*\\.(js|json|css|ico|png|jpg|jpeg|svg|ttf|webp|webm)$)",
+        "dest": "/$1"
+      },
+      {
+        "src": "/public/(.*)",
+        "dest": "/public/$1"
+      }
+    ]
+  }
+  
