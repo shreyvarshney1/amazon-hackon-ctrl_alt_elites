@@ -24,6 +24,7 @@ import {
 
 import ProductCard from "./product-card";
 import { mockProducts } from "@/lib/mockData";
+import { getProducts } from "@/lib/api/product";
 
 export default function AmazonSearchPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -53,6 +54,9 @@ export default function AmazonSearchPage() {
       {count && <span className="text-[#0052b4] text-sm ml-1">{count}</span>}
     </div>
   );
+
+  // API Integration : /api/products
+  const products = getProducts();
 
   return (
     <div className="min-h-screen bg-white">
@@ -280,6 +284,10 @@ export default function AmazonSearchPage() {
             {mockProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
+            
+            {/* {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))} */}
           </div>
         </div>
       </main>

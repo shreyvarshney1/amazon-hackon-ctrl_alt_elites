@@ -1,22 +1,24 @@
 export interface Product {
     id: string;
+    seller : {
+        id : number,
+        name : string,
+        seller_credibility_score : number
+    };
     title: string;
     description: string;
     price: number;
-    imageUrl: string;
-    imageUrls: string[];
-    imageAlt: string;
     category: string;
-    sellerName: string;
+    imageUrls: string[];
     pis: number;
     rating: number;
     reviewCount: string;
-    currentPrice: number;
-    originalPrice?: number;
     discount?: number;
     deliveryDate: string;
     isSponsored?: boolean;
     isFreeDelivery?: boolean;
     currency?: string;
+    // currentPrice: number;
+    // originalPrice?: number;
     // ... other fields
 }

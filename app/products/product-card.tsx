@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star } from "lucide-react";
+import { BookmarkCheck, Star } from "lucide-react";
 import { Product } from "@/types/product";
 
 interface ProductCardProps {
@@ -31,14 +31,25 @@ const StarRating = ({ rating, count }: { rating: number; count: string }) => {
   );
 };
 
+const VerifiedSellerBadge = () => {
+  return (
+    <div className="flex items-center gap-1">
+      <span>
+        <BookmarkCheck className="w-4 h-4 text-green-500" />
+      </span>
+      <span className="text-green-500">Verified Seller</span>
+    </div>
+  );
+};
+
 export default function ProductCard({ product }: ProductCardProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-IN").format(price);
   };
 
-  const savings = product.originalPrice
-    ? product.originalPrice - product.currentPrice
-    : 0;
+  // const savings = product.originalPrice
+  //   ? product.originalPrice - product.currentPrice
+  //   : 0;
 
   return (
     <Link href={`/products/${product.id}`} className="block">
@@ -46,8 +57,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Product Image */}
         <div className="w-48 h-48 bg-[#f0f0f0] rounded flex items-center justify-center">
           <Image
-            src={product.imageUrl}
-            alt={product.imageAlt}
+            src={product.imageUrls[0]}
+            alt={product.title}
             width={180}
             height={180}
             className="object-contain"
@@ -67,22 +78,45 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
 
           {/* Product Title */}
-          <h3 className="text-lg text-[#0052b4] mb-2 hover:text-[#c7511f] transition-colors line-clamp-2">
+          <h3 className="text-lg text-[#0052b4] hover:text-[#c7511f] transition-colors line-clamp-2">
             {product.title}
           </h3>
 
-          {/* Rating */}
+          {/* Seller Name and SCS */}
           <div className="mb-2">
+            <p className="flex items-center gap-1">
+              <span>by</span>
+              <span>{product.seller.name}</span>
+              {product.seller.seller_credibility_score > 0.7 && <VerifiedSellerBadge />}
+            </p>
+          </div>
+
+          {/* Rating */}
+          <div className="">
             <StarRating rating={product.rating} count={product.reviewCount} />
+          </div>
+
+          {/* PIS Score */}
+          <div>
+            <p
+              style={{
+                color: `rgb(${Math.round(
+                  255 * (1 - product.pis)
+                )}, ${Math.round(180 * product.pis)}, 80)`,
+                fontWeight: 500,
+              }}
+            >
+              Product Integrity Score (PIS) : {product.pis}
+            </p>
           </div>
 
           {/* Price Section */}
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="text-2xl font-bold text-[#b12704]">
               {product.currency}
-              {formatPrice(product.currentPrice)}
+              {formatPrice(product.price)}
             </span>
-            {product.originalPrice && (
+            {/* {product.originalPrice && (
               <>
                 <span className="text-sm text-[#565959] line-through">
                   {product.currency}
@@ -95,7 +129,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   </span>
                 )}
               </>
-            )}
+            )} */}
           </div>
 
           {/* Delivery Information */}
