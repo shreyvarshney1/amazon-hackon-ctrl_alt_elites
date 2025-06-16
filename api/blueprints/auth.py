@@ -21,7 +21,6 @@ def login():
             return jsonify({"message": "Email is required"}), 400
         if not username:
             username = email.split('@')[0]
-        
         user = db.session.query(User).filter_by(username=username).first()
         if not user:
             user = User(username=username, email=email)
@@ -29,7 +28,7 @@ def login():
             db.session.commit()
 
         token = jwt.encode(
-            {'user_id': user.id}, 
+            {'user_id': user.id},
             JWT_SECRET,
             algorithm='HS256'
         )

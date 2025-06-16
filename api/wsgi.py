@@ -1,3 +1,3 @@
-from index import create_app
+from .index import create_app
 
-app = create_app()
+app, _ = create_app()
