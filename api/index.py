@@ -25,11 +25,11 @@ def create_app():
     for bp in bps:
         api.register_blueprint(bp)
 
-    return app
+    return app, migrate
 
 
 if __name__ == '__main__':
-    app = create_app()
+    app, _ = create_app()
     with app.app_context():
         db.create_all()
     app.run(debug=True)
