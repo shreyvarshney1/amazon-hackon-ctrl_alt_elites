@@ -78,6 +78,47 @@ def calculate_pis_score(product_id: int):
     
     print(f"PIS score for product {product_id} calculated as: {final_pis:.2f}")
     return final_pis
+    """
+    Microservice 2: Product Integrity Score (PIS)
+    Calculates a score based on the product listing itself.
+    """
+    data = request.json
+    
+    # --- P1: Content Originality (Weight: 30%) ---
+    # Here we just use the linguistic analyzer on the description
+    p1 = analyze_review_text(data['product_description'])
+    
+    # --- P2: Price Point Deviation (Weight: 20%) ---
+    price_dev = abs(data['product_price'] - data['avg_category_price']) / data['avg_category_price']
+    p2 = 1 - min(1, price_dev) # Higher deviation is riskier
+
+    # --- P3: Image Authenticity (Weight: 10%) ---
+    p3 = check_image_authenticity(data['product_image_url'])
+
+    # --- P4: Aggregated Review Sentiment (Weight: 30%) ---
+    # `review_sentiments` is a list of sentiment polarities [-1, 1] from past reviews
+    # We calculate the ratio of positive to total reviews
+    positive_reviews = sum(1 for s in data['review_sentiments'] if s > 0.1)
+    p4 = positive_reviews / len(data['review_sentiments']) if data['review_sentiments'] else 0.5
+    
+    # --- P5: Return Reason Analysis (Weight: 10%) ---
+    # `integrity_return_rate` is the % of returns for reasons like "fake", "not as described"
+    p5 = 1 - min(1, data['integrity_return_rate'])
+    
+    # --- Final PIS Score Calculation ---
+    w1, w2, w3, w4, w5 = 0.30, 0.20, 0.10, 0.30, 0.10
+    pis_score = (w1 * p1) + (w2 * p2) + (w3 * p3) + (w4 * p4) + (w5 * p5)
+    
+    return jsonify({
+        "pis_score": round(pis_score, 4),
+        "details": {
+            "p1_content_originality": round(p1, 2),
+            "p2_price_deviation": round(p2, 2),
+            "p3_image_authenticity": round(p3, 2),
+            "p4_review_sentiment": round(p4, 2),
+            "p5_return_analysis": round(p5, 2)
+        }
+    })
 
 def recalculate_pis_and_cascade_scs(product_id: int):
     """

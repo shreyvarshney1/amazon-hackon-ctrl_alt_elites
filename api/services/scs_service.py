@@ -91,3 +91,48 @@ def calculate_scs_score(seller_id: int):
     
     print(f"SCS score for seller {seller_id} updated to: {final_scs:.2f}")
     return final_scs
+    """
+    Microservice 3: Seller Credibility Score (SCS)
+    Calculates a score based on seller history and performance.
+    """
+    data = request.json
+    
+    # This endpoint relies on data from the other two microservices (PIS) and other metrics.
+    # We assume these are passed in the request.
+    
+    # --- P1: Order Fulfillment Rate (Weight: 25%) ---
+    p1 = (1 - data['cancellation_rate']) * data['on_time_shipping_rate']
+
+    # --- P2: Seller History & Velocity (Weight: 15%) ---
+    seller_tenure_days = data['seller_tenure_days']
+    # A score that rewards tenure but penalizes sudden sales spikes
+    tenure_score = min(1, seller_tenure_days / 365.0) 
+    velocity_stability = 1 - data['sales_spike_factor'] # 0=stable, 1=huge spike
+    p2 = (tenure_score * 0.7) + (velocity_stability * 0.3)
+    
+    # --- P3: Aggregated Seller-Specific Reviews (Weight: 30%) ---
+    # This would analyze reviews about the *seller* (e.g., "fast shipping," "rude service")
+    # For simplicity, we'll simulate this with a simple positive ratio.
+    p3 = data['positive_seller_review_ratio']
+    
+    # --- P4: Dispute & Chargeback Rate (Weight: 20%) ---
+    p4 = 1 - data['dispute_rate']
+    
+    # --- P5: Average Product Integrity (Weight: 10%) ---
+    # This is the critical link: the average PIS of all the seller's products
+    p5 = data['average_pis_of_products']
+    
+    # --- Final SCS Score Calculation ---
+    w1, w2, w3, w4, w5 = 0.25, 0.15, 0.30, 0.20, 0.10
+    scs_score = (w1 * p1) + (w2 * p2) + (w3 * p3) + (w4 * p4) + (w5 * p5)
+    
+    return jsonify({
+        "scs_score": round(scs_score, 4),
+        "details": {
+            "p1_fulfillment": round(p1, 2),
+            "p2_history_velocity": round(p2, 2),
+            "p3_seller_reviews": round(p3, 2),
+            "p4_dispute_rate": round(p4, 2),
+            "p5_avg_product_integrity": round(p5, 2)
+        }
+    })

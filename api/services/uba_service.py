@@ -71,3 +71,45 @@ def calculate_uba_score(user_id: int):
     
     print(f"UBA score for user {user_id} updated to: {final_uba:.2f}")
     return final_uba
+    """
+    Microservice 1: User Behavior & Anomaly Score (UBA)
+    Calculates a score based on user profile and behavior.
+    """
+    data = request.json
+    
+    # --- P1: Account Age & Completeness (Weight: 15%) ---
+    # `creation_date` should be in "YYYY-MM-DD" format
+    days_since_creation = (datetime.now() - datetime.strptime(data['creation_date'], "%Y-%m-%d")).days
+    p1 = 1 - (1 / (1 + days_since_creation * 0.1))
+
+    # --- P2: IP & Device Consistency (Weight: 20%) ---
+    # `unique_ips_last_30d` is the count of unique IPs
+    # We simulate risk from the current IP
+    ip_analysis = get_ip_info(data['current_ip'])
+    # Higher number of unique IPs is riskier. A proxy IP is very risky.
+    p2 = 1 - min(1, (data['unique_ips_last_30d'] / 10.0 + ip_analysis['proxy_risk'])) # Assuming >10 unique IPs is max risk
+
+    # --- P3: Review Velocity (Weight: 25%) ---
+    # `reviews_per_day` is the user's average
+    p3 = 1 - min(1, (data['reviews_per_day'] / 5.0)) # Assuming >5 reviews/day is max risk
+
+    # --- P4: Linguistic Authenticity (LLM) (Weight: 30%) ---
+    p4 = analyze_review_text(data['latest_review_text'])
+    
+    # --- P5: Purchase-Return Ratio (Weight: 10%) ---
+    p5 = 1 - min(1, data['return_rate']) # return_rate is a float 0.0 to 1.0
+    
+    # --- Final UBA Score Calculation ---
+    w1, w2, w3, w4, w5 = 0.15, 0.20, 0.25, 0.30, 0.10
+    uba_score = (w1 * p1) + (w2 * p2) + (w3 * p3) + (w4 * p4) + (w5 * p5)
+    
+    return jsonify({
+        "uba_score": round(uba_score, 4),
+        "details": {
+            "p1_account_age": round(p1, 2),
+            "p2_ip_consistency": round(p2, 2),
+            "p3_review_velocity": round(p3, 2),
+            "p4_linguistic_authenticity": round(p4, 2),
+            "p5_return_ratio": round(p5, 2)
+        }
+    })
