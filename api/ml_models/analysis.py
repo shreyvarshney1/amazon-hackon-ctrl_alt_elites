@@ -14,7 +14,8 @@ def get_ip_info(ip_address):
     """
     try:
         response = requests.get(
-            f"http://ip-api.com/json/{ip_address}?fields=status,proxy,query,country")
+            f"http://ip-api.com/json/{ip_address}?fields=status,proxy,query,country",
+            timeout=5)
         data = response.json()
         if data.get("status") == "success":
             # Penalize if it's a known proxy/VPN
@@ -65,7 +66,10 @@ def check_image_authenticity(image_url):
         image = vision.Image()
         image.source.image_uri = image_url
 
-        response = client.web_detection(image=image)
+        response = client.annotate_image({
+            'image': image,
+            'features': [{'type': vision.Feature.Type.WEB_DETECTION}]
+        })
         annotations = response.web_detection
 
         if annotations.pages_with_matching_images:
