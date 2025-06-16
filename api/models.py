@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
-from sqlalchemy.dialects.postgresql import JSONB, ARRAY
+from sqlalchemy import text
+from sqlalchemy.dialects.postgresql import ARRAY
 
 db = SQLAlchemy()
 
@@ -15,7 +15,7 @@ class User(db.Model):
     created_at = db.Column(
         db.DateTime(
             timezone=True),
-        server_default=func.now())
+        server_default=text('now()'))
 
     # UBA Score - The core output of Microservice 1
     uba_score = db.Column(db.Float, nullable=True, default=1.0)
@@ -35,7 +35,7 @@ class Seller(db.Model):
     created_at = db.Column(
         db.DateTime(
             timezone=True),
-        server_default=func.now())
+        server_default=text('now()'))
 
     # SCS Score - The core output of Microservice 3
     scs_score = db.Column(db.Float, nullable=True, default=1.0)
@@ -59,7 +59,7 @@ class Product(db.Model):
     listed_at = db.Column(
         db.DateTime(
             timezone=True),
-        server_default=func.now())
+        server_default=text('now()'))
 
     # PIS Score - The core output of Microservice 2
     pis_score = db.Column(db.Float, nullable=True, default=1.0)
@@ -83,7 +83,7 @@ class Review(db.Model):
     created_at = db.Column(
         db.DateTime(
             timezone=True),
-        server_default=func.now())
+        server_default=text('now()'))
     is_verified_purchase = db.Column(db.Boolean, default=False)
 
     # From LLM analysis (Parameter P4 of UBA)
@@ -97,7 +97,7 @@ class Order(db.Model):
     created_at = db.Column(
         db.DateTime(
             timezone=True),
-        server_default=func.now())
+        server_default=text('now()'))
     # e.g., pending, shipped, delivered, cancelled
     status = db.Column(db.String(50), default='pending')
 
@@ -138,7 +138,7 @@ class Return(db.Model):
     created_at = db.Column(
         db.DateTime(
             timezone=True),
-        server_default=func.now())
+        server_default=text('now()'))
 
 
 class UserSessionLog(db.Model):
@@ -150,4 +150,4 @@ class UserSessionLog(db.Model):
     timestamp = db.Column(
         db.DateTime(
             timezone=True),
-        server_default=func.now())
+        server_default=text('now()'))
