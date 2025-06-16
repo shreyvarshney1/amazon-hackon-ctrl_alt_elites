@@ -2,9 +2,6 @@
 
 ### A Submission for `< HackOn > with Amazon 5.0` by Team `Ctrl + Alt + Elites`
 
-
-*(This is the title slide from your presentation. You should add it to your repo and link it here.)*
-
 ## 🚀 Elevator Pitch
 
 Our project is an **AI-Powered Trust & Safety Platform** designed to proactively enhance marketplace trust on Amazon. By leveraging a suite of intelligent microservices, we detect fraud, prevent the sale of counterfeit goods, and verify the authenticity of reviews in real-time. Our goal is to create a safer, more reliable ecosystem for millions of customers and sellers.
