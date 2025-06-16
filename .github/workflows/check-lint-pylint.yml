@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   run-linters:
-    name: Run linters and check build
+    name: Run pylint
     runs-on: ubuntu-latest
 
     steps:
@@ -36,4 +36,4 @@ jobs:
 
       - name: Run linters
         run: |
-          pylint .\api\*
+          pylint ./api/*
