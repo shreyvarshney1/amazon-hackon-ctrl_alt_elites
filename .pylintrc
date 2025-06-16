@@ -20,7 +20,7 @@ fail-under=10
 
 #from-stdin=
 
-ignore=CVS
+ignore=CVS,.venv,api/tests,migrations
 
 ignore-paths=
 
