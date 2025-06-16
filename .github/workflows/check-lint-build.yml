@@ -1,0 +1,41 @@
+name: Lint & Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+permissions:
+  checks: write
+  contents: write
+
+jobs:
+  run-linters:
+    name: Run linters and check build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 20
+
+      - name: Install Node.js dependencies
+        run: npm i --force
+
+      - name: Run linters
+        run: npm run lint
+
+      - name: Run build
+        run: npm run build
+
+        
