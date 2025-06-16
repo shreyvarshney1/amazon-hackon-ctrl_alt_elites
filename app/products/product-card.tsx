@@ -31,7 +31,7 @@ const StarRating = ({ rating, count }: { rating: number; count: string }) => {
   );
 };
 
-const VerifiedSellerBadge = () => {
+export const VerifiedSellerBadge = () => {
   return (
     <div className="flex items-center gap-1">
       <span>

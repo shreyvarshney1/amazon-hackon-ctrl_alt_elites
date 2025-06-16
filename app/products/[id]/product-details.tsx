@@ -2,7 +2,7 @@
 import { Product } from "@/types/product";
 
 import { useState } from "react";
-import { MapPin, Star, Share } from "lucide-react";
+import { Star, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input"
 import {
@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
+import { VerifiedSellerBadge } from "../product-card";
 
 interface ProductDetailProps {
   product: Product;
@@ -74,7 +75,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
         <div className="relative">
           <div className="w-[500px] h-[500px] border border-[#dddddd] rounded bg-white flex items-center justify-center">
             <Image
-              src={product.imageUrl}
+              src={product.imageUrls[0]}
               alt="Zemic UV Umbrella"
               width={450}
               height={450}
@@ -87,35 +88,40 @@ export default function ProductDetails({ product }: ProductDetailProps) {
 
       {/* Product Details */}
       <div className="flex-1 max-w-md">
-        <div className="text-[#0052b4] text-sm mb-2 hover:text-[#ff9900] cursor-pointer">
-          Visit the Zemic Store
+        <div className="text-[#0052b4] flex gap-2  text-sm mb-2 hover:text-[#ff9900] cursor-pointer">
+          <p> by {product.seller.name} </p>
+          {product.seller.seller_credibility_score > 0.7 && (
+            <VerifiedSellerBadge />
+          )}
         </div>
 
         <h1 className="text-2xl font-normal mb-3 leading-tight">
-          Zemic UV Umbrella with Novelty Carabiner Handle, Travel Umbrellas for
-          Rain and Sun Windproof Compact, Automatic Open Close, 8 Ribs, Portable
-          Umbrella for Men and Women
+          {product.title}
         </h1>
 
         <div className="flex items-center gap-2 mb-2">
-          <StarRating rating={4} count="790" />
-          <span className="text-[#0052b4] text-sm hover:text-[#ff9900] cursor-pointer">
+          <StarRating rating={product.rating} count={product.reviewCount} />
+          {/* <span className="text-[#0052b4] text-sm hover:text-[#ff9900] cursor-pointer">
             Search this page
-          </span>
+          </span> */}
         </div>
 
-        <div className="text-sm text-[#565959] mb-4">
+        {/* <div className="text-sm text-[#565959] mb-4">
           500+ bought in past month
-        </div>
+        </div> */}
 
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[#b12704] text-lg">-75%</span>
-            <span className="text-3xl font-normal">₹635</span>
+            <span className="text-[#b12704] text-lg">
+              {-(product.discount ?? 0)}
+            </span>
+            <span className="text-3xl font-normal">
+              {product.currency + " " + product.price}
+            </span>
           </div>
-          <div className="text-sm text-[#565959]">
+          {/* <div className="text-sm text-[#565959]">
             M.R.P.: <span className="line-through">₹2,500</span>
-          </div>
+          </div> */}
         </div>
 
         <div className="bg-[#232f3f] text-white px-2 py-1 text-xs inline-block rounded mb-2">
@@ -159,7 +165,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
       {/* Purchase Options */}
       <div className="w-80 border border-[#dddddd] rounded p-4 h-fit">
         <div className="text-3xl font-normal mb-2">
-          ₹635<sup>00</sup>
+          {product.currency + " " + product.price }<sup>00</sup>
         </div>
 
         <div className="bg-[#232f3f] text-white px-2 py-1 text-xs inline-block rounded mb-2">
@@ -168,16 +174,16 @@ export default function ProductDetails({ product }: ProductDetailProps) {
 
         <div className="text-sm mb-2">
           <span className="text-[#0052b4] font-bold">FREE delivery</span>{" "}
-          Monday, 23 June.
-          <span className="text-[#0052b4] underline cursor-pointer">
+          {product.deliveryDate}.
+          {/* <span className="text-[#0052b4] underline cursor-pointer">
             Details
-          </span>
+          </span> */}
         </div>
 
-        <div className="flex items-center gap-1 text-sm mb-4">
+        {/* <div className="flex items-center gap-1 text-sm mb-4">
           <MapPin className="w-4 h-4" />
           <span>Deliver to Athary - Kothri 466114</span>
-        </div>
+        </div> */}
 
         <div className="text-green-700 font-bold text-lg mb-2">In stock</div>
 
@@ -202,6 +208,20 @@ export default function ProductDetails({ product }: ProductDetailProps) {
 
         <Button className="w-full bg-[#ff9900] hover:bg-[#f0a742] text-black font-bold py-2 mb-2">
           Add to Cart
+        </Button>
+
+        <Button
+          className="w-full text-black font-bold py-2 mb-2"
+          style={{
+            backgroundColor: `rgb(${Math.round(
+              255 * (1 - product.pis)
+            )}, ${Math.round(180 * product.pis)}, 80)`,
+            fontWeight: 500,
+          }}
+        >
+          <p>
+            PIS : {product.pis}
+          </p>
         </Button>
 
         <Button className="w-full bg-[#ff9900] hover:bg-[#f0a742] text-black font-bold py-2 mb-4">

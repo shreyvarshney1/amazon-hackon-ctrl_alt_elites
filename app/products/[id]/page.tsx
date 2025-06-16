@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { mockProducts } from "@/lib/mockData"
 import ProductDetails from "./product-details"
 import { use } from "react"
+import { getProductById } from "@/lib/api/product"
 // import Image from "next/image"
 
 interface ProductPageProps {
@@ -18,6 +19,9 @@ export default function ProductDetailPage({params} : ProductPageProps) {
   const resolvedParams = use(params);
 
   const product = mockProducts.find(product => product.id == resolvedParams.id);
+
+  // API Integration : /api/product/:id
+  // const product = getProductById(resolvedParams.id);
 
   return (
     <div className="min-h-screen bg-white">
@@ -143,8 +147,6 @@ export default function ProductDetailPage({params} : ProductPageProps) {
       </div> */}
 
         <ProductDetails product={product}/>
-
-
     </div>
   )
 }
