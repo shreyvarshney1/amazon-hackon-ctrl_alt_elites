@@ -51,7 +51,12 @@ def calculate_uba_score(user_id: int) -> Optional[float]:
     )
     unique_ips = [row.ip_address for row in unique_ips_query]
     if unique_ips:
-        proxy_risks = [get_ip_info(ip)["proxy_risk"] for ip in unique_ips]
+        ip_info_cache = {}  # Cache for storing IP info results
+        proxy_risks = []
+        for ip in unique_ips:
+            if ip not in ip_info_cache:
+                ip_info_cache[ip] = get_ip_info(ip)  # Fetch and cache result
+            proxy_risks.append(ip_info_cache[ip]["proxy_risk"])
         avg_proxy_risk = sum(proxy_risks) / len(proxy_risks) if proxy_risks else 0
         ip_churn_risk = min(
             1.0, len(unique_ips) / 10.0
