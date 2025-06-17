@@ -57,7 +57,7 @@ export default function Home() {
             <div className="text-xs text-gray-600 mb-2">
               <span className="font-bold">New to Amazon?</span>
             </div>
-            <Link href="./signup">
+            <Link href="/signup">
               <Button variant="outline" className="w-full h-8 border-gray-400 font-normal">
                 Create your Amazon account
               </Button>
