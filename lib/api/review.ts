@@ -3,8 +3,8 @@ import { Review } from "@/types/review";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 // Function to fetch all the reviews
-export async function getReviews(): Promise<Review[]> {
-    const response = await fetch(`${API_BASE_URL}/reviews`);
+export async function getReviews(productId : string): Promise<Review[]> {
+    const response = await fetch(`${API_BASE_URL}/reviews/${productId}`);
 
     if (!response.ok) {
         throw new Error("Failed to fetch reviews");
