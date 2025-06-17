@@ -116,5 +116,5 @@ def calculate_uba_score(user_id: int) -> Optional[float]:
     user.uba_score = final_uba
     user.last_uba_update = datetime.utcnow()
     # Let the calling function handle the commit
-    print(f"UBA score for user {user_id} updated to: {final_uba:.2f}")
+    logging.info(f"UBA score for user {user_id} updated to: {final_uba:.2f}")
     return final_uba
