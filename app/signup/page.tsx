@@ -95,7 +95,7 @@ export default function AmazonSignupPage() {
           <div className="pt-4 border-t border-gray-300">
             <div className="text-xs text-gray-600 mb-2">
               Already have an account?{" "}
-              <Link href="/" className="text-blue-600 hover:text-orange-600 hover:underline">
+              <Link href="/login" className="text-blue-600 hover:text-orange-600 hover:underline">
                 Sign in
               </Link>
             </div>
