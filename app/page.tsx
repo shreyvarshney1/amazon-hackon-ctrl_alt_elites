@@ -3,8 +3,13 @@
 export default function Home() {
   return (
     <div>
-      ooh la la la la lei ooh <br/>
-      ooh la la la la mu mei lo 
-    </div>
+      <h1>Welcome to Our Website!</h1>
+      <p>Explore the site using the links below:</p>
+      <ul>
+        <li><a href="/about">About Us</a></li>
+       <li><a href="/contact">Contact</a></li>
+       <li><a href="/services">Our Services</a></li>
+     </ul>
+   </div>
   );
 }
