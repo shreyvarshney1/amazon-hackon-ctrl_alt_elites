@@ -153,7 +153,11 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
         <span className="hover:text-[#ff9900] cursor-pointer">Folding Umbrellas</span>
       </div> */}
 
-      <ProductDetails product={product} />
+      {product ? (
+        <ProductDetails product={product} />
+      ) : (
+        <div className="p-8 text-center text-red-600">Product not found.</div>
+      )}
     </div>
   );
 }
