@@ -10,17 +10,17 @@ from api.models import db, Product, Review, Return, OrderItem
 from api.ml_integration import (
     analyze_content_originality,
     analyze_image_authenticity,
-    analyze_aggregated_reviews
+    analyze_aggregated_reviews,
 )
 from api.services import scs_service
 
 # Weights from the presentation slide
 WEIGHTS = {
-    'p1_content_originality': 0.30,
-    'p2_price_deviation': 0.20,
-    'p3_image_authenticity': 0.10,
-    'p4_review_sentiment': 0.30,
-    'p5_return_analysis': 0.10,
+    "p1_content_originality": 0.30,
+    "p2_price_deviation": 0.20,
+    "p3_image_authenticity": 0.10,
+    "p4_review_sentiment": 0.30,
+    "p5_return_analysis": 0.10,
 }
 
 
@@ -35,8 +35,12 @@ def _calculate_pis_score(product_id: int) -> Optional[float]:
     p1_score = analyze_content_originality(product.description)
 
     # P2: Price Point Deviation
-    avg_category_price = db.session.query(func.avg(Product.price))\
-        .filter(Product.category == product.category, Product.id != product.id).scalar() or 0
+    avg_category_price = (
+        db.session.query(func.avg(Product.price))
+        .filter(Product.category == product.category, Product.id != product.id)
+        .scalar()
+        or 0
+    )
     if avg_category_price > 0:
         deviation = abs(product.price - avg_category_price) / avg_category_price
         p2_score = 1 - min(deviation, 1.0)  # Cap deviation at 100%
@@ -50,22 +54,28 @@ def _calculate_pis_score(product_id: int) -> Optional[float]:
     reviews = Review.query.filter_by(product_id=product_id).all()
     if reviews:
         themes = analyze_aggregated_reviews(reviews)
-        total_themes = themes['Positive_Themes'] + themes['Negative_Themes']
-        p4_score = themes['Positive_Themes'] / total_themes if total_themes > 0 else 0.5
+        total_themes = themes["Positive_Themes"] + themes["Negative_Themes"]
+        p4_score = themes["Positive_Themes"] / total_themes if total_themes > 0 else 0.5
     else:
         p4_score = 0.7  # Neutral score for new products with no reviews
 
     # P5: Return Reason Analysis
     # REFACTORED: Use .count() on the query object.
-    items_sold_count = db.session.query(OrderItem.id)\
-        .filter(OrderItem.product_id == product_id).count()
+    items_sold_count = (
+        db.session.query(OrderItem.id)
+        .filter(OrderItem.product_id == product_id)
+        .count()
+    )
     if items_sold_count > 0:
-        integrity_reasons = ['counterfeit', 'not_as_described', 'damaged', 'fake']
+        integrity_reasons = ["counterfeit", "not_as_described", "damaged", "fake"]
         # REFACTORED: Use .count() on the query object.
-        integrity_return_count = db.session.query(Return.id)\
-            .join(OrderItem, Return.order_item_id == OrderItem.id)\
-            .filter(OrderItem.product_id == product_id)\
-            .filter(Return.reason_category.in_(integrity_reasons)).count()
+        integrity_return_count = (
+            db.session.query(Return.id)
+            .join(OrderItem, Return.order_item_id == OrderItem.id)
+            .filter(OrderItem.product_id == product_id)
+            .filter(Return.reason_category.in_(integrity_reasons))
+            .count()
+        )
         rate_of_integrity_returns = integrity_return_count / items_sold_count
         p5_score = 1 - min(rate_of_integrity_returns, 1.0)
     else:
@@ -73,11 +83,11 @@ def _calculate_pis_score(product_id: int) -> Optional[float]:
 
     # Final Weighted PIS Score
     final_pis = (
-        p1_score * WEIGHTS['p1_content_originality'] +
-        p2_score * WEIGHTS['p2_price_deviation'] +
-        p3_score * WEIGHTS['p3_image_authenticity'] +
-        p4_score * WEIGHTS['p4_review_sentiment'] +
-        p5_score * WEIGHTS['p5_return_analysis']
+        p1_score * WEIGHTS["p1_content_originality"]
+        + p2_score * WEIGHTS["p2_price_deviation"]
+        + p3_score * WEIGHTS["p3_image_authenticity"]
+        + p4_score * WEIGHTS["p4_review_sentiment"]
+        + p5_score * WEIGHTS["p5_return_analysis"]
     )
 
     product.pis_score = final_pis
@@ -105,4 +115,3 @@ def recalculate_pis_and_cascade_scs(product_id: int):
     # Commit all changes (PIS and SCS) together to ensure atomicity
     db.session.commit()
     print(f"--- Event Cascade Complete for Product {product_id} ---")
-    

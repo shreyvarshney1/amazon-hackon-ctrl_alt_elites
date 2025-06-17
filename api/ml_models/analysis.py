@@ -2,6 +2,7 @@
 Utility functions for low-level data analysis, such as IP lookups and
 linguistic analysis.
 """
+
 import requests
 from textblob import TextBlob
 from google.cloud import vision
@@ -24,7 +25,7 @@ def get_ip_info(ip_address: str) -> dict:
     try:
         response = requests.get(
             f"http://ip-api.com/json/{ip_address}?fields=status,proxy,query,country",
-            timeout=5
+            timeout=5,
         )
         response.raise_for_status()
         data = response.json()
@@ -64,7 +65,9 @@ def analyze_review_text(text: str) -> float:
     sentiment_score = abs(blob.sentiment.polarity)
 
     # A good review is subjective and not overly spammy.
-    final_score = (subjectivity_score * 0.7 + (1 - sentiment_score) * 0.3) - spam_penalty
+    final_score = (
+        subjectivity_score * 0.7 + (1 - sentiment_score) * 0.3
+    ) - spam_penalty
     return max(0, min(1, final_score))  # Clamp score between 0 and 1
 
 
@@ -85,10 +88,12 @@ def check_image_authenticity(image_url: str) -> float:
         image = vision.Image()
         image.source.image_uri = image_url
 
-        response = client.annotate_image({
-            'image': image,
-            'features': [{'type': vision.Feature.Type.WEB_DETECTION}],
-        })
+        response = client.annotate_image(
+            {
+                "image": image,
+                "features": [{"type": vision.Feature.Type.WEB_DETECTION}],
+            }
+        )
         annotations = response.web_detection
 
         if annotations.pages_with_matching_images:
@@ -99,7 +104,10 @@ def check_image_authenticity(image_url: str) -> float:
         # Check for stock photo keywords in descriptions
         for entity in annotations.web_entities:
             stock_words = ["stock", "royalty-free", "illustration", "vector"]
-            if any(stock_word in (entity.description or "").lower() for stock_word in stock_words):
+            if any(
+                stock_word in (entity.description or "").lower()
+                for stock_word in stock_words
+            ):
                 return 0.2  # High confidence it's a stock photo
 
         return 0.9  # Seems relatively unique

@@ -6,6 +6,7 @@ application logic to function without requiring live model endpoints. In a
 production environment, these functions would make API calls to services like
 Amazon SageMaker.
 """
+
 import random
 from typing import List, Dict
 
