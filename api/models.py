@@ -20,9 +20,9 @@ class User(db.Model):
     profile_completeness_score = db.Column(db.Float, default=0.5)
     last_uba_update = db.Column(db.DateTime(timezone=True))
 
-    reviews = db.relationship("Review", backref="author", lazy=True)
-    orders = db.relationship("Order", backref="customer", lazy=True)
-    sessions = db.relationship("UserSessionLog", backref="user", lazy=True)
+    reviews = db.relationship("Review", back_populates="author", lazy=True)
+    orders = db.relationship("Order", back_populates="customer", lazy=True)
+    sessions = db.relationship("UserSessionLog", back_populates="user", lazy=True)
 
 
 class Seller(db.Model):
@@ -52,7 +52,7 @@ class Product(db.Model):
     last_pis_update = db.Column(db.DateTime(timezone=True))
 
     seller = db.relationship("Seller", back_populates="products")
-    reviews = db.relationship("Review", backref="product", lazy=True)
+    reviews = db.relationship("Review", back_populates="product", lazy=True)
 
 
 # --- Event & Data Logging Entities ---
@@ -83,7 +83,7 @@ class Order(db.Model):
     # For Seller's Order Fulfillment Rate (Parameter P1 of SCS)
     shipped_on_time = db.Column(db.Boolean, nullable=True)
 
-    items = db.relationship("OrderItem", backref="order", lazy=True)
+    items = db.relationship("OrderItem", back_populates="order", lazy=True)
 
 
 class OrderItem(db.Model):
