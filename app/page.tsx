@@ -4,7 +4,7 @@ import { Label } from "./components/ui/label"
 import { Card, CardContent, CardHeader } from "./components/ui/card"
 import Link from "next/link"
 
-export default function AmazonLoginPage() {
+export default function Home() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
       {/* Amazon Logo */}
