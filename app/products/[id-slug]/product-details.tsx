@@ -51,7 +51,8 @@ export default function ProductDetails({ product }: ProductDetailProps) {
   );
 
   // API Integration
-  const [reviews, setReviews] = useState<Review[]>(mockReviews);
+
+  const [reviews, setReviews] = useState<Review[]>(mockReviews.filter(review => review.productId === product.id));
 
   const handleNewReview = async (newReview: Omit<Review, "id" | "author">) => {
     const author: ReviewAuthor = {
@@ -71,8 +72,8 @@ export default function ProductDetails({ product }: ProductDetailProps) {
 
   // Fetch reviews asynchronously
   useEffect(() => {
-    getReviews().then((reviews) => setReviews(reviews));
-  }, []);
+    getReviews(product.id).then((reviews) => setReviews(reviews));
+  });
 
   return (
     <div className="flex flex-col gap-8">
