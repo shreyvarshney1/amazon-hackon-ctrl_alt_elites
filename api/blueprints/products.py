@@ -22,7 +22,7 @@ def get_products():
                     "price": product.price,
                     "category": product.category,
                     "image_urls": product.image_urls,
-                    "listed_at": product.listed_at,
+                    "listed_at": product.listed_at.isoformat(),
                     "pis_score": product.pis_score,
                     "last_pis_update": product.last_pis_update,
                     "seller": {
