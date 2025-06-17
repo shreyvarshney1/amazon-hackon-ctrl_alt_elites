@@ -40,7 +40,7 @@ export default function AmazonLoginPage() {
           </form>
 
           <div className="text-xs text-gray-600 leading-4">
-            By continuing, you agree to Amazon's{" "}
+            By continuing, you agree to Amazon&#39;s{" "}
             <a href="#" className="text-blue-600 hover:text-orange-600 hover:underline">
               Conditions of Use
             </a>{" "}
