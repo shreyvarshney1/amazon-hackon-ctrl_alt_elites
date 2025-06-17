@@ -17,7 +17,7 @@ export async function getReviews(productId : string): Promise<Review[]> {
 // Function to post a review
 export async function postReview(review: Omit<Review, "id">): Promise<Review> {
 
-    const response = await fetch(`${API_BASE_URL}/api/event/review-posted`, {
+    const response = await fetch(`${API_BASE_URL}/event/review-posted`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
