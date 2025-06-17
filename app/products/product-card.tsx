@@ -84,11 +84,11 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Seller Name and SCS */}
           <div className="mb-2">
-            <p className="flex items-center gap-1">
+            <div className="flex items-center gap-1">
               <span>by</span>
               <span>{product.seller.name}</span>
               {product.seller.seller_credibility_score > 0.7 && <VerifiedSellerBadge />}
-            </p>
+            </div>
           </div>
 
           {/* Rating */}
