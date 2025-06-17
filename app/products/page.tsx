@@ -57,7 +57,7 @@ export default function AmazonSearchPage() {
   );
 
   // API Integration : /api/products
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>(mockProducts);
 
   useEffect(() => {
     getProducts().then((products) => setProducts(products));
@@ -286,13 +286,13 @@ export default function AmazonSearchPage() {
 
           {/* Product Listings */}
           <div className="space-y-4">
-            {mockProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-
-            {/* {products.map((product) => (
+            {/* {mockProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))} */}
+
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         </div>
       </main>

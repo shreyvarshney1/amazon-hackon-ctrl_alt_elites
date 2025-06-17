@@ -14,7 +14,7 @@ import {
 import { mockProducts } from "@/lib/mockData";
 import ProductDetails from "./product-details";
 import { use } from "react";
-import { getProductById } from "@/lib/api/product";
+// import { getProductById } from "@/lib/api/product";
 // import Image from "next/image"
 
 interface ProductPageProps {

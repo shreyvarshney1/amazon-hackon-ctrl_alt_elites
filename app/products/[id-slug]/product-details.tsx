@@ -16,7 +16,8 @@ import Image from "next/image";
 import { VerifiedSellerBadge } from "../product-card";
 import ReviewSection from "./review-section";
 import { Review, ReviewAuthor } from "@/types/review";
-import { getReviews, postReview } from "@/lib/api/review";
+import { getReviews } from "@/lib/api/review";
+// import { postReview } from "@/lib/api/review";
 import { mockReviews } from "@/lib/mockData";
 
 interface ProductDetailProps {
@@ -53,19 +54,19 @@ export default function ProductDetails({ product }: ProductDetailProps) {
   const [reviews, setReviews] = useState<Review[]>(mockReviews);
 
   const handleNewReview = async (newReview: Omit<Review, "id" | "author">) => {
-    const author : ReviewAuthor = {
-      id : "1",
-      username : "John" , 
-      has_trusted_badge : true
-    }
-    const modReview : Omit<Review, "id"> =  {author, ...newReview};
+    const author: ReviewAuthor = {
+      id: "1",
+      username: "John",
+      has_trusted_badge: true,
+    };
+    const modReview: Omit<Review, "id"> = { author, ...newReview };
     // const createdReview = await postReview(modReview);
 
     console.log("New review submitted:", newReview);
 
     // setReviews([createdReview, ...reviews]);
 
-    setReviews([{id : "69",  ...modReview}, ...reviews]);
+    setReviews([{ id: "69", ...modReview }, ...reviews]);
   };
 
   // Fetch reviews asynchronously
@@ -268,7 +269,6 @@ export default function ProductDetails({ product }: ProductDetailProps) {
         </div>
       </div>
 
-            
       {/* Reviews Section */}
       <div className="px-4 py-2">
         <ReviewSection
