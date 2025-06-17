@@ -24,7 +24,7 @@ def get_products():
                     "image_urls": product.image_urls,
                     "listed_at": product.listed_at.isoformat(),
                     "pis_score": product.pis_score,
-                    "last_pis_update": product.last_pis_update,
+                    "last_pis_update": product.last_pis_update.isoformat(),
                     "seller": {
                         "id": product.seller.id,
                         "name": product.seller.name,
