@@ -9,7 +9,9 @@ export default function Home() {
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
       {/* Amazon Logo */}
       <div className="mb-8">
-        <div className="text-3xl font-bold text-gray-900 tracking-tight">amazon</div>
+        <Link href="/">
+          <div className="text-3xl font-bold text-gray-900 tracking-tight">amazon</div>
+        </Link>
       </div>
 
       {/* Login Card */}
