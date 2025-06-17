@@ -1,46 +1,78 @@
+"""
+Mock integration layer for AI/ML models.
+
+This module simulates responses from LLM and CV models to allow the core
+application logic to function without requiring live model endpoints. In a
+production environment, these functions would make API calls to services like
+Amazon SageMaker.
+"""
 import random
+from typing import List, Dict
 
-# --- Stubs for LLM Analysis ---
+# Assuming a Review object has a 'review_text' attribute.
+# A proper implementation would use a defined class.
+from api.models import Review
 
-def analyze_linguistic_authenticity(review_text: str) -> float:
+
+def analyze_linguistic_authenticity(text: str) -> float:
     """
-    Simulates calling a SageMaker LLM endpoint to analyze review authenticity.
-    Checks for genericness, self-plagiarism patterns, extreme sentiment without substance.
-    Returns a score from 0 (inauthentic) to 1 (authentic).
+    Simulates an LLM analyzing text for authenticity.
+
+    Args:
+        text: The review text to analyze.
+
+    Returns:
+        A score from 0.0 (inauthentic) to 1.0 (authentic).
     """
-    print(f"ML STUB: Analyzing review authenticity for: '{review_text[:50]}...'")
-    # In reality: boto3.client('sagemaker-runtime').invoke_endpoint(...)
-    return random.uniform(0.3, 1.0)
+    if not text or len(text.split()) < 5:
+        return 0.1  # Penalize very short text
+    # Simulate a score, perhaps based on length for this stub
+    return min(1.0, 0.5 + len(text) / 500)
+
 
 def analyze_content_originality(description: str) -> float:
     """
-    Simulates calling a SageMaker LLM to check if a description is copied or spammy.
-    Returns a score from 0 (plagiarized/spam) to 1 (original/rich).
-    """
-    print(f"ML STUB: Analyzing content originality for: '{description[:50]}...'")
-    return random.uniform(0.4, 1.0)
+    Simulates an LLM checking for content originality and keyword stuffing.
 
-def analyze_aggregated_reviews(reviews: list) -> dict:
+    Args:
+        description: The product description text.
+
+    Returns:
+        A score from 0.0 (copied/spammy) to 1.0 (original/rich).
     """
-    Simulates an LLM analyzing a batch of reviews for specific themes.
+    if "100% genuine" in description.lower() or "limited time" in description.lower():
+        return random.uniform(0.2, 0.4)  # Penalize spammy keywords
+    return random.uniform(0.6, 0.95)
+
+
+def analyze_image_authenticity(image_urls: List[str]) -> float:
     """
-    print(f"ML STUB: Aggregating sentiment for {len(reviews)} reviews...")
-    positive_themes = sum(1 for r in reviews if "good" in r.review_text.lower() or "great" in r.review_text.lower())
-    negative_themes = sum(1 for r in reviews if any(word in r.review_text.lower() for word in ["fake", "counterfeit", "poor", "damaged"]))
-    
-    # Add some randomness to simulate LLM nuances
-    positive_themes += random.randint(0, 3)
-    negative_themes += random.randint(0, 2)
-    
+    Simulates a CV model checking if an image is a stock photo.
+
+    Args:
+        image_urls: A list of URLs for the product images.
+
+    Returns:
+        A score from 0.0 (likely stock) to 1.0 (likely original).
+    """
+    if not image_urls:
+        return 0.1
+    # In a real scenario, this would call a vision API. Here, we'll just
+    # return a random high score.
+    return random.uniform(0.7, 0.98)
+
+
+def analyze_aggregated_reviews(reviews: List[Review]) -> Dict[str, int]:
+    """
+    Simulates an LLM analyzing a batch of reviews for common themes.
+
+    Args:
+        reviews: A list of Review objects.
+
+    Returns:
+        A dictionary with counts of positive and negative themes.
+    """
+    # Simulate finding themes like "fake", "counterfeit", "good communication", etc.
+    positive_themes = sum(1 for r in reviews if r.rating > 3)
+    negative_themes = len(reviews) - positive_themes
     return {"Positive_Themes": positive_themes, "Negative_Themes": negative_themes}
-
-# --- Stub for CV Analysis ---
-
-def analyze_image_authenticity(image_urls: list) -> float:
-    """
-    Simulates a SageMaker CV/Vision-LLM endpoint to check for stock photos vs. original images.
-    Returns a score from 0 (stock/low-quality) to 1 (original/high-quality).
-    """
-    print(f"ML STUB: Analyzing image authenticity for {len(image_urls)} images...")
-    # In reality: Call a CV model endpoint
-    return random.uniform(0.2, 1.0)
