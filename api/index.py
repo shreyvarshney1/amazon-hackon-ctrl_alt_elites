@@ -11,16 +11,16 @@ load_dotenv()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', None)
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", None)
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
     migrate = Migrate(app, db)
 
-    app.config['API_TITLE'] = 'Core API'
-    app.config['API_VERSION'] = 'v1'
-    app.config['OPENAPI_VERSION'] = '3.0.2'
-    app.config['OPENAPI_URL_PREFIX'] = '/api'
+    app.config["API_TITLE"] = "Core API"
+    app.config["API_VERSION"] = "v1"
+    app.config["OPENAPI_VERSION"] = "3.0.2"
+    app.config["OPENAPI_URL_PREFIX"] = "/api"
     api = Api(app)
     for bp in bps:
         api.register_blueprint(bp)
@@ -28,7 +28,7 @@ def create_app():
     return app, migrate
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app, _ = create_app()
     with app.app_context():
         db.create_all()
