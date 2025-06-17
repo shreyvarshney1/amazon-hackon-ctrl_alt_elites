@@ -4,12 +4,15 @@ Service layer for calculating User Behavior & Anomaly (UBA) Score. (Robust Versi
 
 from datetime import datetime, timedelta
 from typing import Optional
+import logging
 from api.models import db, User, Review, UserSessionLog, Order, Return, OrderItem
 from api.ml_services.analysis_utils import (
     get_ip_info,
     validate_email_address,
     analyze_review_linguistics,
 )
+
+logging.basicConfig(level=logging.INFO)
 
 WEIGHTS = {
     "p1_age_completeness": 0.15,
@@ -115,6 +118,5 @@ def calculate_uba_score(user_id: int) -> Optional[float]:
 
     user.uba_score = final_uba
     user.last_uba_update = datetime.utcnow()
-    # Let the calling function handle the commit
-    logging.info(f"UBA score for user {user_id} updated to: {final_uba:.2f}")
+    logging.info("UBA score for user %d updated to: %.2f", user_id, final_uba)
     return final_uba

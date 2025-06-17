@@ -29,7 +29,11 @@ def get_products():
                         "id": product.seller.id,
                         "name": product.seller.name,
                         "scs_score": product.seller.scs_score,
-                        "last_scs_update": product.seller.last_scs_update.isoformat() if product.seller.last_scs_update else None,
+                        "last_scs_update": (
+                            product.seller.last_scs_update.isoformat()
+                            if product.seller.last_scs_update
+                            else None
+                        ),
                     },
                 }
                 for product in products
