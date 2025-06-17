@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   MapPin,
@@ -25,6 +25,7 @@ import {
 import ProductCard from "./product-card";
 import { mockProducts } from "@/lib/mockData";
 import { getProducts } from "@/lib/api/product";
+import { Product } from "@/types/product";
 
 export default function AmazonSearchPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -56,7 +57,11 @@ export default function AmazonSearchPage() {
   );
 
   // API Integration : /api/products
-  const products = getProducts();
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    getProducts().then((products) => setProducts(products));
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -284,7 +289,7 @@ export default function AmazonSearchPage() {
             {mockProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
-            
+
             {/* {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))} */}

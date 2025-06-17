@@ -1,7 +1,8 @@
 export interface Product {
     id: string;
+    slug: string;
     seller : {
-        id : number,
+        id : string,
         name : string,
         seller_credibility_score : number
     };

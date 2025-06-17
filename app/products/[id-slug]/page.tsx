@@ -1,27 +1,34 @@
-"use client"
+"use client";
 
 // import { useState } from "react"
-import { Search, MapPin, ShoppingCart, Menu, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { mockProducts } from "@/lib/mockData"
-import ProductDetails from "./product-details"
-import { use } from "react"
-import { getProductById } from "@/lib/api/product"
+import { Search, MapPin, ShoppingCart, Menu, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { mockProducts } from "@/lib/mockData";
+import ProductDetails from "./product-details";
+import { use } from "react";
+import { getProductById } from "@/lib/api/product";
 // import Image from "next/image"
 
 interface ProductPageProps {
-  params : Promise<{id:string}>;
+  params: Promise<{ "id-slug": string }>;
 }
 
-export default function ProductDetailPage({params} : ProductPageProps) {
+export default function ProductDetailPage({ params }: ProductPageProps) {
   const resolvedParams = use(params);
+  const id = resolvedParams["id-slug"].split("-")[0];
 
-  const product = mockProducts.find(product => product.id == resolvedParams.id);
+  const product = mockProducts.find((product) => product.id === id);
 
   // API Integration : /api/product/:id
-  // const product = getProductById(resolvedParams.id);
+  // const product = getProductById(id);
 
   return (
     <div className="min-h-screen bg-white">
@@ -146,7 +153,7 @@ export default function ProductDetailPage({params} : ProductPageProps) {
         <span className="hover:text-[#ff9900] cursor-pointer">Folding Umbrellas</span>
       </div> */}
 
-        <ProductDetails product={product}/>
+      <ProductDetails product={product} />
     </div>
-  )
+  );
 }

@@ -52,7 +52,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   //   : 0;
 
   return (
-    <Link href={`/products/${product.id}`} className="block">
+    <Link href={`/products/${product.id}-${product.slug}`} className="block">
       <Card className="flex flex-row gap-4 p-4 border border-[#dddddd] rounded hover:shadow-md transition-shadow duration-200">
         {/* Product Image */}
         <div className="w-48 h-48 bg-[#f0f0f0] rounded flex items-center justify-center">
