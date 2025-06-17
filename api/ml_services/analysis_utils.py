@@ -18,7 +18,7 @@ def get_ip_info(ip_address: str) -> dict:
     try:
         # This API is free and does not require an API key.
         response = requests.get(
-            f"http://ip-api.com/json/{ip_address}?fields=status,proxy,query", timeout=3
+            f"https://ip-api.com/json/{ip_address}?fields=status,proxy,query", timeout=3
         )
         response.raise_for_status()
         data = response.json()
