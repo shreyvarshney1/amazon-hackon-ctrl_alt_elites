@@ -73,7 +73,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
   // Fetch reviews asynchronously
   useEffect(() => {
     getReviews(product.id).then((reviews) => setReviews(reviews));
-  });
+  }, [product.id]);
 
   return (
     <div className="flex flex-col gap-8">
