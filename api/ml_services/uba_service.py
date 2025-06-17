@@ -38,11 +38,16 @@ def calculate_uba_score(user_id: int) -> Optional[float]:
 
     # --- P2: IP & Device Consistency (with Proxy Check) ---
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    recent_sessions = UserSessionLog.query.filter(
-        UserSessionLog.user_id == user_id, UserSessionLog.timestamp >= thirty_days_ago
-    ).all()
-    if recent_sessions:
-        unique_ips = {s.ip_address for s in recent_sessions}
+    unique_ips_query = (
+        UserSessionLog.query.filter(
+            UserSessionLog.user_id == user_id,
+            UserSessionLog.timestamp >= thirty_days_ago,
+        )
+        .distinct(UserSessionLog.ip_address)
+        .with_entities(UserSessionLog.ip_address)
+    )
+    unique_ips = [row.ip_address for row in unique_ips_query]
+    if unique_ips:
         proxy_risks = [get_ip_info(ip)["proxy_risk"] for ip in unique_ips]
         avg_proxy_risk = sum(proxy_risks) / len(proxy_risks) if proxy_risks else 0
         ip_churn_risk = min(
