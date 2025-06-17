@@ -59,7 +59,7 @@ def calculate_uba_score(user_id: int) -> Optional[float]:
 
     # P5: Purchase-Return Ratio
     order_count = Order.query.filter_by(user_id=user_id).count()
-    return_count = Return.query.join(OrderItem).join(Order).filter(Order.user_id == user_id).count()
+    return_count = Return.query.join(Order).filter(Order.user_id == user_id).count()
     if order_count > 5:  # Only calculate for users with a meaningful number of orders
         return_rate = return_count / order_count
         max_acceptable_return_rate = 0.50  # Configurable: 50% return rate is high
