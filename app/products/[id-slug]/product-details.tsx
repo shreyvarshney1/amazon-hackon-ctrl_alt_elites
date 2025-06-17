@@ -107,7 +107,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
           <div className="relative">
             <div className="w-[500px] h-[500px] border border-[#dddddd] rounded bg-white flex items-center justify-center">
               <Image
-                src={product.imageUrls[0]}
+                src={product.imageUrls[selectedImage]}
                 alt="Zemic UV Umbrella"
                 width={450}
                 height={450}
