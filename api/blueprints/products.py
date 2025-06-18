@@ -118,6 +118,7 @@ def add_review(user, product_id):
         data = request.json
         rating = data.get("rating")
         review_text = data.get("review_text", "")
+        title = data.get("title", "")
         is_verified_purchase = data.get("is_verified_purchase", False)
 
         if not rating or not 1 <= rating <= 5:
@@ -133,6 +134,7 @@ def add_review(user, product_id):
             rating=rating,
             review_text=review_text,
             is_verified_purchase=is_verified_purchase,
+            title=title,
         )
         db.session.add(review)
         db.session.commit()
