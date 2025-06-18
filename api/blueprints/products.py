@@ -97,7 +97,10 @@ def get_product(product_id):
 @product_bp.route("/<int:product_id>/reviews", methods=["GET"])
 def get_product_reviews(product_id):
     try:
-        product = db.session.query(Product).get(product_id)
+        product = db.session.query(Product).options(
+            joinedload(Product.reviews).joinedload(Review.user)
+        ).get(product_id)
+
         if not product:
             return {"error": "Product not found"}, 404
 
@@ -144,7 +147,30 @@ def add_review(user, product_id):
         db.session.add(review)
         db.session.commit()
 
-        return {"message": "Review added successfully"}, 201
+        # return {"message": "Review added successfully", "review" : review}, 201
+
+        # Refresh the object to ensure all auto-generated fields are loaded
+        db.session.refresh(review)
+        
+        # Manually construct the response to ensure created_at is properly serialized
+        review_response = {
+            "id": review.id,
+            "user_id": review.user_id,
+            "product_id": review.product_id,
+            "rating": review.rating,
+            "review_text": review.review_text,
+            "title": review.title,
+            "created_at": review.created_at.isoformat(),  # Explicitly convert to ISO format
+            "is_verified_purchase": review.is_verified_purchase,
+            "linguistic_authenticity_score": review.linguistic_authenticity_score,
+            "username": user.username,
+            "has_trusted_badge": (user.uba_score or 0) > 0.7
+        }
+
+        return {
+            "message": "Review added successfully", 
+            "review": review_response
+        }, 201
     except Exception as e:
         db.session.rollback()
         return {"error": str(e)}, 500
