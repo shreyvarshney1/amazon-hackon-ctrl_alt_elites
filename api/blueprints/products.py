@@ -1,17 +1,17 @@
 from flask_smorest import Blueprint
 from flask import request
 from sqlalchemy.inspection import inspect
+from sqlalchemy.orm import joinedload
+from flask_cors import CORS
 from api.models import db, Product, Review
 from .auth import check_auth
 from .seller import check_auth_seller
-from sqlalchemy.orm import joinedload
-from flask_cors import CORS
 
 BASE_ROUTE = "/api/products"
 product_bp = Blueprint("products", __name__, url_prefix=BASE_ROUTE)
 
-
-CORS(product_bp, resources={r"/*": {"origins": "*"}})  # Enable CORS for all routes in this blueprint
+# Enable CORS for all routes in this blueprint
+CORS(product_bp, resources={r"/*": {"origins": "*"}})
 
 @product_bp.route("/", methods=["GET"])
 def get_products():
@@ -151,7 +151,6 @@ def add_review(user, product_id):
 
         # Refresh the object to ensure all auto-generated fields are loaded
         db.session.refresh(review)
-        
         # Manually construct the response to ensure created_at is properly serialized
         review_response = {
             "id": review.id,
