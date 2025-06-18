@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "flask-dev": "python -m api.index",
-    "next-dev": "next dev --turbopack",
+    "next-dev": "next dev",
     "dev": "concurrently \"pnpm run next-dev\" \"pnpm run flask-dev\"",
     "build": "next build",
     "start": "next start",
