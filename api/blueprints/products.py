@@ -4,10 +4,13 @@ from sqlalchemy.inspection import inspect
 from api.models import db, Product, Review
 from .auth import check_auth
 from .seller import check_auth_seller
+from flask_cors import CORS
 
 BASE_ROUTE = "/api/products"
 product_bp = Blueprint("products", __name__, url_prefix=BASE_ROUTE)
 
+
+CORS(product_bp, resources={r"/*": {"origins": "*"}})  # Enable CORS for all routes in this blueprint
 
 @product_bp.route("/", methods=["GET"])
 def get_products():
