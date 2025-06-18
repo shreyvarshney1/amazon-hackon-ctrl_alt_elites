@@ -4,6 +4,7 @@ from sqlalchemy.inspection import inspect
 from api.models import db, Product, Review
 from .auth import check_auth
 from .seller import check_auth_seller
+from sqlalchemy.orm import joinedload
 from flask_cors import CORS
 
 BASE_ROUTE = "/api/products"
@@ -51,7 +52,12 @@ def get_products():
 @product_bp.route("/<int:product_id>", methods=["GET"])
 def get_product(product_id):
     try:
-        product = db.session.query(Product).get(product_id)
+        # product = db.session.query(Product).get(product_id)
+
+        product = db.session.query(Product).options(
+            joinedload(Product.reviews).joinedload(Review.user)
+        ).get(product_id)
+
         if not product:
             return {"error": "Product not found"}, 404
 
@@ -68,15 +74,14 @@ def get_product(product_id):
             "last_pis_update": (
                 product.last_pis_update.isoformat() if product.last_pis_update else None
             ),
-            "reviews": list(
-                map(
-                    lambda obj: {
-                        c.key: getattr(obj, c.key)
-                        for c in inspect(obj).mapper.column_attrs
-                    },
-                    product.reviews,
-                )
-            ),
+            "reviews": [
+                {
+                    **{c.key: getattr(review, c.key) for c in inspect(review).mapper.column_attrs},
+                    "username": review.user.username  ,
+                    "has_trusted_badge": (review.user.uba_score or 0) > 0.7,
+                }
+                for review in product.reviews
+            ],
             "seller": {
                 "id": product.seller.id,
                 "name": product.seller.name,
@@ -96,14 +101,14 @@ def get_product_reviews(product_id):
         if not product:
             return {"error": "Product not found"}, 404
 
-        reviews = list(
-            map(
-                lambda obj: {
-                    c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs
-                },
-                product.reviews,
-            )
-        )
+        reviews = [
+            {
+                **{c.key: getattr(review, c.key) for c in inspect(review).mapper.column_attrs},
+                "username": review.user.username,
+                "has_trusted_badge": (review.user.uba_score or 0) > 0.7  # Add this line
+            }
+            for review in product.reviews
+        ]
 
         return {"reviews": reviews}, 200
     except Exception as e:
