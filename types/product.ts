@@ -1,3 +1,5 @@
+import { Review } from "./review";
+
 export interface Product {
     id: string;
     slug: string;
@@ -16,6 +18,7 @@ export interface Product {
     listed_at: string;
     last_pis_update: string;
     // Remove fields not returned by API or make them optional
+    reviews?: Review[];
     rating?: number;
     reviewCount?: string;
     deliveryDate?: string;
