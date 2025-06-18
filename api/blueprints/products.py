@@ -17,6 +17,7 @@ def get_products():
             "products": [
                 {
                     "id": product.id,
+                    "slug": product.slug,
                     "name": product.name,
                     "description": product.description,
                     "price": product.price,
@@ -53,6 +54,7 @@ def get_product(product_id):
 
         return {
             "id": product.id,
+            "slug": product.slug,
             "name": product.name,
             "description": product.description,
             "price": product.price,
@@ -144,6 +146,7 @@ def add_product(seller):
     try:
         data = request.json
         name = data.get("name")
+        slug = data.get("slug")
         description = data.get("description")
         price = data.get("price")
         category = data.get("category")
@@ -154,6 +157,7 @@ def add_product(seller):
 
         product = Product(
             seller_id=seller.id,
+            slug=slug,
             name=name,
             description=description,
             price=price,
@@ -180,6 +184,8 @@ def update_product(seller, product_id):
 
         if "name" in data:
             product.name = data["name"]
+        if "slug" in data:
+            product.slug = data["slug"]
         if "description" in data:
             product.description = data["description"]
         if "price" in data:
