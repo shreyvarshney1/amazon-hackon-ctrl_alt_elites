@@ -23,7 +23,7 @@ import {
 // import Image from "next/image";
 
 import ProductCard from "./product-card";
-import { mockProducts } from "@/lib/mockData";
+// import { mockProducts } from "@/lib/mockData";
 import { getProducts } from "@/lib/api/product";
 import { Product } from "@/types/product";
 
@@ -57,10 +57,15 @@ export default function AmazonSearchPage() {
   );
 
   // API Integration : /api/products
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    getProducts().then((products) => setProducts(products));
+    getProducts()
+      .then((products) => {
+        setProducts(products)
+        // console.log(products);
+      })
+      .catch((error) => console.error("Failed to fetch all products. " + error.message));
   }, []);
 
   return (
