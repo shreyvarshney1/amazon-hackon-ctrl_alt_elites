@@ -11,9 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockProducts } from "@/lib/mockData";
+// import { mockProducts } from "@/lib/mockData";
 import ProductDetails from "./product-details";
-import { use } from "react";
+import { use, useEffect, useState } from "react";
+import { getProductById } from "@/lib/api/product";
+import { Product } from "@/types/product";
 // import { getProductById } from "@/lib/api/product";
 // import Image from "next/image"
 
@@ -25,10 +27,18 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   const resolvedParams = use(params);
   const id = resolvedParams["id-slug"].split("-")[0];
 
-  const product = mockProducts.find((product) => product.id === id);
+  // const product = mockProducts.find((product) => product.id === id);
 
   // API Integration : /api/product/:id
-  // const product = getProductById(id);
+  const [product, setProduct] = useState<Product>();
+
+  useEffect(() => {
+    getProductById(id)
+      .then((product) => setProduct(product))
+      .catch((error) =>
+        console.error("Failed to fetch product." + error.message)
+      );
+  }, [id]);
 
   return (
     <div className="min-h-screen bg-white">

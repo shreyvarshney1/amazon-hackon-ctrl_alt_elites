@@ -1,7 +1,7 @@
 "use client";
 import { Product } from "@/types/product";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Star, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input"
@@ -15,10 +15,11 @@ import {
 import Image from "next/image";
 import { VerifiedSellerBadge } from "../product-card";
 import ReviewSection from "./review-section";
-import { Review, ReviewAuthor } from "@/types/review";
-import { getReviews } from "@/lib/api/review";
+import { Review } from "@/types/review";
+import { postReview } from "@/lib/api/review";
+// import { getReviews } from "@/lib/api/review";
 // import { postReview } from "@/lib/api/review";
-import { mockReviews } from "@/lib/mockData";
+// import { mockReviews } from "@/lib/mockData";
 
 interface ProductDetailProps {
   product: Product;
@@ -28,7 +29,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   // const [quantity, setQuantity] = useState(1)
 
-  const productImages = product.imageUrls;
+  const productImages = product.image_urls;
 
   const StarRating = ({
     rating,
@@ -52,28 +53,27 @@ export default function ProductDetails({ product }: ProductDetailProps) {
 
   // API Integration
 
-  const [reviews, setReviews] = useState<Review[]>(mockReviews.filter(review => review.productId === product.id));
+  const [reviews, setReviews] = useState<Review[]>(product.reviews ?? []);
 
-  const handleNewReview = async (newReview: Omit<Review, "id" | "author">) => {
-    const author: ReviewAuthor = {
-      id: "1",
-      username: "John",
-      has_trusted_badge: true,
-    };
-    const modReview: Omit<Review, "id"> = { author, ...newReview };
-    // const createdReview = await postReview(modReview);
+  const handleNewReview = async (
+    newReview: Omit<
+      Review,
+      | "id"
+      | "user_id"
+      | "linguistic_authenticity_score"
+      | "product_id"
+      | "username"
+      | "has_trusted_badge"
+    >
+  ) => {
+    // Add product id to the newReview object and submit
+    const createdReview = await postReview({
+      ...newReview,
+      product_id: Number(product.id),
+    });
 
-    console.log("New review submitted:", newReview);
-
-    // setReviews([createdReview, ...reviews]);
-
-    setReviews([{ id: "69", ...modReview }, ...reviews]);
+    setReviews([createdReview, ...reviews]);
   };
-
-  // Fetch reviews asynchronously
-  useEffect(() => {
-    getReviews(product.id).then((reviews) => setReviews(reviews));
-  }, [product.id]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -107,7 +107,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
           <div className="relative">
             <div className="w-[500px] h-[500px] border border-[#dddddd] rounded bg-white flex items-center justify-center">
               <Image
-                src={product.imageUrls[selectedImage]}
+                src={product.image_urls[selectedImage]}
                 alt="Zemic UV Umbrella"
                 width={450}
                 height={450}
@@ -122,17 +122,18 @@ export default function ProductDetails({ product }: ProductDetailProps) {
         <div className="flex-1 max-w-md">
           <div className="text-[#0052b4] flex gap-2  text-sm mb-2 hover:text-[#ff9900] cursor-pointer">
             <p> by {product.seller.name} </p>
-            {product.seller.seller_credibility_score > 0.7 && (
-              <VerifiedSellerBadge />
-            )}
+            {product.seller.scs_score > 0.7 && <VerifiedSellerBadge />}
           </div>
 
           <h1 className="text-2xl font-normal mb-3 leading-tight">
-            {product.title}
+            {product.name}
           </h1>
 
           <div className="flex items-center gap-2 mb-2">
-            <StarRating rating={product.rating} count={product.reviewCount} />
+            <StarRating
+              rating={product.rating ?? 0}
+              count={product.reviewCount ?? "0"}
+            />
             {/* <span className="text-[#0052b4] text-sm hover:text-[#ff9900] cursor-pointer">
               Search this page
             </span> */}
@@ -148,7 +149,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
                 {-(product.discount ?? 0)}
               </span>
               <span className="text-3xl font-normal">
-                {product.currency + " " + product.price}
+                {(product.currency ?? "₹") + " " + product.price}
               </span>
             </div>
             {/* <div className="text-sm text-[#565959]">
@@ -197,7 +198,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
         {/* Purchase Options */}
         <div className="w-80 border border-[#dddddd] rounded p-4 h-fit">
           <div className="text-3xl font-normal mb-2">
-            {product.currency + " " + product.price}
+            {(product.currency ?? "₹") + " " + product.price}
             <sup>00</sup>
           </div>
 
@@ -247,12 +248,12 @@ export default function ProductDetails({ product }: ProductDetailProps) {
             className="w-full text-black font-bold py-2 mb-2"
             style={{
               backgroundColor: `rgb(${Math.round(
-                255 * (1 - product.pis)
-              )}, ${Math.round(180 * product.pis)}, 80)`,
+                255 * (1 - product.pis_score)
+              )}, ${Math.round(180 * product.pis_score)}, 80)`,
               fontWeight: 500,
             }}
           >
-            <p>PIS : {product.pis}</p>
+            <p>PIS : {product.pis_score}</p>
           </Button>
 
           <Button className="w-full bg-[#ff9900] hover:bg-[#f0a742] text-black font-bold py-2 mb-4">
@@ -272,11 +273,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
 
       {/* Reviews Section */}
       <div className="px-4 py-2">
-        <ReviewSection
-          reviews={reviews}
-          productId={product.id}
-          onSubmitReview={handleNewReview}
-        />
+        <ReviewSection reviews={reviews} onSubmitReview={handleNewReview} />
       </div>
     </div>
   );
