@@ -1,6 +1,6 @@
 import { Product } from '@/types/product';
 
-const API_BASE_URL = 'http://vision:3000/api/products';
+// const API_BASE_URL = 'http://vision:3000/api/products';
 
 export async function getProducts(): Promise<Product[]> {
   const response = await fetch(`/api/products`);
@@ -16,9 +16,13 @@ export async function getProducts(): Promise<Product[]> {
 }
 
 export async function getProductById(id: string): Promise<Product> {
-  const response = await fetch(`${API_BASE_URL}/${id}`);
+  const response = await fetch(`/api/products/${id}`);
   if (!response.ok) {
     throw new Error('Failed to fetch product');
   }
-  return await response.json();
+
+  const data = await response.json();
+  console.log(data);
+
+  return data;
 }
