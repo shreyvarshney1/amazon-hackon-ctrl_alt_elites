@@ -106,6 +106,13 @@ def add_order(user):
         # Add order items to the session
         for item_data in data["items"]:
             product_id = item_data.get("product_id")
+            # Get product from cache or database
+            if 'product_cache' not in locals():
+                product_cache = {}
+            
+            if product_id not in product_cache:
+                product_cache[product_id] = db.session.query(Product).get(product_id)
+            
             product = product_cache[product_id]
             order_item = OrderItem(
                 order=order,
