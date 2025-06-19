@@ -71,10 +71,10 @@ def get_session(user):
         user_data = {
             "username": user.username,
             "email": user.email,
-            "created_at": user.created_at,
+            "created_at": user.created_at.isoformat() if user.created_at else None,
             "uba_score": user.uba_score,
             "profile_completeness_score": user.profile_completeness_score,
-            "last_uba_update": user.last_uba_update,
+            "last_uba_update": user.last_uba_update.isoformat() if user.last_uba_update else None,
         }
         session_logs = db.session.query(UserSessionLog).filter_by(user_id=user.id).all()
         session_data = [
