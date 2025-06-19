@@ -68,16 +68,25 @@ def check_auth(f):
 @check_auth
 def get_session(user):
     try:
+        user_data = {
+            "username": user.username,
+            "email": user.email,
+            "created_at": user.created_at.isoformat() if user.created_at else None,
+            "uba_score": user.uba_score,
+            "profile_completeness_score": user.profile_completeness_score,
+            "last_uba_update": (
+                user.last_uba_update.isoformat() if user.last_uba_update else None
+            ),
+        }
         session_logs = db.session.query(UserSessionLog).filter_by(user_id=user.id).all()
         session_data = [
             {
-                "id": log.id,
                 "ip_address": log.ip_address,
                 "device_info": log.device_info,
                 "timestamp": log.timestamp.isoformat(),
             }
             for log in session_logs
         ]
-        return jsonify({"sessions": session_data}), 200
+        return jsonify({"user_data": user_data, "sessions": session_data}), 200
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500

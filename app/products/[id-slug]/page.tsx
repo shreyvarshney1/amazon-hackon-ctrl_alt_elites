@@ -36,7 +36,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
     getProductById(id)
       .then((product) => setProduct(product))
       .catch((error) =>
-        console.error("Failed to fetch product." + error.message)
+        console.error("Failed to fetch product." + error.message),
       );
   }, [id]);
 

@@ -1,14 +1,17 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
       {/* Amazon Logo */}
-      <Link href="/" className="mb-8 text-3xl font-bold text-gray-900 tracking-tight">
+      <Link
+        href="/"
+        className="mb-8 text-3xl font-bold text-gray-900 tracking-tight"
+      >
         amazon
       </Link>
 
@@ -20,7 +23,10 @@ export default function Home() {
         <CardContent className="space-y-4">
           <form className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-bold text-gray-900">
+              <Label
+                htmlFor="email"
+                className="text-sm font-bold text-gray-900"
+              >
                 Email or mobile phone number
               </Label>
               <Input
@@ -41,11 +47,17 @@ export default function Home() {
 
           <div className="text-xs text-gray-600 leading-4">
             By continuing, you agree to Amazon&#39;s{" "}
-            <a href="#" className="text-blue-600 hover:text-orange-600 hover:underline">
+            <a
+              href="#"
+              className="text-blue-600 hover:text-orange-600 hover:underline"
+            >
               Conditions of Use
             </a>{" "}
             and{" "}
-            <a href="#" className="text-blue-600 hover:text-orange-600 hover:underline">
+            <a
+              href="#"
+              className="text-blue-600 hover:text-orange-600 hover:underline"
+            >
               Privacy Notice
             </a>
             .
@@ -56,7 +68,10 @@ export default function Home() {
               <span className="font-bold">New to Amazon?</span>
             </div>
             <Link href="/signup">
-              <Button variant="outline" className="w-full h-8 border-gray-400 font-normal">
+              <Button
+                variant="outline"
+                className="w-full h-8 border-gray-400 font-normal"
+              >
                 Create your Amazon account
               </Button>
             </Link>
@@ -77,8 +92,10 @@ export default function Home() {
             Help
           </a>
         </div>
-        <div className="text-xs text-gray-600">© 1996-2024, Amazon.com, Inc. or its affiliates</div>
+        <div className="text-xs text-gray-600">
+          © 1996-2024, Amazon.com, Inc. or its affiliates
+        </div>
       </div>
     </div>
-  )
+  );
 }

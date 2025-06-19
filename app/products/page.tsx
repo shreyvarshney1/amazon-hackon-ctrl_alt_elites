@@ -32,7 +32,7 @@ export default function AmazonSearchPage() {
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands((prev) =>
-      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
     );
   };
 
@@ -62,10 +62,12 @@ export default function AmazonSearchPage() {
   useEffect(() => {
     getProducts()
       .then((products) => {
-        setProducts(products)
+        setProducts(products);
         // console.log(products);
       })
-      .catch((error) => console.error("Failed to fetch all products. " + error.message));
+      .catch((error) =>
+        console.error("Failed to fetch all products. " + error.message),
+      );
   }, []);
 
   return (
