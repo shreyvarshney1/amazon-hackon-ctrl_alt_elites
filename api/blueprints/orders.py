@@ -197,6 +197,7 @@ def get_seller_orders(seller):
             .join(OrderItem)
             .join(Product)
             .filter(Product.seller_id == seller.id)
+            .distinct(Order.id)
             .all()
         )
 
