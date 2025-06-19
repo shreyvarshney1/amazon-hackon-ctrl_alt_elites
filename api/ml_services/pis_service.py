@@ -8,7 +8,7 @@ from typing import Optional
 from api.models import db, Product, Review, Return, OrderItem, User
 from api.ml_services.analysis_utils import (
     analyze_product_description,
-    analyze_image_authenticity_mock,
+    analyze_image_authenticity,
 )
 
 # Important: Import scs_service to trigger the cascade
@@ -52,7 +52,7 @@ def _calculate_pis_score(product_id: int) -> Optional[float]:
         p2_score = 0.75  # Neutral score if no comparable products
 
     # --- P3: Image Authenticity ---
-    image_risk = analyze_image_authenticity_mock(product.image_urls)["image_risk"]
+    image_risk = analyze_image_authenticity(product.image_urls)["image_risk"]
     p3_score = 1 - image_risk
 
     # --- P4: Aggregated Review Sentiment (CRITICAL: Weighted by User UBA Score) ---

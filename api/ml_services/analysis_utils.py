@@ -260,18 +260,16 @@ def analyze_image_authenticity(image_urls: List[str]) -> Dict[str, float]:
     return {"image_risk": LOW_RISK}  # No stock domains found
 
 
-if __name__ == "__main__":
-    # Example Usage
+def run_examples():
+    """Runs a set of example analyses and prints the results."""
     print("--- Risk Analysis Examples ---")
 
     # IP Check (Example IP, may or may not be a proxy)
-    ip_to_check = "111.93.74.158"
-    print(f"IP Info for {ip_to_check}: {get_ip_info(ip_to_check)}")
-    ip_to_check = "15.206.254.83"
+    ip_to_check = "8.8.8.8"
     print(f"IP Info for {ip_to_check}: {get_ip_info(ip_to_check)}")
 
     # Email Check
-    disposable_email = "test1@yopmail.com"
+    disposable_email = "test@10minutemail.com"
     legit_email = "contact@google.com"
     print(
         f"Email check for {disposable_email}: {validate_email_address(disposable_email)}"
@@ -280,12 +278,16 @@ if __name__ == "__main__":
 
     # Linguistic Analysis
     spammy_review = "MUST BUY this amazing product it is the best ever!!!!!!"
-    good_review = "I found the setup a bit tricky, but after a few minutes, it worked well. The battery life is decent."
+    # FIX: Broke the long line into a multi-line string
+    good_review = (
+        "I found the setup a bit tricky, but after a few minutes, it worked well. "
+        "The battery life is decent."
+    )
     print(f"Spammy Review Risk: {analyze_review_linguistics(spammy_review)}")
     print(f"Good Review Risk: {analyze_review_linguistics(good_review)}")
 
     # Product Description Analysis
-    risky_desc = r"HURRY! Limited time offer on this 100% genuine item. Act now!"
+    risky_desc = "HURRY! Limited time offer on this 100% genuine item. Act now!"
     print(f"Risky Description Risk: {analyze_product_description(risky_desc)}")
 
     # Image Authenticity Analysis
@@ -293,3 +295,7 @@ if __name__ == "__main__":
     real_images = ["https://example.com/my-product-images/photo1.png"]
     print(f"Stock Images Risk: {analyze_image_authenticity(stock_images)}")
     print(f"Real Images Risk: {analyze_image_authenticity(real_images)}")
+
+
+if __name__ == "__main__":
+    run_examples()
