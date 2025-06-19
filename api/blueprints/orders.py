@@ -203,11 +203,7 @@ def get_seller_orders(seller):
                         order.created_at.isoformat() if order.created_at else None
                     ),
                     "status": order.status,
-                    "shipped_on_time": (
-                        order.shipped_on_time.isoformat()
-                        if order.shipped_on_time
-                        else None
-                    ),
+                    "shipped_on_time": order.shipped_on_time,
                     "items": [
                         {
                             "id": item.id,
