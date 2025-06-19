@@ -26,6 +26,7 @@ import ProductCard from "./product-card";
 // import { mockProducts } from "@/lib/mockData";
 import { getProducts } from "@/lib/api/product";
 import { Product } from "@/types/product";
+import UserAvatar from "./user-avatar";
 
 export default function AmazonSearchPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -72,7 +73,7 @@ export default function AmazonSearchPage() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-[#232f3f] text-white">
-        <div className="flex items-center px-4 py-2">
+        <div className="flex items-center px-4 py-2 justify-around">
           {/* Amazon Logo */}
           <div className="flex items-center mr-4">
             <div className="text-white text-xl font-bold">amazon</div>
@@ -111,8 +112,8 @@ export default function AmazonSearchPage() {
           {/* Account & Cart */}
           <div className="flex items-center gap-6 text-sm">
             <div>
-              <div className="text-xs">Hello, John</div>
-              <div className="font-bold">Accounts & Lists</div>
+              <div className="text-xs">Accounts</div>
+              <div className="font-bold">& Lists</div>
             </div>
             <div>
               <div className="text-xs">Returns</div>
@@ -126,6 +127,10 @@ export default function AmazonSearchPage() {
               <span className="ml-1 font-bold">Cart</span>
             </div>
           </div>
+
+          {/* User Avatar  */}
+          <UserAvatar username="Guest" email="example@backchod.com"/>
+
         </div>
 
         {/* Navigation */}
