@@ -1,0 +1,56 @@
+name: Auto Format Code
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install Black
+        run: pip install black
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          
+      - name: Install Prettier
+        run: npm install --global prettier
+        
+      - name: Format Python code with Black
+        run: black api/*
+        
+      - name: Format code with Prettier
+        run: prettier --write "**/*.{js,jsx,ts,tsx,json,css,scss,md,yaml,yml}"
+        
+      - name: Check for modified files
+        id: git-check
+        run: |
+          git status --porcelain
+          echo "modified=$(if git status --porcelain | grep -q -v "^\?"; then echo "true"; else echo "false"; fi)" >> $GITHUB_OUTPUT
+          
+      - name: Commit changes
+        if: steps.git-check.outputs.modified == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git commit -m "chore: auto-format code"
+          git push
