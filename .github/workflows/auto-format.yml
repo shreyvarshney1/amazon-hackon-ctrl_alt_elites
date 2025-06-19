@@ -38,7 +38,7 @@ jobs:
         run: black api/*
         
       - name: Format code with Prettier
-        run: prettier --write "**/*.{js,jsx,ts,tsx,json,css,scss,md,yaml,yml}"
+        run: prettier --write "**/*.{js,jsx,ts,tsx,json,css,scss,md}"
         
       - name: Check for modified files
         id: git-check
