@@ -13,8 +13,13 @@ interface ReviewSectionProps {
   onSubmitReview?: (
     review: Omit<
       Review,
-      "id" | "user_id" | "linguistic_authenticity_score" | "product_id" | "username" | "has_trusted_badge"
-    >
+      | "id"
+      | "user_id"
+      | "linguistic_authenticity_score"
+      | "product_id"
+      | "username"
+      | "has_trusted_badge"
+    >,
   ) => void;
 }
 

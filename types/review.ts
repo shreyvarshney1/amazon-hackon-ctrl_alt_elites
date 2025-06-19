@@ -1,7 +1,7 @@
 export interface ReviewAuthor {
-  id: string
-  username: string
-  has_trusted_badge: boolean
+  id: string;
+  username: string;
+  has_trusted_badge: boolean;
 }
 export interface Review {
   id: number;
