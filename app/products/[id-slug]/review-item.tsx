@@ -41,7 +41,7 @@ export default function ReviewItem({ review }: ReviewItemProps) {
         {/* User Avatar */}
         <div
           className={`w-10 h-10 rounded-full ${getAvatarColor(
-            review.id.toString()
+            review.id.toString(),
           )} flex items-center justify-center text-white font-bold`}
         >
           <User className="w-5 h-5" />

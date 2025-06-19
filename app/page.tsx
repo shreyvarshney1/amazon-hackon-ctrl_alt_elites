@@ -6,10 +6,16 @@ export default function Home() {
       <h1>Welcome to Our Website!</h1>
       <p>Explore the site using the links below:</p>
       <ul>
-        <li><a href="/about">About Us</a></li>
-       <li><a href="/contact">Contact</a></li>
-       <li><a href="/services">Our Services</a></li>
-     </ul>
-   </div>
+        <li>
+          <a href="/about">About Us</a>
+        </li>
+        <li>
+          <a href="/contact">Contact</a>
+        </li>
+        <li>
+          <a href="/services">Our Services</a>
+        </li>
+      </ul>
+    </div>
   );
 }
