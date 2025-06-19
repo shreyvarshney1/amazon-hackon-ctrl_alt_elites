@@ -3,8 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+<<<<<<< HEAD
     "flask-dev": "python -m flask --app api/index run -p 5000 --reload",
     "next-dev": "next dev",
+=======
+    "flask-dev": "python -m api.index",
+    "next-dev": "next dev --turbopack",
+>>>>>>> e310b31 (feat: auth init)
     "dev": "concurrently \"pnpm run next-dev\" \"pnpm run flask-dev\"",
     "build": "next build",
     "start": "next start",
