@@ -35,7 +35,8 @@ def login():
         )
         db.session.add(user_session)
         db.session.commit()
-        return jsonify({"message": "User logged in successfully", "token": token, "user_id": user.id}), 200
+        return jsonify({"message": "User logged in successfully",
+                        "token": token, "user_id": user.id}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
