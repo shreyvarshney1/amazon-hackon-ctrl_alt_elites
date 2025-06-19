@@ -3,12 +3,37 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, LogOut, User, Settings } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface UserAvatarProps {
   username: string;
   email: string;
   avatarUrl?: string;
   onLogout?: () => void;
+}
+
+function LogOutButton({ handleLogout } : {handleLogout: () => void}) {
+  return (
+    <button
+      onClick={handleLogout}
+      className="w-full px-4 py-2 text-left text-sm text-[#b12704] hover:bg-[#fef7f7] flex items-center gap-3 font-medium"
+    >
+      <LogOut className="w-4 h-4" />
+      Sign Out
+    </button>
+  );
+}
+
+function SignInButton({ handleSignIn }: { handleSignIn: () => void }) {
+  return (
+    <button
+      onClick={handleSignIn}
+      className="w-full px-4 py-2 text-left text-sm text-[#04b141] hover:bg-[#fef7f7] flex items-center gap-3 font-medium"
+    >
+      <LogOut className="w-4 h-4" />
+      Sign In
+    </button>
+  );
 }
 
 export default function UserAvatar({
@@ -20,6 +45,7 @@ export default function UserAvatar({
   const [isHovered, setIsHovered] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Generate initials from username
   const getInitials = (name: string) => {
@@ -63,6 +89,10 @@ export default function UserAvatar({
     }
   };
 
+  const handleSignIn = () => {
+    router.push("/login");
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       <div
@@ -99,7 +129,9 @@ export default function UserAvatar({
         {/* Username */}
         <div className="flex items-center text-white text-xs">
           <span
-            className={`transition-colors ${isDropdownOpen ? "text-[#ff9900]" : "group-hover:text-[#ff9900]"}`}
+            className={`transition-colors ${
+              isDropdownOpen ? "text-[#ff9900]" : "group-hover:text-[#ff9900]"
+            }`}
           >
             {username}
           </span>
@@ -146,15 +178,13 @@ export default function UserAvatar({
               </button>
             </div>
 
-            {/* Logout Button */}
+            {/* Logout Button / SignIn Button */}
             <div className="border-t border-[#e7e7e7] py-1">
-              <button
-                onClick={handleLogout}
-                className="w-full px-4 py-2 text-left text-sm text-[#b12704] hover:bg-[#fef7f7] flex items-center gap-3 font-medium"
-              >
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </button>
+              {username === "Guest" ? (
+                <SignInButton handleSignIn={handleSignIn} />
+              ) : (
+                <LogOutButton handleLogout={handleLogout} />
+              )}
             </div>
 
             {/* Dropdown Arrow */}
