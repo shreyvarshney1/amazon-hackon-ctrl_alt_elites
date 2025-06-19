@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           id: data.user_id,
           email,
           username: finalUsername,
-        })
+        }),
       );
 
       // Extract user info from email if username not provided

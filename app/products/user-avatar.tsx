@@ -12,7 +12,7 @@ interface UserAvatarProps {
   onLogout?: () => void;
 }
 
-function LogOutButton({ handleLogout } : {handleLogout: () => void}) {
+function LogOutButton({ handleLogout }: { handleLogout: () => void }) {
   return (
     <button
       onClick={handleLogout}
