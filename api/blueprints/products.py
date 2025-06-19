@@ -1,6 +1,8 @@
 from flask_smorest import Blueprint
 from flask import request
 from sqlalchemy.inspection import inspect
+from sqlalchemy.orm import joinedload
+from flask_cors import CORS
 from api.models import db, Product, Review
 from .auth import check_auth
 from .seller import check_auth_seller
@@ -8,8 +10,11 @@ from .seller import check_auth_seller
 BASE_ROUTE = "/api/products"
 product_bp = Blueprint("products", __name__, url_prefix=BASE_ROUTE)
 
+# Enable CORS for all routes in this blueprint
+CORS(product_bp, resources={r"/*": {"origins": "*"}})
 
-@product_bp.route("/", methods=["GET"])
+
+@product_bp.route("/all", methods=["GET"])
 def get_products():
     try:
         products = db.session.query(Product).all()
@@ -17,6 +22,7 @@ def get_products():
             "products": [
                 {
                     "id": product.id,
+                    "slug": product.slug,
                     "name": product.name,
                     "description": product.description,
                     "price": product.price,
@@ -47,12 +53,20 @@ def get_products():
 @product_bp.route("/<int:product_id>", methods=["GET"])
 def get_product(product_id):
     try:
-        product = db.session.query(Product).get(product_id)
+        # product = db.session.query(Product).get(product_id)
+
+        product = (
+            db.session.query(Product)
+            .options(joinedload(Product.reviews).joinedload(Review.user))
+            .get(product_id)
+        )
+
         if not product:
             return {"error": "Product not found"}, 404
 
         return {
             "id": product.id,
+            "slug": product.slug,
             "name": product.name,
             "description": product.description,
             "price": product.price,
@@ -63,15 +77,17 @@ def get_product(product_id):
             "last_pis_update": (
                 product.last_pis_update.isoformat() if product.last_pis_update else None
             ),
-            "reviews": list(
-                map(
-                    lambda obj: {
-                        c.key: getattr(obj, c.key)
-                        for c in inspect(obj).mapper.column_attrs
+            "reviews": [
+                {
+                    **{
+                        c.key: getattr(review, c.key)
+                        for c in inspect(review).mapper.column_attrs
                     },
-                    product.reviews,
-                )
-            ),
+                    "username": review.user.username,
+                    "has_trusted_badge": (review.user.uba_score or 0) > 0.7,
+                }
+                for review in product.reviews
+            ],
             "seller": {
                 "id": product.seller.id,
                 "name": product.seller.name,
@@ -87,18 +103,27 @@ def get_product(product_id):
 @product_bp.route("/<int:product_id>/reviews", methods=["GET"])
 def get_product_reviews(product_id):
     try:
-        product = db.session.query(Product).get(product_id)
+        product = (
+            db.session.query(Product)
+            .options(joinedload(Product.reviews).joinedload(Review.user))
+            .get(product_id)
+        )
+
         if not product:
             return {"error": "Product not found"}, 404
 
-        reviews = list(
-            map(
-                lambda obj: {
-                    c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs
+        reviews = [
+            {
+                **{
+                    c.key: getattr(review, c.key)
+                    for c in inspect(review).mapper.column_attrs
                 },
-                product.reviews,
-            )
-        )
+                "username": review.user.username,
+                "has_trusted_badge": (review.user.uba_score or 0)
+                > 0.7,  # Add this line
+            }
+            for review in product.reviews
+        ]
 
         return {"reviews": reviews}, 200
     except Exception as e:
@@ -113,6 +138,7 @@ def add_review(user, product_id):
         data = request.json
         rating = data.get("rating")
         review_text = data.get("review_text", "")
+        title = data.get("title", "")
         is_verified_purchase = data.get("is_verified_purchase", False)
 
         if not rating or not 1 <= rating <= 5:
@@ -128,11 +154,31 @@ def add_review(user, product_id):
             rating=rating,
             review_text=review_text,
             is_verified_purchase=is_verified_purchase,
+            title=title,
         )
         db.session.add(review)
         db.session.commit()
 
-        return {"message": "Review added successfully"}, 201
+        # return {"message": "Review added successfully", "review" : review}, 201
+
+        # Refresh the object to ensure all auto-generated fields are loaded
+        db.session.refresh(review)
+        # Manually construct the response to ensure created_at is properly serialized
+        review_response = {
+            "id": review.id,
+            "user_id": review.user_id,
+            "product_id": review.product_id,
+            "rating": review.rating,
+            "review_text": review.review_text,
+            "title": review.title,
+            "created_at": review.created_at.isoformat(),  # Explicitly convert to ISO format
+            "is_verified_purchase": review.is_verified_purchase,
+            "linguistic_authenticity_score": review.linguistic_authenticity_score,
+            "username": user.username,
+            "has_trusted_badge": (user.uba_score or 0) > 0.7,
+        }
+
+        return {"message": "Review added successfully", "review": review_response}, 201
     except Exception as e:
         db.session.rollback()
         return {"error": str(e)}, 500
@@ -144,6 +190,7 @@ def add_product(seller):
     try:
         data = request.json
         name = data.get("name")
+        slug = data.get("slug")
         description = data.get("description")
         price = data.get("price")
         category = data.get("category")
@@ -154,6 +201,7 @@ def add_product(seller):
 
         product = Product(
             seller_id=seller.id,
+            slug=slug,
             name=name,
             description=description,
             price=price,
@@ -180,6 +228,8 @@ def update_product(seller, product_id):
 
         if "name" in data:
             product.name = data["name"]
+        if "slug" in data:
+            product.slug = data["slug"]
         if "description" in data:
             product.description = data["description"]
         if "price" in data:

@@ -28,8 +28,8 @@ def create_app():
     return app, migrate
 
 
+app, _ = create_app()
 if __name__ == "__main__":
-    app, _ = create_app()
     with app.app_context():
         db.create_all()
     app.run(debug=True)

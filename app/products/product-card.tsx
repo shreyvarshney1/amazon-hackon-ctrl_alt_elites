@@ -57,8 +57,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Product Image */}
         <div className="w-48 h-48 bg-[#f0f0f0] rounded flex items-center justify-center">
           <Image
-            src={product.imageUrls[0]}
-            alt={product.title}
+            src={product.image_urls[0]}
+            alt={product.name}
             width={180}
             height={180}
             className="object-contain"
@@ -79,7 +79,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Product Title */}
           <h3 className="text-lg text-[#0052b4] hover:text-[#c7511f] transition-colors line-clamp-2">
-            {product.title}
+            {product.name}
           </h3>
 
           {/* Seller Name and SCS */}
@@ -87,13 +87,13 @@ export default function ProductCard({ product }: ProductCardProps) {
             <div className="flex items-center gap-1">
               <span>by</span>
               <span>{product.seller.name}</span>
-              {product.seller.seller_credibility_score > 0.7 && <VerifiedSellerBadge />}
+              {product.seller.scs_score > 0.7 && <VerifiedSellerBadge />}
             </div>
           </div>
 
           {/* Rating */}
           <div className="">
-            <StarRating rating={product.rating} count={product.reviewCount} />
+            <StarRating rating={product.rating ?? 0} count={product.reviewCount ?? "0"} />
           </div>
 
           {/* PIS Score */}
@@ -101,12 +101,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             <p
               style={{
                 color: `rgb(${Math.round(
-                  255 * (1 - product.pis)
-                )}, ${Math.round(180 * product.pis)}, 80)`,
+                  255 * (1 - product.pis_score)
+                )}, ${Math.round(180 * product.pis_score)}, 80)`,
                 fontWeight: 500,
               }}
             >
-              Product Integrity Score (PIS) : {product.pis}
+              Product Integrity Score (PIS) : {product.pis_score}
             </p>
           </div>
 

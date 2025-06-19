@@ -20,8 +20,8 @@ class User(db.Model):
     profile_completeness_score = db.Column(db.Float, default=0.5)
     last_uba_update = db.Column(db.DateTime(timezone=True))
 
-    reviews = db.relationship("Review", back_populates="author", lazy=True)
-    orders = db.relationship("Order", back_populates="customer", lazy=True)
+    reviews = db.relationship("Review", back_populates="user", lazy=True)
+    orders = db.relationship("Order", back_populates="user", lazy=True)
     sessions = db.relationship("UserSessionLog", back_populates="user", lazy=True)
 
 
@@ -40,6 +40,7 @@ class Seller(db.Model):
 class Product(db.Model):
     __tablename__ = "products"
     id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(255), unique=True, nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey("sellers.id"), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=False)
@@ -68,8 +69,13 @@ class Review(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=text("now()"))
     is_verified_purchase = db.Column(db.Boolean, default=False)
 
+    title = db.Column(db.Text)  # Added title for the review
+
     # From LLM analysis (Parameter P4 of UBA)
     linguistic_authenticity_score = db.Column(db.Float)
+
+    user = db.relationship("User", back_populates="reviews")
+    product = db.relationship("Product", back_populates="reviews")
 
 
 class Order(db.Model):
@@ -83,6 +89,7 @@ class Order(db.Model):
     # For Seller's Order Fulfillment Rate (Parameter P1 of SCS)
     shipped_on_time = db.Column(db.Boolean, nullable=True)
 
+    user = db.relationship("User", back_populates="orders")
     items = db.relationship("OrderItem", back_populates="order", lazy=True)
 
 
@@ -93,6 +100,8 @@ class OrderItem(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price_at_purchase = db.Column(db.Float, nullable=False)
+
+    order = db.relationship("Order", back_populates="items")
 
 
 class Return(db.Model):
@@ -117,3 +126,5 @@ class UserSessionLog(db.Model):
     ip_address = db.Column(db.String(45))
     device_info = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime(timezone=True), server_default=text("now()"))
+
+    user = db.relationship("User", back_populates="sessions")

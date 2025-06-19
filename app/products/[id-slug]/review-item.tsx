@@ -41,7 +41,7 @@ export default function ReviewItem({ review }: ReviewItemProps) {
         {/* User Avatar */}
         <div
           className={`w-10 h-10 rounded-full ${getAvatarColor(
-            review.id
+            review.id.toString()
           )} flex items-center justify-center text-white font-bold`}
         >
           <User className="w-5 h-5" />
@@ -51,9 +51,9 @@ export default function ReviewItem({ review }: ReviewItemProps) {
           {/* User Info */}
           <div className="flex items-center gap-2 mb-2">
             <span className="font-medium text-[#333333]">
-              {review.author.username}
+              {review.username}
             </span>
-            {review.author.has_trusted_badge && (
+            {review.has_trusted_badge && (
               <CheckCircle className="w-4 h-4 text-green-600 fill-current" />
             )}
           </div>
@@ -66,17 +66,17 @@ export default function ReviewItem({ review }: ReviewItemProps) {
             )}
           </div>
 
-          {/* Review Date and Location */}
+          {/* Review Date */}
           <div className="text-sm text-[#565959] mb-2">
-            {review.date && review.location && (
+            {review.created_at && (
               <span>
-                Reviewed in {review.location} on {review.date}
+                Reviewed on {new Date(review.created_at).toLocaleDateString()}
               </span>
             )}
           </div>
 
           {/* Verified Purchase Badge */}
-          {review.verified_purchase && (
+          {review.is_verified_purchase && (
             <div className="mb-3">
               <span className="bg-[#ff9900] text-white px-2 py-1 text-xs rounded font-medium">
                 Verified Purchase
@@ -90,13 +90,13 @@ export default function ReviewItem({ review }: ReviewItemProps) {
           </div>
 
           {/* Helpful Count */}
-          {review.helpful_count && review.helpful_count > 0 && (
+          {/* {review.helpful_count && review.helpful_count > 0 && (
             <div className="text-sm text-[#565959] mb-3">
               {review.helpful_count}{" "}
               {review.helpful_count === 1 ? "person" : "people"} found this
               helpful
             </div>
-          )}
+          )} */}
 
           {/* Action Buttons */}
           <div className="flex gap-4">

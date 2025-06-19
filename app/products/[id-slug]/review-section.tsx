@@ -10,15 +10,16 @@ import type { Review } from "@/types/review";
 
 interface ReviewSectionProps {
   reviews: Review[];
-  productId: string;
   onSubmitReview?: (
-    review: Omit<Review, "id" | "author"> 
+    review: Omit<
+      Review,
+      "id" | "user_id" | "linguistic_authenticity_score" | "product_id" | "username" | "has_trusted_badge"
+    >
   ) => void;
 }
 
 export default function ReviewSection({
   reviews,
-  productId,
   onSubmitReview,
 }: ReviewSectionProps) {
   const [rating, setRating] = useState(0);
@@ -37,16 +38,9 @@ export default function ReviewSection({
       onSubmitReview({
         rating,
         title: reviewTitle,
-        productId: productId,
         review_text: reviewText,
-        date: new Date().toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        }),
-        location: "India",
-        verified_purchase: true,
-        helpful_count: 0,
+        created_at: new Date().toISOString(),
+        is_verified_purchase: true,
       });
 
       // Reset form
