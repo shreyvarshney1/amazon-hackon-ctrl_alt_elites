@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import ReviewItem from "./review-item";
 import type { Review } from "@/types/review";
 import { useProtectedAction } from "@/app/protected-action";
-// import { useAuth } from "@/app/auth-context";
 
 interface ReviewSectionProps {
   reviews: Review[];
@@ -35,7 +34,6 @@ export default function ReviewSection({
   const [reviewText, setReviewText] = useState("");
 
   const { executeProtectedAction, isAuthenticated } = useProtectedAction();
-  // const { user } = useAuth();
 
   const handleSubmitReview = () => {
     executeProtectedAction(() => {
