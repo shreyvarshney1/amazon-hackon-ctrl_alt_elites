@@ -12,6 +12,7 @@ auth_bp = Blueprint("auth", __name__, url_prefix=BASE_ROUTE)
 
 
 @auth_bp.route("/login", methods=["POST"])
+#login controller
 def login():
     try:
         data = request.json
@@ -21,6 +22,7 @@ def login():
             return jsonify({"message": "Email is required"}), 400
         if not username:
             username = email.split("@")[0]
+            # check if username is existing in DB
         user = db.session.query(User).filter_by(username=username).first()
         if not user:
             user = User(username=username, email=email)
@@ -41,6 +43,8 @@ def login():
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
 
 
+
+# auth token check controller
 def check_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):

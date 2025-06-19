@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import Link from "next/link"
 import { useState } from "react"
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
 
@@ -50,7 +51,7 @@ export default function Home() {
     return ""
   }
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setInputValue(value)
     
@@ -60,19 +61,33 @@ export default function Home() {
     }
   }
 
-  const handleSubmit = () => {
-    const error = validateInput(inputValue)
-    
-    if (error) {
-      setInputError(error)
-      return
-    }
-    
-    // Process the form submission
-    console.log("Valid input:", inputValue)
-    alert(`Successfully validated: ${inputValue}`)
-    // Add your submission logic here
+  const handleSubmit = async () => {
+  const error = validateInput(inputValue);
+  if (error) {
+    setInputError(error);
+    return;
   }
+
+  try {
+    const response = await fetch('https://amazon-hackon-ctrl-alt-delete.vercel.app/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: inputValue }),
+    });
+
+    if (!response.ok) throw new Error("Login failed");
+    
+    const data = await response.json();
+    localStorage.setItem('authToken', data.token);  // Store JWT
+    window.location.href = '/products';  // Hard redirect
+  } catch (err) {
+    setInputError(
+      err && typeof err === "object" && err !== null && "message" in err && typeof (err as { message?: unknown }).message === "string"
+        ? (err as { message: string }).message
+        : "Login failed"
+    );
+  }
+};
 
   const getInputType = () => {
     // Dynamically set input type based on content

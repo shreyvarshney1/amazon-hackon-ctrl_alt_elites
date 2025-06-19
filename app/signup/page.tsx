@@ -1,10 +1,66 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import Link from "next/link"
+import { useState } from "react"
 
 export default function AmazonSignupPage() {
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError("")
+
+    try {
+      // Basic validation
+      if (password !== confirmPassword) {
+        throw new Error("Passwords don't match")
+      }
+      if (password.length < 6) {
+        throw new Error("Password must be at least 6 characters")
+      }
+
+      // Call login endpoint (since signup is same as login in our mock)
+      const response = await fetch(
+        "https://amazon-hackon-ctrl-alt-delete.vercel.app/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            email,
+            username: name.split(" ")[0] || email.split("@")[0] // Auto-generate username
+          }),
+        }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Signup failed")
+      }
+
+      const data = await response.json()
+      localStorage.setItem("authToken", data.token)
+      window.location.href = "/products"
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError("An unknown error occurred")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
       {/* Amazon Logo */}
@@ -20,7 +76,13 @@ export default function AmazonSignupPage() {
           <h1 className="text-2xl font-normal text-gray-900">Create account</h1>
         </CardHeader>
         <CardContent className="space-y-4">
-          <form className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <p className="text-sm text-red-600 bg-red-50 p-2 rounded">
+                {error}
+              </p>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-bold text-gray-900">
                 Your name
@@ -28,6 +90,8 @@ export default function AmazonSignupPage() {
               <Input
                 id="name"
                 type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="First and last name"
                 className="h-8 border-gray-400 focus:border-orange-400 focus:ring-orange-400 focus:ring-1"
                 required
@@ -41,6 +105,8 @@ export default function AmazonSignupPage() {
               <Input
                 id="email"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="h-8 border-gray-400 focus:border-orange-400 focus:ring-orange-400 focus:ring-1"
                 required
               />
@@ -53,11 +119,13 @@ export default function AmazonSignupPage() {
               <Input
                 id="password"
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 6 characters"
                 className="h-8 border-gray-400 focus:border-orange-400 focus:ring-orange-400 focus:ring-1"
                 required
               />
-              <div className="text-xs text-gray-600">{"Passwords must be at least 6 characters."}</div>
+              <div className="text-xs text-gray-600">Passwords must be at least 6 characters.</div>
             </div>
 
             <div className="space-y-2">
@@ -67,6 +135,8 @@ export default function AmazonSignupPage() {
               <Input
                 id="confirmPassword"
                 type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="h-8 border-gray-400 focus:border-orange-400 focus:ring-orange-400 focus:ring-1"
                 required
               />
@@ -74,9 +144,10 @@ export default function AmazonSignupPage() {
 
             <Button
               type="submit"
+              disabled={loading}
               className="w-full h-8 bg-gradient-to-b from-yellow-200 to-yellow-400 hover:from-yellow-300 hover:to-yellow-500 text-black border border-yellow-600 shadow-sm font-normal"
             >
-              Create your Amazon account
+              {loading ? "Creating..." : "Create your Amazon account"}
             </Button>
           </form>
 
@@ -98,15 +169,6 @@ export default function AmazonSignupPage() {
               <Link href="/login" className="text-blue-600 hover:text-orange-600 hover:underline">
                 Sign in
               </Link>
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <div className="text-xs text-gray-600 mb-2">
-              Buying for work?{" "}
-              <a href="#" className="text-blue-600 hover:text-orange-600 hover:underline">
-                Create a free business account
-              </a>
             </div>
           </div>
         </CardContent>
