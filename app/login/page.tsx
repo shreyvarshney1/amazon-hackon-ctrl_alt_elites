@@ -9,12 +9,11 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
 import { useAuth } from "../auth-context";
 
-
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  
+
   const { login } = useAuth();
   const router = useRouter();
 
@@ -25,14 +24,19 @@ export default function LoginPage() {
 
     try {
       await login(email);
-      
+
       // Check for redirect URL
-      const redirectUrl = localStorage.getItem('redirect_after_login') || '/products';
-      localStorage.removeItem('redirect_after_login');
-      
+      const redirectUrl =
+        localStorage.getItem("redirect_after_login") || "/products";
+      localStorage.removeItem("redirect_after_login");
+
       router.push(redirectUrl);
     } catch (err) {
-      setError(err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(String(err));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +65,10 @@ export default function LoginPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-bold text-gray-900">
+              <Label
+                htmlFor="email"
+                className="text-sm font-bold text-gray-900"
+              >
                 Email or mobile phone number
               </Label>
               <Input
@@ -86,11 +93,17 @@ export default function LoginPage() {
 
           <div className="text-xs text-gray-600 leading-4">
             By continuing, you agree to Amazon&#39;s{" "}
-            <a href="#" className="text-blue-600 hover:text-orange-600 hover:underline">
+            <a
+              href="#"
+              className="text-blue-600 hover:text-orange-600 hover:underline"
+            >
               Conditions of Use
             </a>{" "}
             and{" "}
-            <a href="#" className="text-blue-600 hover:text-orange-600 hover:underline">
+            <a
+              href="#"
+              className="text-blue-600 hover:text-orange-600 hover:underline"
+            >
               Privacy Notice
             </a>
             .
@@ -101,7 +114,10 @@ export default function LoginPage() {
               <span className="font-bold">New to Amazon?</span>
             </div>
             <Link href="/signup">
-              <Button variant="outline" className="w-full h-8 border-gray-400 font-normal">
+              <Button
+                variant="outline"
+                className="w-full h-8 border-gray-400 font-normal"
+              >
                 Create your Amazon account
               </Button>
             </Link>
