@@ -13,6 +13,7 @@ product_bp = Blueprint("products", __name__, url_prefix=BASE_ROUTE)
 # Enable CORS for all routes in this blueprint
 CORS(product_bp, resources={r"/*": {"origins": "*"}})
 
+
 @product_bp.route("/", methods=["GET"])
 def get_products():
     try:
@@ -54,9 +55,11 @@ def get_product(product_id):
     try:
         # product = db.session.query(Product).get(product_id)
 
-        product = db.session.query(Product).options(
-            joinedload(Product.reviews).joinedload(Review.user)
-        ).get(product_id)
+        product = (
+            db.session.query(Product)
+            .options(joinedload(Product.reviews).joinedload(Review.user))
+            .get(product_id)
+        )
 
         if not product:
             return {"error": "Product not found"}, 404
@@ -76,8 +79,11 @@ def get_product(product_id):
             ),
             "reviews": [
                 {
-                    **{c.key: getattr(review, c.key) for c in inspect(review).mapper.column_attrs},
-                    "username": review.user.username  ,
+                    **{
+                        c.key: getattr(review, c.key)
+                        for c in inspect(review).mapper.column_attrs
+                    },
+                    "username": review.user.username,
                     "has_trusted_badge": (review.user.uba_score or 0) > 0.7,
                 }
                 for review in product.reviews
@@ -97,18 +103,24 @@ def get_product(product_id):
 @product_bp.route("/<int:product_id>/reviews", methods=["GET"])
 def get_product_reviews(product_id):
     try:
-        product = db.session.query(Product).options(
-            joinedload(Product.reviews).joinedload(Review.user)
-        ).get(product_id)
+        product = (
+            db.session.query(Product)
+            .options(joinedload(Product.reviews).joinedload(Review.user))
+            .get(product_id)
+        )
 
         if not product:
             return {"error": "Product not found"}, 404
 
         reviews = [
             {
-                **{c.key: getattr(review, c.key) for c in inspect(review).mapper.column_attrs},
+                **{
+                    c.key: getattr(review, c.key)
+                    for c in inspect(review).mapper.column_attrs
+                },
                 "username": review.user.username,
-                "has_trusted_badge": (review.user.uba_score or 0) > 0.7  # Add this line
+                "has_trusted_badge": (review.user.uba_score or 0)
+                > 0.7,  # Add this line
             }
             for review in product.reviews
         ]
@@ -163,13 +175,10 @@ def add_review(user, product_id):
             "is_verified_purchase": review.is_verified_purchase,
             "linguistic_authenticity_score": review.linguistic_authenticity_score,
             "username": user.username,
-            "has_trusted_badge": (user.uba_score or 0) > 0.7
+            "has_trusted_badge": (user.uba_score or 0) > 0.7,
         }
 
-        return {
-            "message": "Review added successfully", 
-            "review": review_response
-        }, 201
+        return {"message": "Review added successfully", "review": review_response}, 201
     except Exception as e:
         db.session.rollback()
         return {"error": str(e)}, 500

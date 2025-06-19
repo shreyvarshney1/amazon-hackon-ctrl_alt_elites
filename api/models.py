@@ -69,7 +69,7 @@ class Review(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=text("now()"))
     is_verified_purchase = db.Column(db.Boolean, default=False)
 
-    title = db.Column(db.Text) # Added title for the review
+    title = db.Column(db.Text)  # Added title for the review
 
     # From LLM analysis (Parameter P4 of UBA)
     linguistic_authenticity_score = db.Column(db.Float)
