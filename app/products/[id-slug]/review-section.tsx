@@ -33,17 +33,13 @@ export default function ReviewSection({
   const [hoveredRating, setHoveredRating] = useState(0);
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewText, setReviewText] = useState("");
-  
+
   const { executeProtectedAction, isAuthenticated } = useProtectedAction();
   // const { user } = useAuth();
 
   const handleSubmitReview = () => {
     executeProtectedAction(() => {
-      if (
-        rating > 0 &&
-        reviewText.trim() &&
-        onSubmitReview
-      ) {
+      if (rating > 0 && reviewText.trim() && onSubmitReview) {
         onSubmitReview({
           rating,
           title: reviewTitle,
@@ -87,12 +83,14 @@ export default function ReviewSection({
         {!isAuthenticated && (
           <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-4">
             <p className="text-blue-800 text-sm">
-              Please <button 
+              Please{" "}
+              <button
                 onClick={() => executeProtectedAction(() => {})}
                 className="text-blue-600 underline hover:text-blue-800"
               >
                 sign in
-              </button> to write a review.
+              </button>{" "}
+              to write a review.
             </p>
           </div>
         )}

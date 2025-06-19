@@ -28,7 +28,7 @@ interface ProductPageProps {
 export default function ProductDetailPage({ params }: ProductPageProps) {
   const resolvedParams = use(params);
   const id = resolvedParams["id-slug"].split("-")[0];
-  const {user, logout} = useAuth();
+  const { user, logout } = useAuth();
 
   // const product = mockProducts.find((product) => product.id === id);
 
@@ -103,8 +103,11 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
           </div>
 
           {/* User Avatar  */}
-          <UserAvatar username={user?.username ?? "Guest"} email={user?.email ?? "example@gmail.com"} onLogout={logout}/>
-
+          <UserAvatar
+            username={user?.username ?? "Guest"}
+            email={user?.email ?? "example@gmail.com"}
+            onLogout={logout}
+          />
         </div>
 
         {/* Navigation */}

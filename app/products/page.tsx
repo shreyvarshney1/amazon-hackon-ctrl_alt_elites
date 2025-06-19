@@ -31,7 +31,7 @@ import { useAuth } from "../auth-context";
 
 export default function AmazonSearchPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const {user, logout} = useAuth();
+  const { user, logout } = useAuth();
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands((prev) =>
@@ -133,8 +133,11 @@ export default function AmazonSearchPage() {
           </div>
 
           {/* User Avatar  */}
-          <UserAvatar username={user?.username ?? "Guest"} email={user?.email ?? "example@gmail.com"} onLogout={logout}/>
-
+          <UserAvatar
+            username={user?.username ?? "Guest"}
+            email={user?.email ?? "example@gmail.com"}
+            onLogout={logout}
+          />
         </div>
 
         {/* Navigation */}

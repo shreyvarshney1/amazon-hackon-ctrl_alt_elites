@@ -1,20 +1,25 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { ChevronDown, LogOut, User, Settings } from "lucide-react"
-import Image from "next/image"
+import { useState, useRef, useEffect } from "react";
+import { ChevronDown, LogOut, User, Settings } from "lucide-react";
+import Image from "next/image";
 
 interface UserAvatarProps {
-  username: string
-  email: string
-  avatarUrl?: string
-  onLogout?: () => void
+  username: string;
+  email: string;
+  avatarUrl?: string;
+  onLogout?: () => void;
 }
 
-export default function UserAvatar({ username, email, avatarUrl, onLogout }: UserAvatarProps) {
-  const [isHovered, setIsHovered] = useState(false)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+export default function UserAvatar({
+  username,
+  email,
+  avatarUrl,
+  onLogout,
+}: UserAvatarProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Generate initials from username
   const getInitials = (name: string) => {
@@ -22,38 +27,41 @@ export default function UserAvatar({ username, email, avatarUrl, onLogout }: Use
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase())
       .join("")
-      .slice(0, 2)
-  }
+      .slice(0, 2);
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false)
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleAvatarClick = () => {
-    setIsDropdownOpen(!isDropdownOpen)
-    setIsHovered(false) // Hide email tooltip when dropdown opens
-  }
+    setIsDropdownOpen(!isDropdownOpen);
+    setIsHovered(false); // Hide email tooltip when dropdown opens
+  };
 
   const handleLogout = () => {
-    setIsDropdownOpen(false)
+    setIsDropdownOpen(false);
     if (onLogout) {
-      onLogout()
+      onLogout();
     } else {
       // Default logout behavior
-      console.log("Logging out...")
+      console.log("Logging out...");
       // In a real app, you would clear tokens, redirect to login, etc.
     }
-  }
+  };
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -70,7 +78,9 @@ export default function UserAvatar({ username, email, avatarUrl, onLogout }: Use
               src={avatarUrl || "/placeholder.svg"}
               alt={username}
               className={`w-8 h-8 rounded-full object-cover border-2 transition-colors ${
-                isDropdownOpen ? "border-[#ff9900]" : "border-transparent group-hover:border-[#ff9900]"
+                isDropdownOpen
+                  ? "border-[#ff9900]"
+                  : "border-transparent group-hover:border-[#ff9900]"
               }`}
             />
           ) : (
@@ -88,12 +98,16 @@ export default function UserAvatar({ username, email, avatarUrl, onLogout }: Use
 
         {/* Username */}
         <div className="flex items-center text-white text-xs">
-          <span className={`transition-colors ${isDropdownOpen ? "text-[#ff9900]" : "group-hover:text-[#ff9900]"}`}>
+          <span
+            className={`transition-colors ${isDropdownOpen ? "text-[#ff9900]" : "group-hover:text-[#ff9900]"}`}
+          >
             {username}
           </span>
           <ChevronDown
             className={`w-3 h-3 ml-1 transition-all ${
-              isDropdownOpen ? "text-[#ff9900] rotate-180" : "group-hover:text-[#ff9900] rotate-0"
+              isDropdownOpen
+                ? "text-[#ff9900] rotate-180"
+                : "group-hover:text-[#ff9900] rotate-0"
             }`}
           />
         </div>
@@ -149,5 +163,5 @@ export default function UserAvatar({ username, email, avatarUrl, onLogout }: Use
         </div>
       )}
     </div>
-  )
+  );
 }
