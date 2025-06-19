@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from "react";
 // import { useRouter } from 'next/navigation';
 
 interface User {
@@ -29,15 +29,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuthStatus = async () => {
     try {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setIsLoading(false);
         return;
       }
 
-      const response = await fetch('/api/auth/session', {
+      const response = await fetch("/api/auth/session", {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -45,11 +45,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userData = await response.json();
         setUser(userData.user);
       } else {
-        localStorage.removeItem('auth_token');
+        localStorage.removeItem("auth_token");
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
-      localStorage.removeItem('auth_token');
+      console.error("Auth check failed:", error);
+      localStorage.removeItem("auth_token");
     } finally {
       setIsLoading(false);
     }
@@ -57,36 +57,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, username?: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, username }),
       });
 
       if (!response.ok) {
-        throw new Error('Login failed');
+        throw new Error("Login failed");
       }
 
       const data = await response.json();
-      localStorage.setItem('auth_token', data.token);
-      
+      localStorage.setItem("auth_token", data.token);
+
       // Extract user info from email if username not provided
-      const finalUsername = username || email.split('@')[0];
+      const finalUsername = username || email.split("@")[0];
       setUser({
-        id: data.user_id || '1', // You might want to return this from your API
+        id: data.user_id || "1", // You might want to return this from your API
         username: finalUsername,
         email,
       });
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       throw error;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem("auth_token");
     setUser(null);
   };
 
@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

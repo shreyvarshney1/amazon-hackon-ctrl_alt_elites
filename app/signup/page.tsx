@@ -1,15 +1,18 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function AmazonSignupPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
       {/* Amazon Logo */}
       <div className="mb-8">
-        <Link href="/" className="text-3xl font-bold text-gray-900 tracking-tight hover:text-orange-600">
+        <Link
+          href="/"
+          className="text-3xl font-bold text-gray-900 tracking-tight hover:text-orange-600"
+        >
           amazon
         </Link>
       </div>
@@ -35,7 +38,10 @@ export default function AmazonSignupPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-bold text-gray-900">
+              <Label
+                htmlFor="email"
+                className="text-sm font-bold text-gray-900"
+              >
                 Mobile number or email
               </Label>
               <Input
@@ -47,7 +53,10 @@ export default function AmazonSignupPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-bold text-gray-900">
+              <Label
+                htmlFor="password"
+                className="text-sm font-bold text-gray-900"
+              >
                 Password
               </Label>
               <Input
@@ -57,11 +66,16 @@ export default function AmazonSignupPage() {
                 className="h-8 border-gray-400 focus:border-orange-400 focus:ring-orange-400 focus:ring-1"
                 required
               />
-              <div className="text-xs text-gray-600">{"Passwords must be at least 6 characters."}</div>
+              <div className="text-xs text-gray-600">
+                {"Passwords must be at least 6 characters."}
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-sm font-bold text-gray-900">
+              <Label
+                htmlFor="confirmPassword"
+                className="text-sm font-bold text-gray-900"
+              >
                 Re-enter password
               </Label>
               <Input
@@ -82,11 +96,17 @@ export default function AmazonSignupPage() {
 
           <div className="text-xs text-gray-600 leading-4">
             By creating an account, you agree to Amazon&#39;s{" "}
-            <a href="#" className="text-blue-600 hover:text-orange-600 hover:underline">
+            <a
+              href="#"
+              className="text-blue-600 hover:text-orange-600 hover:underline"
+            >
               Conditions of Use
             </a>{" "}
             and{" "}
-            <a href="#" className="text-blue-600 hover:text-orange-600 hover:underline">
+            <a
+              href="#"
+              className="text-blue-600 hover:text-orange-600 hover:underline"
+            >
               Privacy Notice
             </a>
             .
@@ -95,7 +115,10 @@ export default function AmazonSignupPage() {
           <div className="pt-4 border-t border-gray-300">
             <div className="text-xs text-gray-600 mb-2">
               Already have an account?{" "}
-              <Link href="/login" className="text-blue-600 hover:text-orange-600 hover:underline">
+              <Link
+                href="/login"
+                className="text-blue-600 hover:text-orange-600 hover:underline"
+              >
                 Sign in
               </Link>
             </div>
@@ -104,7 +127,10 @@ export default function AmazonSignupPage() {
           <div className="pt-2">
             <div className="text-xs text-gray-600 mb-2">
               Buying for work?{" "}
-              <a href="#" className="text-blue-600 hover:text-orange-600 hover:underline">
+              <a
+                href="#"
+                className="text-blue-600 hover:text-orange-600 hover:underline"
+              >
                 Create a free business account
               </a>
             </div>
@@ -125,8 +151,10 @@ export default function AmazonSignupPage() {
             Help
           </a>
         </div>
-        <div className="text-xs text-gray-600">© 1996-2024, Amazon.com, Inc. or its affiliates</div>
+        <div className="text-xs text-gray-600">
+          © 1996-2024, Amazon.com, Inc. or its affiliates
+        </div>
       </div>
     </div>
-  )
+  );
 }

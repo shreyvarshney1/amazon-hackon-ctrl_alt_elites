@@ -16,6 +16,8 @@ import ProductDetails from "./product-details";
 import { use, useEffect, useState } from "react";
 import { getProductById } from "@/lib/api/product";
 import { Product } from "@/types/product";
+import UserAvatar from "../user-avatar";
+import { useAuth } from "@/app/auth-context";
 // import { getProductById } from "@/lib/api/product";
 // import Image from "next/image"
 
@@ -26,6 +28,7 @@ interface ProductPageProps {
 export default function ProductDetailPage({ params }: ProductPageProps) {
   const resolvedParams = use(params);
   const id = resolvedParams["id-slug"].split("-")[0];
+  const {user, logout} = useAuth();
 
   // const product = mockProducts.find((product) => product.id === id);
 
@@ -44,7 +47,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-[#232f3f] text-white">
-        <div className="flex items-center px-4 py-2">
+        <div className="flex items-center px-4 py-2 justify-around">
           {/* Amazon Logo */}
           <div className="flex items-center mr-4">
             <div className="text-white text-xl font-bold">amazon</div>
@@ -98,6 +101,10 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               <span className="ml-1 font-bold">Cart</span>
             </div>
           </div>
+
+          {/* User Avatar  */}
+          <UserAvatar username={user?.username ?? "Guest"} email={user?.email ?? "example@gmail.com"} onLogout={logout}/>
+
         </div>
 
         {/* Navigation */}

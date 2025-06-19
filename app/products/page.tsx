@@ -27,9 +27,11 @@ import ProductCard from "./product-card";
 import { getProducts } from "@/lib/api/product";
 import { Product } from "@/types/product";
 import UserAvatar from "./user-avatar";
+import { useAuth } from "../auth-context";
 
 export default function AmazonSearchPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const {user, logout} = useAuth();
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands((prev) =>
@@ -129,7 +131,7 @@ export default function AmazonSearchPage() {
           </div>
 
           {/* User Avatar  */}
-          <UserAvatar username="Guest" email="example@backchod.com"/>
+          <UserAvatar username={user?.username ?? "Guest"} email={user?.email ?? "example@gmail.com"} onLogout={logout}/>
 
         </div>
 
