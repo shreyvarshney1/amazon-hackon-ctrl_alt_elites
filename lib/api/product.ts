@@ -22,7 +22,6 @@ export async function getProductById(id: string): Promise<Product> {
   }
 
   const data = await response.json();
-  console.log(data);
 
   return data;
 }
