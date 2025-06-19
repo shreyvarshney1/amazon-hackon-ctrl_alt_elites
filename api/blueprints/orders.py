@@ -90,16 +90,22 @@ def add_order(user):
         if not data or "items" not in data:
             return {"error": "Invalid request data"}, 400
 
-        order = Order(user_id=user.id)
-        db.session.add(order)
-
+        # Validate all products before creating the order
         for item_data in data["items"]:
             product = db.session.query(Product).get(item_data.get("product_id"))
             if not product:
+                db.session.rollback()
                 return {
                     "error": f"Product with ID {item_data.get('product_id')} not found"
                 }, 404
 
+        # Create the order and add it to the session
+        order = Order(user_id=user.id)
+        db.session.add(order)
+
+        # Add order items to the session
+        for item_data in data["items"]:
+            product = db.session.query(Product).get(item_data.get("product_id"))
             order_item = OrderItem(
                 order=order,
                 product=product,
