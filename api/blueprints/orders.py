@@ -274,6 +274,9 @@ def get_seller_order(seller, order_id):
 @check_auth_seller
 def deliver_order(seller, order_id):
     try:
+        data = request.get_json()
+        if not data or "shipped_on_time" not in data:
+            return {"error": "Invalid request data"}, 400
         order = (
             db.session.query(Order)
             .join(OrderItem)
@@ -289,6 +292,7 @@ def deliver_order(seller, order_id):
             return {"error": "Order can only be delivered if it is pending"}, 400
 
         order.status = "delivered"
+        order.shipped_on_time = data["shipped_on_time"]
         db.session.commit()
         return {"message": "Order delivered successfully"}, 200
     except Exception as e:
