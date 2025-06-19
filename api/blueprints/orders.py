@@ -105,7 +105,8 @@ def add_order(user):
 
         # Add order items to the session
         for item_data in data["items"]:
-            product = db.session.query(Product).get(item_data.get("product_id"))
+            product_id = item_data.get("product_id")
+            product = product_cache[product_id]
             order_item = OrderItem(
                 order=order,
                 product=product,
