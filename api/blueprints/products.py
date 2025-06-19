@@ -3,7 +3,7 @@ from flask import request
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import joinedload
 from flask_cors import CORS
-from api.models import db, Product, Review
+from api.models import db, Product, Review, Order, OrderItem
 from .auth import check_auth
 from .seller import check_auth_seller
 
@@ -139,7 +139,6 @@ def add_review(user, product_id):
         rating = data.get("rating")
         review_text = data.get("review_text", "")
         title = data.get("title", "")
-        is_verified_purchase = data.get("is_verified_purchase", False)
 
         if not rating or not 1 <= rating <= 5:
             return {"error": "Rating must be between 1 and 5"}, 400
@@ -147,6 +146,18 @@ def add_review(user, product_id):
         product = db.session.query(Product).get(product_id)
         if not product:
             return {"error": "Product not found"}, 404
+
+        orders = (
+            db.session.query(Order)
+            .join(OrderItem)
+            .filter(
+                Order.user_id == user.id,
+                OrderItem.product_id == product_id,
+                Order.status.in_(["delivered", "returned"]),
+            )
+            .all()
+        )
+        is_verified_purchase = len(orders) > 0
 
         review = Review(
             user_id=user.id,

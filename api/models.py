@@ -54,6 +54,7 @@ class Product(db.Model):
 
     seller = db.relationship("Seller", back_populates="products")
     reviews = db.relationship("Review", back_populates="product", lazy=True)
+    order_items = db.relationship("OrderItem", back_populates="product", lazy=True)
 
 
 # --- Event & Data Logging Entities ---
@@ -102,6 +103,7 @@ class OrderItem(db.Model):
     price_at_purchase = db.Column(db.Float, nullable=False)
 
     order = db.relationship("Order", back_populates="items")
+    product = db.relationship("Product", back_populates="order_items", lazy=True)
 
 
 class Return(db.Model):
