@@ -24,6 +24,10 @@ export async function postReview(review: Omit<
     
     const token = localStorage.getItem("auth_token");
 
+    if (!token) {
+        throw new Error("No auth token available!");
+    }
+
     const response = await fetch(`${API_BASE_URL}/${review.product_id}/add-review`, {
         method: "POST",
         headers: {
