@@ -14,7 +14,7 @@ product_bp = Blueprint("products", __name__, url_prefix=BASE_ROUTE)
 CORS(product_bp, resources={r"/*": {"origins": "*"}})
 
 
-@product_bp.route("/", methods=["GET"])
+@product_bp.route("/all", methods=["GET"])
 def get_products():
     try:
         products = db.session.query(Product).all()
