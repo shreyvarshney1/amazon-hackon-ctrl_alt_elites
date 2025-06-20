@@ -32,7 +32,6 @@ export default function RootLayout({
       >
         <AuthProvider>
           <CartProvider>
-            <Navbar />
             {children}
           </CartProvider>
         </AuthProvider>
