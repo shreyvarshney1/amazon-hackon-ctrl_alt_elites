@@ -389,3 +389,80 @@ def cancel_seller_order(seller):
     except Exception as e:
         db.session.rollback()
         return {"error": str(e)}, 500
+
+@orders_bp.route("/seller/orders/refund-requested", methods=["GET"])
+@check_auth_seller
+def get_refund_requested_orders(seller):
+    try:
+        orders = (
+            db.session.query(Order)
+            .join(OrderItem)
+            .filter(OrderItem.status == "returned", Product.seller_id == seller.id)
+            .all()
+        )
+        return {
+            "orders": [
+                {
+                    "id": order.id,
+                    "user_id": order.user_id,
+                    "created_at": order.created_at,
+                    "total_amount": order.total_amount,
+                    "items": [
+                        {
+                            "product_id": item.product_id,
+                            "quantity": item.quantity,
+                            "price_at_purchase": item.price_at_purchase,
+                            "status": item.status,
+                        }
+                        for item in order.items
+                    ],
+                }
+                for order in orders
+            ]
+        }, 200
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
+    
+@orders_bp.route("/seller/orders/refund-process", methods=["POST"])
+@check_auth_seller
+def process_refund_request(seller):
+    try:
+        data = request.get_json()
+        if not data or "order_id" not in data or "product_id" not in data:
+            return {"error": "Invalid request data"}, 400
+
+        order = (
+            db.session.query(Order)
+            .join(OrderItem)
+            .join(Product)
+            .filter(Order.id == data["order_id"], Product.seller_id == seller.id)
+            .first()
+        )
+
+        if not order:
+            return {"error": "Order not found"}, 404
+
+        order_item = (
+            db.session.query(OrderItem)
+            .filter(
+                OrderItem.order_id == order.id,
+                OrderItem.product_id == data["product_id"],
+            )
+            .first()
+        )
+        if not order_item:
+            return {"error": "Order item not found"}, 404
+
+        order_item.status = "refunded"
+        db.session.commit()
+
+        requests.post(
+            url_for("services.trigger_scs_calculation", _external=True),
+            json={"seller_id": seller.id},
+            timeout=5,
+        )
+        return {"message": "Refund processed successfully"}, 200
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
