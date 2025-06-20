@@ -105,9 +105,10 @@ def add_order(user):
                 }, 404
 
         # Create the order and add it to the session
-        order = Order(user_id=user.id)
+        order = Order(user_id=user.id, total_amount=0)
         db.session.add(order)
 
+        total_amount = 0
         # Add order items to the session
         for item_data in data["items"]:
             product = db.session.query(Product).get(item_data.get("product_id"))
@@ -118,6 +119,8 @@ def add_order(user):
                 price_at_purchase=product.price,
             )
             db.session.add(order_item)
+            total_amount += product.price * order_item.quantity
+        order.total_amount = total_amount
 
         db.session.commit()
         return {"message": "Order created successfully", "order_id": order.id}, 201
