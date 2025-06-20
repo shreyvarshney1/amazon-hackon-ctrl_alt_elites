@@ -285,7 +285,7 @@ function OrdersTab() {
                           </Button>
                         </>
                       )}
-                      {item.status === "returned" && (
+                      {(item.status === "returned" || item.status === "cancelled" ) && (
                         <>
                           <Button
                             size="sm"
