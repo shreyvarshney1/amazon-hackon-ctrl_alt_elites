@@ -5,9 +5,5 @@ export default function SellerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <SellerAuthProvider>
-      {children}
-    </SellerAuthProvider>
-  );
+  return <SellerAuthProvider>{children}</SellerAuthProvider>;
 }

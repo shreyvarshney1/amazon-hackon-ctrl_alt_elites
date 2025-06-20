@@ -18,13 +18,17 @@ export default function SellerLogin() {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-    
+
     try {
       await auth.login(email, username);
       window.location.href = "/seller/dashboard";
     } catch (error) {
       console.error("Seller login failed", error);
-      setError(error instanceof Error ? error.message : "Login failed. Please try again.");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +57,7 @@ export default function SellerLogin() {
                 {error}
               </div>
             )}
-            
+
             <div className="space-y-2">
               <Label
                 htmlFor="email"
@@ -130,8 +134,8 @@ export default function SellerLogin() {
               </Button>
             </Link>
             <div className="text-center">
-              <Link 
-                href="/login" 
+              <Link
+                href="/login"
                 className="text-xs text-blue-600 hover:text-orange-600 hover:underline"
               >
                 Sign in as a customer instead

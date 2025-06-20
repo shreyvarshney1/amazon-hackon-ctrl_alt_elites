@@ -5,7 +5,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { Seller } from "@/types/seller";
 
-
 interface SellerAuthContextType {
   seller: Seller | null;
   isLoading: boolean;
@@ -14,7 +13,7 @@ interface SellerAuthContextType {
 }
 
 const SellerAuthContext = createContext<SellerAuthContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function SellerAuthProvider({
@@ -39,7 +38,7 @@ export function SellerAuthProvider({
           if (sessionResponse.ok) {
             const sessionData = await sessionResponse.json();
             const sellerData = JSON.parse(
-              localStorage.getItem("seller_data") || "{}"
+              localStorage.getItem("seller_data") || "{}",
             );
             const updatedSellerData = {
               ...sellerData,
@@ -49,7 +48,7 @@ export function SellerAuthProvider({
             };
             localStorage.setItem(
               "seller_data",
-              JSON.stringify(updatedSellerData)
+              JSON.stringify(updatedSellerData),
             );
             setSeller(updatedSellerData);
           } else {
@@ -87,14 +86,14 @@ export function SellerAuthProvider({
           message: "Seller login failed with non-JSON response",
         }));
         throw new Error(
-          `Seller login failed: ${errorData.message || "Unknown error"}`
+          `Seller login failed: ${errorData.message || "Unknown error"}`,
         );
       }
 
       const data = await response.json();
       localStorage.setItem("seller_auth_token", data.token);
       const decodedToken: { seller_id: string; username: string } = jwtDecode(
-        data.token
+        data.token,
       );
       const finalUsername = username || email.split("@")[0];
 
@@ -104,7 +103,7 @@ export function SellerAuthProvider({
           id: decodedToken.seller_id,
           email,
           name: finalUsername,
-        })
+        }),
       );
 
       const sessionResponse = await fetch("/api/seller/session", {

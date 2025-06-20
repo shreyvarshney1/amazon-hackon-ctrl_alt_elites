@@ -169,8 +169,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Edit, Plus, X } from "lucide-react";
 import { Product } from "@/types/product";
 
-interface ProductFormData 
- {
+interface ProductFormData {
   name: string;
   slug: string;
   description: string;
@@ -209,12 +208,12 @@ export default function SellerDashboard() {
       if (response.ok) {
         const data = await response.json();
         // Filter products by current seller
-        console.log(data.products)
+        console.log(data.products);
         console.log(seller);
         const sellerProducts = data.products.filter(
-          (product: Product) => product.seller.id === seller?.id
+          (product: Product) => product.seller.id === seller?.id,
         );
-        console.log(sellerProducts)
+        console.log(sellerProducts);
         setProducts(sellerProducts);
       }
     } catch (error) {
@@ -231,7 +230,7 @@ export default function SellerDashboard() {
   }, [seller]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -353,7 +352,7 @@ export default function SellerDashboard() {
     } catch (error) {
       console.error("Delete error:", error);
       alert(
-        error instanceof Error ? error.message : "Failed to delete product"
+        error instanceof Error ? error.message : "Failed to delete product",
       );
     }
   };
@@ -439,7 +438,7 @@ export default function SellerDashboard() {
                         <p>
                           Updated:{" "}
                           {new Date(
-                            seller.last_scs_update
+                            seller.last_scs_update,
                           ).toLocaleDateString()}
                         </p>
                       )}
@@ -527,7 +526,7 @@ export default function SellerDashboard() {
                               </span>
                               <p className="text-gray-900">
                                 {new Date(
-                                  product.listed_at
+                                  product.listed_at,
                                 ).toLocaleDateString()}
                               </p>
                             </div>
@@ -550,7 +549,9 @@ export default function SellerDashboard() {
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
-                            onClick={() => handleDeleteProduct(Number(product.id))}
+                            onClick={() =>
+                              handleDeleteProduct(Number(product.id))
+                            }
                             variant="outline"
                             size="sm"
                             className="text-red-600 hover:text-red-700"
@@ -677,8 +678,8 @@ export default function SellerDashboard() {
                   {formLoading
                     ? "Saving..."
                     : editingProduct
-                    ? "Update Product"
-                    : "Add Product"}
+                      ? "Update Product"
+                      : "Add Product"}
                 </Button>
               </div>
             </form>
