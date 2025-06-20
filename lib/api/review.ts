@@ -17,24 +17,30 @@ export async function getReviews(productId: string): Promise<Review[]> {
 
 
 // Function to post a review
-export async function postReview(review: Omit<
+export async function postReview(
+  review: Omit<
     Review,
-    "id" | "user_id" | "linguistic_authenticity_score" | "username" | "has_trusted_badge"
->): Promise<Review> {
-    
-    const token = localStorage.getItem("auth_token");
+    | "id"
+    | "user_id"
+    | "linguistic_authenticity_score"
+    | "username"
+    | "has_trusted_badge"
+    | "product_id"
+  >,
+  productId: string,
+): Promise<Review> {
+  const token = localStorage.getItem("auth_token");
+  if (!token) {
+    throw new Error("Authentication token not found.");
+  }
 
-    if (!token) {
-        throw new Error("No auth token available!");
-    }
-
-    const response = await fetch(`${API_BASE_URL}/${review.product_id}/add-review`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+  const response = await fetch(`${API_BASE_URL}/${productId}/add-review`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
             review_text: review.review_text,
             rating: review.rating,
             is_verified_purchase: review.is_verified_purchase,

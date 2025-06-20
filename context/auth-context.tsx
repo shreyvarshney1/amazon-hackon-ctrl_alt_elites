@@ -1,7 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
-// import { useRouter } from 'next/navigation';
+import { jwtDecode } from "jwt-decode";
 
 interface User {
   id: string;
@@ -11,6 +12,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  isLoading: boolean;
   login: (email: string, username?: string) => Promise<void>;
   logout: () => void;
 }
@@ -19,46 +21,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-  // Check for existing session on mount
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
     const userData = localStorage.getItem("user_data");
 
     if (token && userData) {
       setUser(JSON.parse(userData));
+    } else {
+      // Set a guest user if no token is found
+      setUser({ id: "guest", username: "Guest", email: "" });
     }
-
-    // checkAuthStatus();
+    setIsLoading(false);
   }, []);
-
-  // const checkAuthStatus = async () => {
-  //   try {
-  //     const token = localStorage.getItem("auth_token");
-  //     if (!token) {
-  //       setIsLoading(false);
-  //       return;
-  //     }
-
-  //     const response = await fetch("/api/auth/session", {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     if (response.ok) {
-  //       const userData = await response.json();
-  //       setUser(userData.user);
-  //     } else {
-  //       localStorage.removeItem("auth_token");
-  //     }
-  //   } catch (error) {
-  //     console.error("Auth check failed:", error);
-  //     localStorage.removeItem("auth_token");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   const login = async (email: string, username?: string) => {
     try {
@@ -71,29 +48,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (!response.ok) {
-        throw new Error("Login failed");
+        const errorData = await response.json().catch(() => ({
+          message: "Login failed with non-JSON response",
+        }));
+        throw new Error(
+          `Login failed: ${errorData.message || "Unknown error"}`,
+        );
       }
 
       const data = await response.json();
       localStorage.setItem("auth_token", data.token);
+      const decodedToken: { user_id: string } = jwtDecode(data.token);
       const finalUsername = username || email.split("@")[0];
       localStorage.setItem(
         "user_data",
         JSON.stringify({
-          id: data.user_id,
+          id: decodedToken.user_id,
           email,
           username: finalUsername,
         }),
       );
 
-      // Extract user info from email if username not provided
       setUser({
-        id: data.user_id || "1", // You might want to return this from your API
+        id: decodedToken.user_id,
         username: finalUsername,
         email,
       });
     } catch (error) {
       console.error("Login error:", error);
+      // Re-throw the error to be caught by the calling component
       throw error;
     }
   };
@@ -101,11 +84,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("user_data");
-    setUser(null);
+    setUser({ id: "guest", username: "Guest", email: "" });
+    router.push("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/context/auth-context";
 import { useEffect, useState } from "react";
 import {
   Search,
@@ -10,6 +11,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -20,18 +22,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// import Image from "next/image";
-
 import ProductCard from "./product-card";
-// import { mockProducts } from "@/lib/mockData";
 import { getProducts } from "@/lib/api/product";
 import { Product } from "@/types/product";
-import UserAvatar from "./user-avatar";
-import { useAuth } from "../auth-context";
 
 export default function AmazonSearchPage() {
+  const { user, logout, isLoading } = useAuth();
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const { user, logout } = useAuth();
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands((prev) =>
@@ -77,7 +74,7 @@ export default function AmazonSearchPage() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-[#232f3f] text-white">
-        <div className="flex items-center px-4 py-2 justify-around">
+        <div className="flex items-center px-4 py-2">
           {/* Amazon Logo */}
           <div className="flex items-center mr-4">
             <div className="text-white text-xl font-bold">amazon</div>
@@ -115,10 +112,26 @@ export default function AmazonSearchPage() {
 
           {/* Account & Cart */}
           <div className="flex items-center gap-6 text-sm">
-            <div>
-              <div className="text-xs">Accounts</div>
-              <div className="font-bold">& Lists</div>
-            </div>
+            {isLoading ? (
+              <div>Loading...</div>
+            ) : user && user.id !== "guest" ? (
+              <>
+                <div>
+                  <div className="text-xs">Hello, {user.username}</div>
+                  <div className="font-bold">Accounts & Lists</div>
+                </div>
+                <Button
+                  onClick={logout}
+                  className="bg-red-500 hover:bg-red-600"
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link href="/login">
+                <Button>Login</Button>
+              </Link>
+            )}
             <div>
               <div className="text-xs">Returns</div>
               <div className="font-bold">& Orders</div>
@@ -131,13 +144,6 @@ export default function AmazonSearchPage() {
               <span className="ml-1 font-bold">Cart</span>
             </div>
           </div>
-
-          {/* User Avatar  */}
-          <UserAvatar
-            username={user?.username ?? "Guest"}
-            email={user?.email ?? "example@gmail.com"}
-            onLogout={logout}
-          />
         </div>
 
         {/* Navigation */}
