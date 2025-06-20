@@ -1,9 +1,12 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookmarkCheck, Star } from "lucide-react";
 import { Product } from "@/types/product";
+import { useCart } from "@/context/cart-context";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   product: Product;
@@ -43,6 +46,8 @@ export const VerifiedSellerBadge = () => {
 };
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCart();
+  const router = useRouter();
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-IN").format(price);
   };
@@ -52,10 +57,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   //   : 0;
 
   return (
-    <Link href={`/products/${product.id}-${product.slug}`} className="block">
-      <Card className="flex flex-row gap-4 p-4 border border-[#dddddd] rounded hover:shadow-md transition-shadow duration-200">
+    <Card className="flex flex-col gap-4 p-4 border border-[#dddddd] rounded hover:shadow-md transition-shadow duration-200">
+      <Link href={`/products/${product.id}-${product.slug}`} className="block">
         {/* Product Image */}
-        <div className="w-48 h-48 bg-[#f0f0f0] rounded flex items-center justify-center">
+        <div className="w-48 h-48 bg-[#f0f0f0] rounded flex items-center justify-center mx-auto">
           <Image
             src={product.image_urls[0]}
             alt={product.name}
@@ -146,7 +151,26 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
         </div>
-      </Card>
-    </Link>
+      </Link>
+      <div className="flex gap-2">
+        <button
+          onClick={() => {
+            addToCart(product);
+          }}
+          className="mt-4 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
+        >
+          Add to Cart
+        </button>
+        <button
+          onClick={() => {
+            addToCart(product);
+            router.push("/cart");
+          }}
+          className="mt-4 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
+        >
+          Buy Now
+        </button>
+      </div>
+    </Card>
   );
 }
