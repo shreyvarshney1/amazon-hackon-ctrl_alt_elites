@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  redirects: async () => {
+    return [
+      {
+        source: "/",
+        destination: "/products",
+        permanent: false,
+      },
+    ];
+  },
   rewrites: async () => {
     return [
       {
