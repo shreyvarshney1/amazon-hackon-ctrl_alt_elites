@@ -23,6 +23,7 @@ def get_my_orders(user):
                     "created_at": (
                         order.created_at.isoformat() if order.created_at else None
                     ),
+                    "total_amount": order.total_amount, # @Sat
                     "items": [
                         {
                             "id": item.id,
