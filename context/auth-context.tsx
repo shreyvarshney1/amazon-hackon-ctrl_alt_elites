@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (sessionResponse.ok) {
             const sessionData = await sessionResponse.json();
             const userData = JSON.parse(
-              localStorage.getItem("user_data") || "{}"
+              localStorage.getItem("user_data") || "{}",
             );
             const updatedUserData = {
               ...userData,
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           message: "Login failed with non-JSON response",
         }));
         throw new Error(
-          `Login failed: ${errorData.message || "Unknown error"}`
+          `Login failed: ${errorData.message || "Unknown error"}`,
         );
       }
 
