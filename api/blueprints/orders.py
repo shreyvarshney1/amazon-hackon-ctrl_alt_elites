@@ -23,17 +23,19 @@ def get_my_orders(user):
                     "created_at": (
                         order.created_at.isoformat() if order.created_at else None
                     ),
-                    "status": order.status,
-                    "shipped_on_time": order.shipped_on_time,
                     "items": [
                         {
                             "id": item.id,
+                            "product_id": item.product.id,
                             "product_name": item.product.name,
                             "product_description": item.product.description,
                             "product_category": item.product.category,
                             "product_seller": item.product.seller.name,
                             "quantity": item.quantity,
                             "price_at_purchase": item.price_at_purchase,
+                            "status": item.status,
+                            "cancelled_by_seller": item.cancelled_by_seller,
+                            "delivered_on_time": item.delivered_on_time,
                         }
                         for item in order.items
                     ],
@@ -63,17 +65,19 @@ def get_order(user, order_id):
             "id": order.id,
             "username": order.user.username,
             "created_at": order.created_at.isoformat() if order.created_at else None,
-            "status": order.status,
-            "shipped_on_time": order.shipped_on_time,
             "items": [
                 {
                     "id": item.id,
+                    "product_id": item.product.id,
                     "product_name": item.product.name,
                     "product_description": item.product.description,
                     "product_category": item.product.category,
                     "product_seller": item.product.seller.name,
                     "quantity": item.quantity,
                     "price_at_purchase": item.price_at_purchase,
+                    "status": item.status,
+                    "cancelled_by_seller": item.cancelled_by_seller,
+                    "delivered_on_time": item.delivered_on_time,
                 }
                 for item in order.items
             ],
@@ -122,64 +126,69 @@ def add_order(user):
         return {"error": str(e)}, 500
 
 
-@orders_bp.route("/<int:order_id>/cancel", methods=["POST"])
+@orders_bp.route("/cancel-order", methods=["POST"])
 @check_auth
-def cancel_order(user, order_id):
+def cancel_order(user):
     try:
-        order = (
-            db.session.query(Order)
-            .filter(Order.id == order_id, Order.user_id == user.id)
-            .first()
-        )
+        data = request.get_json()
+        if not data or "order_id" not in data or "product_id" not in data:
+            return {"error": "Invalid request data"}, 400
+
+        order = db.session.query(Order).get(data["order_id"])
         if not order:
             return {"error": "Order not found"}, 404
 
-        if order.status == "delivered":
-            return {
-                "error": "Cannot cancel an order that has already been delivered"
-            }, 400
-
-        order.status = "cancelled"
-        db.session.commit()
-        requests.post(
-            url_for("services.trigger_uba_calculation", _external=True),
-            json={"user_id": user.id},
-            timeout=5,
+        order_item = (
+            db.session.query(OrderItem)
+            .filter(
+                OrderItem.order_id == order.id,
+                OrderItem.product_id == data["product_id"],
+                OrderItem.user_id == user.id,
+            )
+            .filter(OrderItem.status != "delivered")
+            .first()
         )
+        if not order_item:
+            return {"error": "No matching order items found"}, 404
+
+        order_item.status = "cancelled"
+        order_item.cancelled_by_seller = False
+
+        db.session.commit()
         return {"message": "Order cancelled successfully"}, 200
     except Exception as e:
         db.session.rollback()
         return {"error": str(e)}, 500
 
 
-@orders_bp.route("/<int:product_id>/return", methods=["POST"])
+@orders_bp.route("/return-product", methods=["POST"])
 @check_auth
-def return_product(user, product_id):
+def return_product(user):
     try:
         data = request.get_json()
-        if not data or "reason" not in data:
+        if not data or "reason" not in data or "product_id" not in data:
             return {"error": "Invalid request data"}, 400
 
-        product = db.session.query(Product).get(product_id)
+        product = db.session.query(Product).get(data["product_id"])
         if not product:
             return {"error": "Product not found"}, 404
-
-        return_items = (
+        order_item = (
             db.session.query(OrderItem)
             .filter(OrderItem.product_id == product.id, OrderItem.user_id == user.id)
-            .all()
+            .filter(OrderItem.status == "delivered")
+            .first()
         )
-        if not return_items:
-            return {"error": "No items to return for this product"}, 400
 
-        for item in return_items:
-            return_record = Return(
-                order_item_id=item.id,
-                user_id=user.id,
-                reason_text=data["reason"],
-                reason_category=data.get("reason_category", "other"),
-            )
-            db.session.add(return_record)
+        if not order_item:
+            return {"error": "No matching order item found"}, 404
+
+        return_record = Return(
+            order_item_id=order_item.id,
+            user_id=user.id,
+            reason_text=data["reason"],
+            reason_category=data.get("reason_category", "other"),
+        )
+        db.session.add(return_record)
 
         db.session.commit()
 
@@ -226,16 +235,18 @@ def get_seller_orders(seller):
                     "created_at": (
                         order.created_at.isoformat() if order.created_at else None
                     ),
-                    "status": order.status,
-                    "shipped_on_time": order.shipped_on_time,
                     "items": [
                         {
                             "id": item.id,
+                            "product_id": item.product.id,
                             "product_name": item.product.name,
                             "product_description": item.product.description,
                             "product_category": item.product.category,
                             "quantity": item.quantity,
                             "price_at_purchase": item.price_at_purchase,
+                            "status": item.status,
+                            "cancelled_by_seller": item.cancelled_by_seller,
+                            "delivered_on_time": item.delivered_on_time,
                         }
                         for item in order.items
                     ],
@@ -267,16 +278,18 @@ def get_seller_order(seller, order_id):
             "id": order.id,
             "username": order.user.username,
             "created_at": order.created_at.isoformat() if order.created_at else None,
-            "status": order.status,
-            "shipped_on_time": order.shipped_on_time,
             "items": [
                 {
                     "id": item.id,
+                    "product_id": item.product.id,
                     "product_name": item.product.name,
                     "product_description": item.product.description,
                     "product_category": item.product.category,
                     "quantity": item.quantity,
                     "price_at_purchase": item.price_at_purchase,
+                    "status": item.status,
+                    "cancelled_by_seller": item.cancelled_by_seller,
+                    "delivered_on_time": item.delivered_on_time,
                 }
                 for item in order.items
             ],
@@ -286,36 +299,45 @@ def get_seller_order(seller, order_id):
         return {"error": str(e)}, 500
 
 
-@orders_bp.route("/seller/orders/<int:order_id>/deliver", methods=["POST"])
+@orders_bp.route("/seller/orders/deliver-product", methods=["POST"])
 @check_auth_seller
-def deliver_order(seller, order_id):
+def deliver_order(seller):
     try:
         data = request.get_json()
-        if not data or "shipped_on_time" not in data:
+        if (
+            not data
+            or "delivered_on_time" not in data
+            or "order_id" not in data
+            or "product_id" not in data
+        ):
             return {"error": "Invalid request data"}, 400
         order = (
             db.session.query(Order)
             .join(OrderItem)
             .join(Product)
-            .filter(Order.id == order_id, Product.seller_id == seller.id)
+            .filter(Order.id == data["order_id"], Product.seller_id == seller.id)
             .first()
         )
-
         if not order:
             return {"error": "Order not found"}, 404
-
-        if order.status != "pending":
-            return {"error": "Order can only be delivered if it is pending"}, 400
-
-        order.status = "delivered"
-        order.shipped_on_time = data["shipped_on_time"]
-        db.session.commit()
-        for item in order.items:
-            requests.post(
-                url_for("services.trigger_pis_calculation", _external=True),
-                json={"product_id": item.product.id},
-                timeout=5,
+        order_item = (
+            db.session.query(OrderItem)
+            .filter(
+                OrderItem.order_id == order.id,
+                OrderItem.product_id == data["product_id"],
             )
+            .first()
+        )
+        if not order_item:
+            return {"error": "Order item not found"}, 404
+        order_item.delivered_on_time = data["delivered_on_time"]
+        order_item.status = "delivered"
+        db.session.commit()
+        requests.post(
+            url_for("services.trigger_pis_calculation", _external=True),
+            json={"product_id": order_item.product.id},
+            timeout=5,
+        )
         requests.post(
             url_for("services.trigger_scs_calculation", _external=True),
             json={"seller_id": seller.id},
@@ -327,27 +349,36 @@ def deliver_order(seller, order_id):
         return {"error": str(e)}, 500
 
 
-@orders_bp.route("/seller/orders/<int:order_id>/cancel", methods=["POST"])
+@orders_bp.route("/seller/orders/cancel-product", methods=["POST"])
 @check_auth_seller
-def cancel_seller_order(seller, order_id):
+def cancel_seller_order(seller):
     try:
+        data = request.get_json()
+        if not data or "order_id" not in data or "product_id" not in data:
+            return {"error": "Invalid request data"}, 400
         order = (
             db.session.query(Order)
             .join(OrderItem)
             .join(Product)
-            .filter(Order.id == order_id, Product.seller_id == seller.id)
+            .filter(Order.id == data["order_id"], Product.seller_id == seller.id)
             .first()
         )
 
         if not order:
             return {"error": "Order not found"}, 404
 
-        if order.status == "delivered":
-            return {
-                "error": "Cannot cancel an order that has already been delivered"
-            }, 400
-
-        order.status = "cancelled"
+        order_item = (
+            db.session.query(OrderItem)
+            .filter(
+                OrderItem.order_id == order.id,
+                OrderItem.product_id == data["product_id"],
+            )
+            .first()
+        )
+        if not order_item:
+            return {"error": "Order item not found"}, 404
+        order_item.cancelled_by_seller = True
+        order_item.status = "cancelled"
         db.session.commit()
         requests.post(
             url_for("services.trigger_scs_calculation", _external=True),
