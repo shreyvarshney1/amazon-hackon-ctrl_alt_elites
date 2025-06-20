@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import ReviewItem from "./review-item";
 import type { Review } from "@/types/review";
-import { useProtectedAction } from "@/app/protected-action";
 
 interface ReviewSectionProps {
   reviews: Review[];
@@ -32,26 +31,29 @@ export default function ReviewSection({
   const [hoveredRating, setHoveredRating] = useState(0);
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewText, setReviewText] = useState("");
-
-  const { executeProtectedAction, isAuthenticated } = useProtectedAction();
+  // const [authorName, setAuthorName] = useState("");
 
   const handleSubmitReview = () => {
-    executeProtectedAction(() => {
-      if (rating > 0 && reviewText.trim() && onSubmitReview) {
-        onSubmitReview({
-          rating,
-          title: reviewTitle,
-          review_text: reviewText,
-          created_at: new Date().toISOString(),
-          is_verified_purchase: true,
-        });
+    if (
+      rating > 0 &&
+      reviewText.trim() &&
+      // authorName.trim() &&
+      onSubmitReview
+    ) {
+      onSubmitReview({
+        rating,
+        title: reviewTitle,
+        review_text: reviewText,
+        created_at: new Date().toISOString(),
+        is_verified_purchase: true,
+      });
 
-        // Reset form
-        setRating(0);
-        setReviewTitle("");
-        setReviewText("");
-      }
-    });
+      // Reset form
+      setRating(0);
+      setReviewTitle("");
+      setReviewText("");
+      // setAuthorName("");
+    }
   };
 
   const StarRating = ({ interactive = false }: { interactive?: boolean }) => (
@@ -78,29 +80,25 @@ export default function ReviewSection({
       <div className="bg-white border border-[#dddddd] rounded-lg p-6 mb-8">
         <h2 className="text-xl font-bold mb-4">Write a customer review</h2>
 
-        {!isAuthenticated && (
-          <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-4">
-            <p className="text-blue-800 text-sm">
-              Please{" "}
-              <button
-                onClick={() => executeProtectedAction(() => {})}
-                className="text-blue-600 underline hover:text-blue-800"
-              >
-                sign in
-              </button>{" "}
-              to write a review.
-            </p>
-          </div>
-        )}
-
         <div className="space-y-4">
           {/* Rating */}
           <div>
             <label className="block text-sm font-medium mb-2">
               Overall rating
             </label>
-            <StarRating interactive={isAuthenticated} />
+            <StarRating interactive={true} />
           </div>
+
+          {/* Author Name */}
+          {/* <div>
+            <label className="block text-sm font-medium mb-2">Your name</label>
+            <Input
+              value={authorName}
+              onChange={(e) => setAuthorName(e.target.value)}
+              placeholder="Enter your name"
+              className="max-w-md"
+            />
+          </div> */}
 
           {/* Review Title */}
           <div>
@@ -112,7 +110,6 @@ export default function ReviewSection({
               onChange={(e) => setReviewTitle(e.target.value)}
               placeholder="What's most important to know?"
               className="max-w-md"
-              disabled={!isAuthenticated}
             />
           </div>
 
@@ -126,17 +123,16 @@ export default function ReviewSection({
               onChange={(e) => setReviewText(e.target.value)}
               placeholder="What did you like or dislike? What did you use this product for?"
               className="min-h-[120px]"
-              disabled={!isAuthenticated}
             />
           </div>
 
           {/* Submit Button */}
           <Button
             onClick={handleSubmitReview}
-            disabled={!isAuthenticated || !rating || !reviewText.trim()}
+            disabled={!rating || !reviewText.trim()}
             className="bg-[#ff9900] hover:bg-[#f0a742] text-black font-medium px-6"
           >
-            {!isAuthenticated ? "Sign in to Submit" : "Submit"}
+            Submit
           </Button>
         </div>
       </div>

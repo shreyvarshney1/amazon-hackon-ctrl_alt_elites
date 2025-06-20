@@ -21,18 +21,12 @@ export async function postReview(review: Omit<
     Review,
     "id" | "user_id" | "linguistic_authenticity_score" | "username" | "has_trusted_badge"
 >): Promise<Review> {
-    
-    const token = localStorage.getItem("auth_token");
-
-    if (!token) {
-        throw new Error("No auth token available!");
-    }
 
     const response = await fetch(`${API_BASE_URL}/${review.product_id}/add-review`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            // "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
             review_text: review.review_text,

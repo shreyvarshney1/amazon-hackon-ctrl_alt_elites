@@ -1,47 +1,10 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
-import { useAuth } from "../auth-context";
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const { login } = useAuth();
-  const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
-    try {
-      await login(email);
-
-      // Check for redirect URL
-      const redirectUrl =
-        localStorage.getItem("redirect_after_login") || "/products";
-      localStorage.removeItem("redirect_after_login");
-
-      router.push(redirectUrl);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError(String(err));
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+export default function Home() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
       {/* Amazon Logo */}
@@ -58,12 +21,7 @@ export default function LoginPage() {
           <h1 className="text-2xl font-normal text-gray-900">Sign in</h1>
         </CardHeader>
         <CardContent className="space-y-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="text-red-600 text-sm bg-red-50 p-2 rounded">
-                {error}
-              </div>
-            )}
+          <form className="space-y-4">
             <div className="space-y-2">
               <Label
                 htmlFor="email"
@@ -74,20 +32,16 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className="h-8 border-gray-400 focus:border-orange-400 focus:ring-orange-400 focus:ring-1"
                 required
-                disabled={isLoading}
               />
             </div>
 
             <Button
               type="submit"
-              disabled={isLoading}
               className="w-full h-8 bg-gradient-to-b from-yellow-200 to-yellow-400 hover:from-yellow-300 hover:to-yellow-500 text-black border border-yellow-600 shadow-sm font-normal"
             >
-              {isLoading ? "Signing in..." : "Continue"}
+              Continue
             </Button>
           </form>
 
