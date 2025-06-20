@@ -29,6 +29,7 @@ class Seller(db.Model):
     __tablename__ = "sellers"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
+    dispute_rate = db.Column(db.Float, nullable=True, default=0.0)
     created_at = db.Column(db.DateTime(timezone=True), server_default=text("now()"))
 
     scs_score = db.Column(db.Float, nullable=True, default=0.5)
@@ -76,6 +77,7 @@ class Review(db.Model):
     linguistic_authenticity_score = db.Column(db.Float)
 
     user = db.relationship("User", back_populates="reviews")
+    author = db.relationship("User", foreign_keys=[user_id], overlaps="user,reviews")
     product = db.relationship("Product", back_populates="reviews")
 
 
