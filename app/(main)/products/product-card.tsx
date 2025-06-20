@@ -116,7 +116,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               fontWeight: 500,
             }}
           >
-            Product Integrity Score (PIS) : {product.pis_score}
+            Product Integrity Score (PIS) : {product.pis_score.toFixed(2)}
           </p>
         </div>
 
