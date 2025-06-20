@@ -65,13 +65,9 @@ export default function ProductDetails({ product }: ProductDetailProps) {
       | "username"
       | "has_trusted_badge"
     >,
+    productId: string,
   ) => {
-    // Add product id to the newReview object and submit
-    const createdReview = await postReview({
-      ...newReview,
-      product_id: Number(product.id),
-    });
-
+    const createdReview = await postReview(newReview, productId);
     setReviews([createdReview, ...reviews]);
   };
 
@@ -306,7 +302,11 @@ export default function ProductDetails({ product }: ProductDetailProps) {
 
       {/* Reviews Section */}
       <div className="px-4 py-2">
-        <ReviewSection reviews={reviews} onSubmitReview={handleNewReview} />
+        <ReviewSection
+          reviews={reviews}
+          productId={product.id.toString()}
+          onSubmitReview={handleNewReview}
+        />
       </div>
     </div>
   );
