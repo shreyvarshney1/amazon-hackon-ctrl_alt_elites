@@ -254,10 +254,11 @@ def get_seller_orders(seller):
                             "cancelled_by_seller": item.cancelled_by_seller,
                             "delivered_on_time": item.delivered_on_time,
                         }
-                        for item in order.items
+                        for item in order.items if item.product.seller_id == seller.id
                     ],
                 }
                 for order in orders
+                if any(item.product.seller_id == seller.id for item in order.items)
             ]
         }, 200
     except Exception as e:
