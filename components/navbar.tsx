@@ -78,7 +78,10 @@ export default function Navbar() {
                 Accounts & Lists (UBA: {user.uba_score?.toFixed(2)})
               </div>
             </div>
-            <Button onClick={logout} className="bg-red-500 hover:bg-red-600 cursor-pointer">
+            <Button
+              onClick={logout}
+              className="bg-red-500 hover:bg-red-600 cursor-pointer"
+            >
               Logout
             </Button>
           </>
