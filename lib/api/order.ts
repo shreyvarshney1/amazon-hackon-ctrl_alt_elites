@@ -4,7 +4,7 @@ interface OrderDetails {
 }
 
 export async function placeOrder(
-  product_id: string,
+  productId: string,
   quantity: number,
 ): Promise<OrderDetails> {
   const token = localStorage.getItem("auth_token");
@@ -22,7 +22,7 @@ export async function placeOrder(
     body: JSON.stringify({
       items: [
         {
-          product_id: product_id,
+          product_id: productId,
           quantity: quantity,
         },
       ],
