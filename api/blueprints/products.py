@@ -86,6 +86,12 @@ def get_product(product_id):
             "image_urls": product.image_urls,
             "listed_at": product.listed_at.isoformat(),
             "pis_score": product.pis_score,
+            "rating": (
+                sum(review.rating for review in product.reviews) / len(product.reviews)
+                if product.reviews
+                else 0
+            ),
+            "review_count": len(product.reviews),
             "last_pis_update": (
                 product.last_pis_update.isoformat() if product.last_pis_update else None
             ),
