@@ -1,5 +1,6 @@
 from flask_smorest import Blueprint
-from flask import request
+from flask import request, url_for
+import requests
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import joinedload
 from flask_cors import CORS
@@ -170,6 +171,33 @@ def add_review(user, product_id):
         db.session.add(review)
         db.session.commit()
 
+        requests.post(
+            url_for(
+                "services.trigger_uba_calculation",
+                _external=True,
+            ),
+            json={"user_id": user.id},
+            timeout=5,
+        )
+
+        requests.post(
+            url_for(
+                "services.trigger_pis_calculation",
+                _external=True,
+            ),
+            json={"product_id": product_id},
+            timeout=5,
+        )
+
+        requests.post(
+            url_for(
+                "services.trigger_scs_calculation",
+                _external=True,
+            ),
+            json={"seller_id": product.seller_id},
+            timeout=5,
+        )
+
         # return {"message": "Review added successfully", "review" : review}, 201
 
         # Refresh the object to ensure all auto-generated fields are loaded
@@ -222,6 +250,15 @@ def add_product(seller):
         db.session.add(product)
         db.session.commit()
 
+        requests.post(
+            url_for(
+                "services.trigger_pis_calculation",
+                _external=True,
+            ),
+            json={"product_id": product.id},
+            timeout=5,
+        )
+
         return {"message": "Product added successfully", "product_id": product.id}, 201
     except Exception as e:
         db.session.rollback()
@@ -251,6 +288,15 @@ def update_product(seller, product_id):
             product.image_urls = data["image_urls"]
 
         db.session.commit()
+
+        requests.post(
+            url_for(
+                "services.trigger_pis_calculation",
+                _external=True,
+            ),
+            json={"product_id": product.id},
+            timeout=5,
+        )
 
         return {"message": "Product updated successfully"}, 200
     except Exception as e:

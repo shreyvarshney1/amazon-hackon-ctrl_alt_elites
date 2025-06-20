@@ -1,5 +1,6 @@
 from flask_smorest import Blueprint
-from flask import request
+from flask import request, url_for
+import requests
 
 from api.models import db, Order, OrderItem, Product, Return
 from .auth import check_auth
@@ -140,35 +141,37 @@ def cancel_order(user, order_id):
 
         order.status = "cancelled"
         db.session.commit()
+        requests.post(
+            url_for("services.trigger_uba_calculation", _external=True),
+            json={"user_id": user.id},
+            timeout=5,
+        )
         return {"message": "Order cancelled successfully"}, 200
     except Exception as e:
         db.session.rollback()
         return {"error": str(e)}, 500
 
 
-@orders_bp.route("/<int:order_id>/return", methods=["POST"])
+@orders_bp.route("/<int:product_id>/return", methods=["POST"])
 @check_auth
-def return_order(user, order_id):
+def return_product(user, product_id):
     try:
         data = request.get_json()
         if not data or "reason" not in data:
             return {"error": "Invalid request data"}, 400
-        order = (
-            db.session.query(Order)
-            .filter(Order.id == order_id, Order.user_id == user.id)
-            .first()
-        )
-        if not order:
-            return {"error": "Order not found"}, 404
 
-        if order.status != "delivered":
-            return {"error": "Only delivered orders can be returned"}, 400
+        product = db.session.query(Product).get(product_id)
+        if not product:
+            return {"error": "Product not found"}, 404
 
         return_items = (
-            db.session.query(OrderItem).filter(OrderItem.order_id == order.id).all()
+            db.session.query(OrderItem)
+            .filter(OrderItem.product_id == product.id, OrderItem.user_id == user.id)
+            .all()
         )
         if not return_items:
-            return {"error": "No items to return in this order"}, 400
+            return {"error": "No items to return for this product"}, 400
+
         for item in return_items:
             return_record = Return(
                 order_item_id=item.id,
@@ -177,12 +180,26 @@ def return_order(user, order_id):
                 reason_category=data.get("reason_category", "other"),
             )
             db.session.add(return_record)
-        db.session.flush()
 
-        order.status = "returned"
         db.session.commit()
 
-        return {"message": "Order returned successfully"}, 200
+        requests.post(
+            url_for("services.trigger_uba_calculation", _external=True),
+            json={"user_id": user.id},
+            timeout=5,
+        )
+        requests.post(
+            url_for("services.trigger_pis_calculation", _external=True),
+            json={"product_id": product.id},
+            timeout=5,
+        )
+        requests.post(
+            url_for("services.trigger_scs_calculation", _external=True),
+            json={"seller_id": product.seller_id},
+            timeout=5,
+        )
+
+        return {"message": "Product return initiated successfully"}, 200
     except Exception as e:
         db.session.rollback()
         return {"error": str(e)}, 500
@@ -293,6 +310,17 @@ def deliver_order(seller, order_id):
         order.status = "delivered"
         order.shipped_on_time = data["shipped_on_time"]
         db.session.commit()
+        for item in order.items:
+            requests.post(
+                url_for("services.trigger_pis_calculation", _external=True),
+                json={"product_id": item.product.id},
+                timeout=5,
+            )
+        requests.post(
+            url_for("services.trigger_scs_calculation", _external=True),
+            json={"seller_id": seller.id},
+            timeout=5,
+        )
         return {"message": "Order delivered successfully"}, 200
     except Exception as e:
         db.session.rollback()
@@ -321,6 +349,11 @@ def cancel_seller_order(seller, order_id):
 
         order.status = "cancelled"
         db.session.commit()
+        requests.post(
+            url_for("services.trigger_scs_calculation", _external=True),
+            json={"seller_id": seller.id},
+            timeout=5,
+        )
         return {"message": "Order cancelled successfully"}, 200
     except Exception as e:
         db.session.rollback()

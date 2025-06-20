@@ -3,7 +3,7 @@ Flask Blueprints for the UBA, PIS, and SCS API endpoints.
 These routes act as the triggers for score recalculations.
 """
 
-from flask import jsonify
+from flask import jsonify, request
 from flask_smorest import Blueprint
 from api.models import db, User, Product, Seller
 from api.ml_services import uba_service, pis_service, scs_service
@@ -13,12 +13,16 @@ BASE_ROUTE = "/api/services"
 services_bp = Blueprint("services", __name__, url_prefix=BASE_ROUTE)
 
 
-@services_bp.route("/uba/<int:user_id>", methods=["POST"])
-def trigger_uba_calculation(user_id):
+@services_bp.route("/uba", methods=["POST"])
+def trigger_uba_calculation():
     """
     Calculates and returns the User Behavior & Anomaly score for a given user.
     This is triggered when a user performs an action like posting a review.
     """
+    data = request.json
+    if not data or "user_id" not in data:
+        return jsonify({"error": "User ID is required"}), 400
+    user_id = data["user_id"]
     if not User.query.get(user_id):
         return jsonify({"error": "User not found"}), 404
 
@@ -39,13 +43,17 @@ def trigger_uba_calculation(user_id):
     )
 
 
-@services_bp.route("/pis/<int:product_id>", methods=["POST"])
-def trigger_pis_calculation(product_id):
+@services_bp.route("/pis", methods=["POST"])
+def trigger_pis_calculation():
     """
     Calculates the Product Integrity Score and triggers a cascading update
     to the seller's SCS. This is triggered by events like a new review,
     a return, or a manual flag.
     """
+    data = request.json
+    if not data or "product_id" not in data:
+        return jsonify({"error": "Product ID is required"}), 400
+    product_id = data["product_id"]
     product = Product.query.get(product_id)
     if not product:
         return jsonify({"error": "Product not found"}), 404
@@ -76,13 +84,17 @@ def trigger_pis_calculation(product_id):
     )
 
 
-@services_bp.route("/scs/<int:seller_id>", methods=["POST"])
-def trigger_scs_calculation(seller_id):
+@services_bp.route("/scs", methods=["POST"])
+def trigger_scs_calculation():
     """
     Calculates and returns the Seller Credibility Score.
     This can be triggered by seller-specific events like a dispute or
     a change in fulfillment metrics, independent of a PIS update.
     """
+    data = request.json
+    if not data or "seller_id" not in data:
+        return jsonify({"error": "Seller ID is required"}), 400
+    seller_id = data["seller_id"]
     if not Seller.query.get(seller_id):
         return jsonify({"error": "Seller not found"}), 404
 

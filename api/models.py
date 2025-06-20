@@ -15,7 +15,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=text("now()"))
 
     # UBA Score - The core output of Microservice 1
-    uba_score = db.Column(db.Float, nullable=True, default=1.0)
+    uba_score = db.Column(db.Float, nullable=True, default=0.5)
     # Example: 1.0 if phone/address verified
     profile_completeness_score = db.Column(db.Float, default=0.5)
     last_uba_update = db.Column(db.DateTime(timezone=True))
@@ -31,7 +31,7 @@ class Seller(db.Model):
     name = db.Column(db.String(150), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=text("now()"))
 
-    scs_score = db.Column(db.Float, nullable=True, default=1.0)
+    scs_score = db.Column(db.Float, nullable=True, default=0.5)
     last_scs_update = db.Column(db.DateTime(timezone=True))
 
     products = db.relationship("Product", back_populates="seller", lazy=True)
