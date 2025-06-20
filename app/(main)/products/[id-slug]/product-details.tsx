@@ -4,7 +4,6 @@ import { Product } from "@/types/product";
 import { useState } from "react";
 import { Star, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -19,9 +18,6 @@ import { Review } from "@/types/review";
 import { postReview } from "@/lib/api/review";
 import { useCart } from "@/context/cart-context";
 import { useRouter } from "next/navigation";
-// import { getReviews } from "@/lib/api/review";
-// import { postReview } from "@/lib/api/review";
-// import { mockReviews } from "@/lib/mockData";
 
 interface ProductDetailProps {
   product: Product;
