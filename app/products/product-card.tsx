@@ -7,6 +7,7 @@ import { BookmarkCheck, Star } from "lucide-react";
 import { Product } from "@/types/product";
 import { useCart } from "@/context/cart-context";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
   product: Product;
@@ -57,10 +58,12 @@ export default function ProductCard({ product }: ProductCardProps) {
   //   : 0;
 
   return (
-    <Card className="flex flex-col gap-4 p-4 border border-[#dddddd] rounded hover:shadow-md transition-shadow duration-200">
-      <Link href={`/products/${product.id}-${product.slug}`} className="block">
-        {/* Product Image */}
-        <div className="w-48 h-48 bg-[#f0f0f0] rounded flex items-center justify-center mx-auto">
+    <Card className="flex flex-row gap-4 p-4 border border-[#dddddd] rounded hover:shadow-md transition-shadow duration-200">
+      <div className="h-full bg-[#f0f0f0] rounded flex items-center justify-center self-start my-auto">
+        <Link
+          href={`/products/${product.id}-${product.slug}`}
+          className="block"
+        >
           <Image
             src={product.image_urls[0]}
             alt={product.name}
@@ -68,108 +71,104 @@ export default function ProductCard({ product }: ProductCardProps) {
             height={180}
             className="object-contain"
           />
+        </Link>
+      </div>
+
+      <div className="w-fit">
+        {product.isSponsored && (
+          <Badge
+            variant="secondary"
+            className="text-xs text-[#565959] mb-1 bg-transparent border-none p-0 h-auto"
+          >
+            Sponsored
+          </Badge>
+        )}
+        <Link
+          href={`/products/${product.id}-${product.slug}`}
+          className="block text-lg text-[#0052b4] hover:text-[#c7511f] transition-colors line-clamp-2"
+        >
+          {product.name}
+        </Link>
+
+        <div className="mb-2">
+          <div className="flex items-center gap-1">
+            <span>by</span>
+            <span>{product.seller.name}</span>
+            {product.seller.scs_score > 0.7 && <VerifiedSellerBadge />}
+          </div>
         </div>
 
-        {/* Product Details */}
-        <div className="w-fit">
-          {/* Sponsored Badge */}
-          {product.isSponsored && (
-            <Badge
-              variant="secondary"
-              className="text-xs text-[#565959] mb-1 bg-transparent border-none p-0 h-auto"
-            >
-              Sponsored
-            </Badge>
-          )}
+        {/* Rating */}
+        <div className="">
+          <StarRating
+            rating={product.rating ?? 0}
+            count={product.reviewCount ?? "0"}
+          />
+        </div>
 
-          {/* Product Title */}
-          <h3 className="text-lg text-[#0052b4] hover:text-[#c7511f] transition-colors line-clamp-2">
-            {product.name}
-          </h3>
+        {/* PIS Score */}
+        <div>
+          <p
+            style={{
+              color: `rgb(${Math.round(
+                255 * (1 - product.pis_score)
+              )}, ${Math.round(180 * product.pis_score)}, 80)`,
+              fontWeight: 500,
+            }}
+          >
+            Product Integrity Score (PIS) : {product.pis_score}
+          </p>
+        </div>
 
-          {/* Seller Name and SCS */}
-          <div className="mb-2">
-            <div className="flex items-center gap-1">
-              <span>by</span>
-              <span>{product.seller.name}</span>
-              {product.seller.scs_score > 0.7 && <VerifiedSellerBadge />}
-            </div>
-          </div>
-
-          {/* Rating */}
-          <div className="">
-            <StarRating
-              rating={product.rating ?? 0}
-              count={product.reviewCount ?? "0"}
-            />
-          </div>
-
-          {/* PIS Score */}
-          <div>
-            <p
-              style={{
-                color: `rgb(${Math.round(
-                  255 * (1 - product.pis_score),
-                )}, ${Math.round(180 * product.pis_score)}, 80)`,
-                fontWeight: 500,
-              }}
-            >
-              Product Integrity Score (PIS) : {product.pis_score}
-            </p>
-          </div>
-
-          {/* Price Section */}
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="text-2xl font-bold text-[#b12704]">
-              {product.currency}
-              {formatPrice(product.price)}
-            </span>
-            {/* {product.originalPrice && (
+        {/* Price Section */}
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
+          <span className="text-2xl font-bold text-[#b12704]">
+            {product.currency}
+            {formatPrice(product.price)}
+          </span>
+          {/* {product.originalPrice && (
               <>
-                <span className="text-sm text-[#565959] line-through">
-                  {product.currency}
-                  {formatPrice(product.originalPrice)}
-                </span>
-                {product.discount && (
-                  <span className="text-sm">
-                    Save {product.currency}
-                    {formatPrice(savings)} ({product.discount}%)
+              <span className="text-sm text-[#565959] line-through">
+              {product.currency}
+              {formatPrice(product.originalPrice)}
+              </span>
+              {product.discount && (
+                <span className="text-sm">
+                Save {product.currency}
+                {formatPrice(savings)} ({product.discount}%)
                   </span>
                 )}
               </>
-            )} */}
-          </div>
-
-          {/* Delivery Information */}
-          <div className="text-sm mb-1">
-            Get it by <span className="font-bold">{product.deliveryDate}</span>
-          </div>
-
-          {product.isFreeDelivery && (
-            <div className="text-sm text-[#565959]">
-              FREE Delivery by Amazon
-            </div>
-          )}
+              )} */}
         </div>
-      </Link>
-      <div className="flex gap-2">
-        <button
-          onClick={() => {
-            addToCart(product);
-          }}
-          className="mt-4 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
-        >
-          Add to Cart
-        </button>
-        <button
-          onClick={() => {
-            addToCart(product);
-            router.push("/cart");
-          }}
-          className="mt-4 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
-        >
-          Buy Now
-        </button>
+
+        {/* Delivery Information */}
+        <div className="text-sm mb-1">
+          Get it by <span className="font-bold">{product.deliveryDate}</span>
+        </div>
+
+        {product.isFreeDelivery && (
+          <div className="text-sm text-[#565959]">FREE Delivery by Amazon</div>
+        )}
+        <div className="flex items-start gap-4 mt-4">
+          <Button
+            onClick={() => {
+              addToCart(product);
+            }}
+            className="bg-yellow-300 rounded-4xl p-4 my-auto text-sm leading-none text-black hover:bg-yellow-400 transition-colors cursor-pointer"
+          >
+            Add to Cart
+          </Button>
+          <Button
+            onClick={() => {
+              addToCart(product);
+              router.push("/cart");
+            }}
+            className="bg-yellow-300 rounded-4xl p-4 my-auto text-sm leading-none text-black hover:bg-yellow-400 transition-colors cursor-pointer"
+          >
+            Buy Now
+          </Button>
+        </div>
       </div>
     </Card>
   );

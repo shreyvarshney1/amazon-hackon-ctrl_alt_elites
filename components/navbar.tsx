@@ -10,7 +10,7 @@ function CartLink() {
   return (
     <Link
       href="/cart"
-      className="flex items-center space-x-1 text-white p-2 rounded"
+      className="flex items-center space-x-1 text-white p-2 rounded w-full hover:bg-[#3a4553] transition-colors"
     >
       <div className="relative">
         <ShoppingCart />
@@ -35,8 +35,8 @@ import { useCart } from "@/context/cart-context";
 export default function Navbar() {
   const { user, logout, isLoading } = useAuth();
   return (
-    <header className="bg-[#232f3f] text-white flex flex-col items-center justify-center">
-      <nav className="flex items-center px-4 py-2 border-b border-[#3a4553] w-full gap-4">
+    <header className="text-white flex flex-col items-center justify-center">
+      <nav className="bg-[#131921] flex items-center px-4 py-2 border-b border-[#3a4553] w-full gap-4 leading-none justify-around">
         <Link href="/" className="text-white text-xl font-bold">
           amazon
         </Link>
@@ -78,16 +78,22 @@ export default function Navbar() {
                 Accounts & Lists (UBA: {user.uba_score?.toFixed(2)})
               </div>
             </div>
-            <Button onClick={logout} className="bg-red-500 hover:bg-red-600">
+            <Button onClick={logout} className="bg-red-500 hover:bg-red-600 cursor-pointer">
               Logout
             </Button>
           </>
         ) : (
-          <Link href="/login">
-            <Button>Login</Button>
+          <Link
+            href="/login"
+            className="text-white hover:text-[#ff9900] cursor-pointer"
+          >
+            Login
           </Link>
         )}
-        <Link href="/orders">
+        <Link
+          href="/orders"
+          className="flex flex-col items-start text-white hover:text-[#ff9900]"
+        >
           <div className="text-xs">Returns</div>
           <div className="font-bold">& Orders</div>
         </Link>
@@ -95,12 +101,12 @@ export default function Navbar() {
           <CartLink />
         </div>
       </nav>
-      <nav className="bg-[#232f3f] px-4 py-2 border-t border-[#3a4553] w-full">
+      <nav className="bg-[#232f3e] px-4 py-1 border-t border-[#3a4553] w-full h-9">
         <div className="flex items-center justify-around w-full gap-6 text-sm">
-          <Button variant="ghost" className="text-white hover:bg-[#3a4553] p-2">
-            <Menu className="w-4 h-4 mr-2" />
+          <div className="flex items-center gap-2 px-2 rounded cursor-pointer hover:text-[#ff9900]">
+            <Menu />
             All
-          </Button>
+          </div>
           <span className="hover:text-[#ff9900] cursor-pointer">Fashion</span>
           <span className="hover:text-[#ff9900] cursor-pointer">Mobiles</span>
           <span className="hover:text-[#ff9900] cursor-pointer">
