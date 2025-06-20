@@ -20,9 +20,6 @@ import { postReview } from "@/lib/api/review";
 import { useProtectedAction } from "@/app/protected-action";
 import BuyNowPopup from "./buy-now-popup";
 import { placeOrder } from "@/lib/api/order";
-// import { getReviews } from "@/lib/api/review";
-// import { postReview } from "@/lib/api/review";
-// import { mockReviews } from "@/lib/mockData";
 
 interface ProductDetailProps {
   product: Product;

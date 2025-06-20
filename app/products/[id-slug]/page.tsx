@@ -19,8 +19,7 @@ import { Product } from "@/types/product";
 import UserAvatar from "../user-avatar";
 import { useAuth } from "@/app/auth-context";
 import Link from "next/link"
-// import { getProductById } from "@/lib/api/product";
-// import Image from "next/image"
+
 
 interface ProductPageProps {
   params: Promise<{ "id-slug": string }>;
