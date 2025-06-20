@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { useState } from "react";
 
@@ -12,24 +11,17 @@ export default function Home() {
   const auth = useAuth();
   const [email, setEmail] = useState("");
 
-  if (auth.user && auth.user.id !== "guest") {
-    redirect("/");
-  }
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await auth.login(email);
-      window.location.href = "/";
     } catch (error) {
       console.error("Login failed", error);
-      // Handle login error (e.g., show a message to the user)
     }
   };
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
-      {/* Amazon Logo */}
       <Link
         href="/"
         className="mb-8 text-3xl font-bold text-gray-900 tracking-tight"
@@ -37,7 +29,6 @@ export default function Home() {
         amazon
       </Link>
 
-      {/* Login Card */}
       <Card className="w-full max-w-sm border border-gray-300 shadow-sm">
         <CardHeader className="pb-4">
           <h1 className="text-2xl font-normal text-gray-900">Sign in</h1>
@@ -103,7 +94,6 @@ export default function Home() {
         </CardContent>
       </Card>
 
-      {/* Footer */}
       <div className="mt-8 text-center">
         <div className="flex items-center justify-center space-x-4 text-xs text-blue-600 mb-4">
           <a href="#" className="hover:text-orange-600 hover:underline">
@@ -117,7 +107,7 @@ export default function Home() {
           </a>
         </div>
         <div className="text-xs text-gray-600">
-          © 1996-2024, Amazon.com, Inc. or its affiliates
+          © 1996-2025, Amazon.com, Inc. or its affiliates
         </div>
       </div>
     </div>

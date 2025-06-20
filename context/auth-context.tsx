@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
@@ -16,17 +16,33 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, username?: string) => Promise<void>;
   logout: () => void;
+  redirectToLogin: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    try {
+      const userData = localStorage.getItem("user_data");
+      return userData
+        ? JSON.parse(userData)
+        : { id: "guest", username: "Guest", email: "" };
+    } catch (error) {
+      console.error("Failed to parse user data from localStorage", error);
+      return { id: "guest", username: "Guest", email: "" };
+    }
+  });
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const checkAuthStatus = async () => {
+      setIsLoading(true);
       const token = localStorage.getItem("auth_token");
       if (token) {
         try {
@@ -38,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (sessionResponse.ok) {
             const sessionData = await sessionResponse.json();
             const userData = JSON.parse(
-              localStorage.getItem("user_data") || "{}",
+              localStorage.getItem("user_data") || "{}"
             );
             const updatedUserData = {
               ...userData,
@@ -47,15 +63,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem("user_data", JSON.stringify(updatedUserData));
             setUser(updatedUserData);
           } else {
-            localStorage.removeItem("auth_token");
-            localStorage.removeItem("user_data");
-            setUser({ id: "guest", username: "Guest", email: "" });
+            logout();
           }
         } catch (error) {
           console.error("Failed to fetch session data", error);
-          localStorage.removeItem("auth_token");
-          localStorage.removeItem("user_data");
-          setUser({ id: "guest", username: "Guest", email: "" });
+          logout();
         }
       } else {
         setUser({ id: "guest", username: "Guest", email: "" });
@@ -65,6 +77,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     checkAuthStatus();
   }, []);
+
+  const redirectToLogin = () => {
+    sessionStorage.setItem("redirect_path", pathname);
+    router.push("/login");
+  };
 
   const login = async (email: string, username?: string) => {
     try {
@@ -81,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           message: "Login failed with non-JSON response",
         }));
         throw new Error(
-          `Login failed: ${errorData.message || "Unknown error"}`,
+          `Login failed: ${errorData.message || "Unknown error"}`
         );
       }
 
@@ -89,14 +106,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("auth_token", data.token);
       const decodedToken: { user_id: string } = jwtDecode(data.token);
       const finalUsername = username || email.split("@")[0];
-      localStorage.setItem(
-        "user_data",
-        JSON.stringify({
-          id: decodedToken.user_id,
-          email,
-          username: finalUsername,
-        }),
-      );
 
       const sessionResponse = await fetch("/api/auth/session", {
         headers: {
@@ -115,9 +124,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
       localStorage.setItem("user_data", JSON.stringify(userData));
       setUser(userData);
+
+      const redirectPath = sessionStorage.getItem("redirect_path") || "/";
+      sessionStorage.removeItem("redirect_path");
+      router.push(redirectPath);
     } catch (error) {
       console.error("Login error:", error);
-      // Re-throw the error to be caught by the calling component
       throw error;
     }
   };
@@ -126,11 +138,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("user_data");
     setUser({ id: "guest", username: "Guest", email: "" });
-    router.push("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, isLoading, redirectToLogin }}
+    >
       {children}
     </AuthContext.Provider>
   );

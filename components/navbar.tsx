@@ -33,7 +33,7 @@ import {
 import { useCart } from "@/context/cart-context";
 
 export default function Navbar() {
-  const { user, logout, isLoading } = useAuth();
+  const { user, logout, isLoading, redirectToLogin } = useAuth();
   return (
     <header className="text-white flex flex-col items-center justify-center">
       <nav className="bg-[#131921] flex items-center px-4 py-2 border-b border-[#3a4553] w-full gap-4 leading-none justify-around">
@@ -86,12 +86,12 @@ export default function Navbar() {
             </Button>
           </>
         ) : (
-          <Link
-            href="/login"
+          <button
+            onClick={redirectToLogin}
             className="text-white hover:text-[#ff9900] cursor-pointer"
           >
             Login
-          </Link>
+          </button>
         )}
         <Link
           href="/orders"
