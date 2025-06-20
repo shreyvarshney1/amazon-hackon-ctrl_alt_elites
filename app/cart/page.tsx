@@ -38,7 +38,7 @@ const CartPage = () => {
 
   const total = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
-    0
+    0,
   );
 
   return (

@@ -24,7 +24,6 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
   return (
     <div className="min-h-screen bg-white">
-
       {/* Breadcrumb */}
       {/* <div className="px-4 py-2 text-sm text-[#565959]">
         <span className="hover:text-[#ff9900] cursor-pointer">Bags, Wallets and Luggage</span>

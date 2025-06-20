@@ -37,7 +37,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
           if (sessionResponse.ok) {
             const sessionData = await sessionResponse.json();
-            const userData = JSON.parse(localStorage.getItem("user_data") || "{}");
+            const userData = JSON.parse(
+              localStorage.getItem("user_data") || "{}",
+            );
             const updatedUserData = {
               ...userData,
               uba_score: sessionData.user_data.uba_score,
