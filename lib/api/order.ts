@@ -1,4 +1,4 @@
-interface orderDetails {
+interface OrderDetails {
   message: string;
   order_id: string;
 }
@@ -6,7 +6,7 @@ interface orderDetails {
 export async function placeOrder(
   product_id: string,
   quantity: number,
-): Promise<orderDetails> {
+): Promise<OrderDetails> {
   const token = localStorage.getItem("auth_token");
 
   if (!token) {
@@ -33,7 +33,7 @@ export async function placeOrder(
     throw new Error("Failed to place order!");
   }
 
-  const orderDetails = await response.json();
+  const OrderDetails = await response.json();
 
-  return orderDetails;
+  return OrderDetails;
 }
