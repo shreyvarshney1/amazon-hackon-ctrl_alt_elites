@@ -17,6 +17,9 @@ import { VerifiedSellerBadge } from "../product-card";
 import ReviewSection from "./review-section";
 import { Review } from "@/types/review";
 import { postReview } from "@/lib/api/review";
+import { useProtectedAction } from "@/app/protected-action";
+import BuyNowPopup from "./buy-now-popup";
+import { placeOrder } from "@/lib/api/order";
 // import { getReviews } from "@/lib/api/review";
 // import { postReview } from "@/lib/api/review";
 // import { mockReviews } from "@/lib/mockData";
@@ -27,7 +30,9 @@ interface ProductDetailProps {
 
 export default function ProductDetails({ product }: ProductDetailProps) {
   const [selectedImage, setSelectedImage] = useState(0);
-  // const [quantity, setQuantity] = useState(1)
+  const { executeProtectedAction, isAuthenticated } = useProtectedAction();
+  // const [quantity, setQuantity] = useState(1);
+  const [isBuyNowPopupOpen, setIsBuyNowPopupOpen] = useState(false);
 
   const productImages = product.image_urls;
 
@@ -75,6 +80,12 @@ export default function ProductDetails({ product }: ProductDetailProps) {
     setReviews([createdReview, ...reviews]);
   };
 
+  const handleBuyNow = (quantity: number) => {
+    placeOrder(product.id, quantity)
+      .then((order) => console.log(order))
+      .catch((error) => console.error(error));
+  };
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex px-4 py-4 gap-8">
@@ -108,7 +119,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
             <div className="w-[500px] h-[500px] border border-[#dddddd] rounded bg-white flex items-center justify-center">
               <Image
                 src={product.image_urls[selectedImage]}
-                alt="Zemic UV Umbrella"
+                alt={product.name}
                 width={450}
                 height={450}
                 className="object-contain"
@@ -256,9 +267,28 @@ export default function ProductDetails({ product }: ProductDetailProps) {
             <p>PIS : {product.pis_score}</p>
           </Button>
 
-          <Button className="w-full bg-[#ff9900] hover:bg-[#f0a742] text-black font-bold py-2 mb-4">
-            Buy Now
+          <Button
+            className="w-full bg-[#ff9900] hover:bg-[#f0a742] text-black font-bold py-2 mb-4"
+            onClick={
+              !isAuthenticated
+                ? () => executeProtectedAction(() => {})
+                : () => setIsBuyNowPopupOpen(true)
+            }
+          >
+            {!isAuthenticated ? <p>Sign In to Purchase</p> : <p> Buy Now </p>}
           </Button>
+
+          {/* Buy Now Popup */}
+          <BuyNowPopup
+            isOpen={isBuyNowPopupOpen}
+            onClose={() => setIsBuyNowPopupOpen(false)}
+            product={{
+              name: product.name,
+              price: product.price,
+              image: product.image_urls[0],
+            }}
+            onPlaceOrder={handleBuyNow}
+          />
 
           <Select defaultValue="wishlist">
             <SelectTrigger className="w-full">
