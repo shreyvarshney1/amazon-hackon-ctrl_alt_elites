@@ -172,7 +172,8 @@ def cancel_order(user):
 def return_product(user):
     try:
         data = request.get_json()
-        if not data or "reason" not in data or "product_id" not in data:
+        if not data or "reason" not in data or "product_id" not in data or "order_id" not in data: # @Sat
+        # if not data or "reason" not in data or "product_id" not in data:
             return {"error": "Invalid request data"}, 400
 
         product = db.session.query(Product).get(data["product_id"])
@@ -180,13 +181,16 @@ def return_product(user):
             return {"error": "Product not found"}, 404
         order_item = (
             db.session.query(OrderItem)
-            .filter(OrderItem.product_id == product.id, OrderItem.user_id == user.id)
+            .filter(OrderItem.product_id == product.id, OrderItem.order_id == data["order_id"]) # @Sat
+            # .filter(OrderItem.product_id == product.id, OrderItem.order_id == user.id)
             .filter(OrderItem.status == "delivered")
             .first()
         )
 
         if not order_item:
             return {"error": "No matching order item found"}, 404
+
+        order_item.status = "returned" # @Sat
 
         return_record = Return(
             order_item_id=order_item.id,
@@ -254,7 +258,7 @@ def get_seller_orders(seller):
                             "cancelled_by_seller": item.cancelled_by_seller,
                             "delivered_on_time": item.delivered_on_time,
                         }
-                        for item in order.items if item.product.seller_id == seller.id
+                        for item in order.items if item.product.seller_id == seller.id # @Sat
                     ],
                 }
                 for order in orders
