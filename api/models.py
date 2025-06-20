@@ -79,7 +79,7 @@ class Review(db.Model):
     linguistic_authenticity_score = db.Column(db.Float)
 
     user = db.relationship("User", back_populates="reviews")
-    author = db.relationship("User", foreign_keys=[user_id])
+    author = db.relationship("User", foreign_keys=[user_id], overlaps="user,reviews")
     product = db.relationship("Product", back_populates="reviews")
 
 
