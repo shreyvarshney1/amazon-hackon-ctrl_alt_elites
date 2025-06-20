@@ -390,6 +390,7 @@ def cancel_seller_order(seller):
         db.session.rollback()
         return {"error": str(e)}, 500
 
+
 @orders_bp.route("/seller/orders/refund-requested", methods=["GET"])
 @check_auth_seller
 def get_refund_requested_orders(seller):
@@ -423,7 +424,8 @@ def get_refund_requested_orders(seller):
     except Exception as e:
         db.session.rollback()
         return {"error": str(e)}, 500
-    
+
+
 @orders_bp.route("/seller/orders/refund-process", methods=["POST"])
 @check_auth_seller
 def process_refund_request(seller):
