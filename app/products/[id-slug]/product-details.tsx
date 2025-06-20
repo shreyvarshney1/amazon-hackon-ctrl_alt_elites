@@ -118,7 +118,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
         <div className="flex-1 max-w-md">
           <div className="text-[#0052b4] flex gap-2  text-sm mb-2 hover:text-[#ff9900] cursor-pointer">
             <p> by {product.seller.name} </p>
-            {product.seller.scs_score > 0.7 && <VerifiedSellerBadge />}
+            {product.seller.scs_score > 0.8 && <VerifiedSellerBadge />}
           </div>
 
           <h1 className="text-2xl font-normal mb-3 leading-tight">

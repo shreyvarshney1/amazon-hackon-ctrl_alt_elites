@@ -507,7 +507,7 @@ export default function SellerDashboard() {
                                 Price
                               </span>
                               <p className="text-gray-900 font-semibold">
-                                ${product.price}
+                                ₹{product.price}
                               </p>
                             </div>
                             <div>
