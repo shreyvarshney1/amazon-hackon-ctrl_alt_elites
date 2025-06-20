@@ -19,11 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-// import Image from "next/image";
-
 import ProductCard from "./product-card";
-// import { mockProducts } from "@/lib/mockData";
 import { getProducts } from "@/lib/api/product";
 import { Product } from "@/types/product";
 import UserAvatar from "./user-avatar";
@@ -306,10 +302,6 @@ export default function AmazonSearchPage() {
 
           {/* Product Listings */}
           <div className="space-y-4">
-            {/* {mockProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))} */}
-
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
