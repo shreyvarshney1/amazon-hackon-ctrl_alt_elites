@@ -66,7 +66,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
       | "product_id"
       | "username"
       | "has_trusted_badge"
-    >
+    >,
   ) => {
     // Add product id to the newReview object and submit
     const createdReview = await postReview({
@@ -256,7 +256,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
             className="w-full text-black font-bold py-2 mb-2"
             style={{
               backgroundColor: `rgb(${Math.round(
-                255 * (1 - product.pis_score)
+                255 * (1 - product.pis_score),
               )}, ${Math.round(180 * product.pis_score)}, 80)`,
               fontWeight: 500,
             }}

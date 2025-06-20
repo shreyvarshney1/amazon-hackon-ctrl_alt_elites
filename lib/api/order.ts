@@ -1,36 +1,39 @@
 interface orderDetails {
-    message : string,
-    order_id : string
+  message: string;
+  order_id: string;
 }
 
-export async function placeOrder(product_id : string, quantity : number) : Promise<orderDetails> {
-    const token = localStorage.getItem('auth_token');
+export async function placeOrder(
+  product_id: string,
+  quantity: number,
+): Promise<orderDetails> {
+  const token = localStorage.getItem("auth_token");
 
-    if (!token) {
-        throw new Error("Failed to retrieve token!");
-    }
+  if (!token) {
+    throw new Error("Failed to retrieve token!");
+  }
 
-    const response = await fetch('/api/orders/add-order', {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+  const response = await fetch("/api/orders/add-order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      items: [
+        {
+          product_id: product_id,
+          quantity: quantity,
         },
-        body: JSON.stringify({
-            items: [
-                {
-                    product_id: product_id,
-                    quantity: quantity,
-                }
-            ]
-        })
-    })
+      ],
+    }),
+  });
 
-    if (!response.ok) {
-        throw new Error("Failed to place order!");
-    }
+  if (!response.ok) {
+    throw new Error("Failed to place order!");
+  }
 
-    const orderDetails = await response.json();
+  const orderDetails = await response.json();
 
-    return orderDetails;
+  return orderDetails;
 }

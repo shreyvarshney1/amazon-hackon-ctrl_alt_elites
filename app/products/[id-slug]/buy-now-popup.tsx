@@ -1,70 +1,75 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { X, Plus, Minus, Check } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Image from 'next/image'
+import { useState, useEffect } from "react";
+import { X, Plus, Minus, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface BuyNowPopupProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
   product: {
-    name: string
-    price: number
-    image: string
-  }
-  onPlaceOrder: (quantity: number) => void
+    name: string;
+    price: number;
+    image: string;
+  };
+  onPlaceOrder: (quantity: number) => void;
 }
 
-export default function BuyNowPopup({ isOpen, onClose, product, onPlaceOrder }: BuyNowPopupProps) {
-  const [quantity, setQuantity] = useState(1)
-  const [isOrderPlaced, setIsOrderPlaced] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
+export default function BuyNowPopup({
+  isOpen,
+  onClose,
+  product,
+  onPlaceOrder,
+}: BuyNowPopupProps) {
+  const [quantity, setQuantity] = useState(1);
+  const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // Reset states when popup opens
   useEffect(() => {
     if (isOpen) {
-      setQuantity(1)
-      setIsOrderPlaced(false)
-      setShowSuccess(false)
+      setQuantity(1);
+      setIsOrderPlaced(false);
+      setShowSuccess(false);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // Handle quantity changes
   const increaseQuantity = () => {
-    setQuantity((prev) => Math.min(prev + 1, 10)) // Max 10 items
-  }
+    setQuantity((prev) => Math.min(prev + 1, 10)); // Max 10 items
+  };
 
   const decreaseQuantity = () => {
-    setQuantity((prev) => Math.max(prev - 1, 1)) // Min 1 item
-  }
+    setQuantity((prev) => Math.max(prev - 1, 1)); // Min 1 item
+  };
 
   // Handle place order
   const handlePlaceOrder = () => {
-    setIsOrderPlaced(true)
-    setShowSuccess(true)
+    setIsOrderPlaced(true);
+    setShowSuccess(true);
 
     // Call the parent's place order function
-    onPlaceOrder(quantity)
+    onPlaceOrder(quantity);
 
     // Show success animation for 2 seconds then close
     setTimeout(() => {
-      setShowSuccess(false)
-      setIsOrderPlaced(false)
-      onClose()
-    }, 2000)
-  }
+      setShowSuccess(false);
+      setIsOrderPlaced(false);
+      onClose();
+    }, 2000);
+  };
 
   // Handle backdrop click
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div
@@ -94,21 +99,27 @@ export default function BuyNowPopup({ isOpen, onClose, product, onPlaceOrder }: 
             </div>
 
             <div className="mt-6 text-center">
-              <h3 className="text-xl font-bold text-green-600 mb-2">Order Placed Successfully!</h3>
+              <h3 className="text-xl font-bold text-green-600 mb-2">
+                Order Placed Successfully!
+              </h3>
               <p className="text-gray-600">Thank you for your purchase</p>
               <div className="mt-4 flex items-center justify-center">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-500"></div>
-                <span className="ml-2 text-sm text-gray-500">Redirecting...</span>
+                <span className="ml-2 text-sm text-gray-500">
+                  Redirecting...
+                </span>
               </div>
             </div>
-          </div>    
+          </div>
         )}
 
         {/* Popup Content */}
         <div className="p-6">
           {/* Header */}
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Complete Your Purchase</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              Complete Your Purchase
+            </h2>
             <p className="text-gray-600">Review your order details below</p>
           </div>
 
@@ -128,9 +139,13 @@ export default function BuyNowPopup({ isOpen, onClose, product, onPlaceOrder }: 
 
               {/* Product Details */}
               <div className="flex-1">
-                <h3 className="font-medium text-gray-800 mb-2 line-clamp-2 leading-tight">{product.name}</h3>
+                <h3 className="font-medium text-gray-800 mb-2 line-clamp-2 leading-tight">
+                  {product.name}
+                </h3>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-[#b12704]">₹{product.price}</span>
+                  <span className="text-2xl font-bold text-[#b12704]">
+                    ₹{product.price}
+                  </span>
                   <span className="text-sm text-gray-500">per item</span>
                 </div>
               </div>
@@ -139,7 +154,9 @@ export default function BuyNowPopup({ isOpen, onClose, product, onPlaceOrder }: 
 
           {/* Quantity Selector */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">Quantity</label>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Quantity
+            </label>
             <div className="flex items-center gap-4">
               <div className="flex items-center border border-gray-300 rounded-lg">
                 <button
@@ -184,7 +201,9 @@ export default function BuyNowPopup({ isOpen, onClose, product, onPlaceOrder }: 
               <div className="border-t border-gray-200 pt-2 mt-2">
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span className="text-[#b12704]">₹{(product.price * quantity).toLocaleString()}</span>
+                  <span className="text-[#b12704]">
+                    ₹{(product.price * quantity).toLocaleString()}
+                  </span>
                 </div>
               </div>
             </div>
@@ -210,11 +229,13 @@ export default function BuyNowPopup({ isOpen, onClose, product, onPlaceOrder }: 
           <div className="mt-4 text-center">
             <p className="text-xs text-gray-500">
               By placing this order, you agree to Amazon&apos;s{" "}
-              <span className="text-[#0052b4] underline cursor-pointer">Terms & Conditions</span>
+              <span className="text-[#0052b4] underline cursor-pointer">
+                Terms & Conditions
+              </span>
             </p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
