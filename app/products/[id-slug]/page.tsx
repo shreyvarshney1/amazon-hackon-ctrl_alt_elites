@@ -91,7 +91,9 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               <>
                 <div>
                   <div className="text-xs">Hello, {user.username}</div>
-                  <div className="font-bold">Accounts & Lists</div>
+                  <div className="font-bold">
+                    Accounts & Lists (UBA: {user.uba_score?.toFixed(2)})
+                  </div>
                 </div>
                 <Button
                   onClick={logout}

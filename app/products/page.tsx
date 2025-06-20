@@ -32,7 +32,7 @@ export default function AmazonSearchPage() {
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands((prev) =>
-      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
     );
   };
 
@@ -66,7 +66,7 @@ export default function AmazonSearchPage() {
         // console.log(products);
       })
       .catch((error) =>
-        console.error("Failed to fetch all products. " + error.message),
+        console.error("Failed to fetch all products. " + error.message)
       );
   }, []);
 
@@ -74,7 +74,7 @@ export default function AmazonSearchPage() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-[#232f3f] text-white">
-        <div className="flex items-center px-4 py-2">
+        <div className="flex items-center px-4 py-2 w-full justify-around">
           {/* Amazon Logo */}
           <div className="flex items-center mr-4">
             <div className="text-white text-xl font-bold">amazon</div>
@@ -118,7 +118,9 @@ export default function AmazonSearchPage() {
               <>
                 <div>
                   <div className="text-xs">Hello, {user.username}</div>
-                  <div className="font-bold">Accounts & Lists</div>
+                  <div className="font-bold">
+                    Accounts & Lists (UBA: {user.uba_score?.toFixed(2)})
+                  </div>
                 </div>
                 <Button
                   onClick={logout}
@@ -147,53 +149,38 @@ export default function AmazonSearchPage() {
         </div>
 
         {/* Navigation */}
-        <nav className="bg-[#232f3f] px-4 py-2 border-t border-[#3a4553]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6 text-sm">
-              <Button
-                variant="ghost"
-                className="text-white hover:bg-[#3a4553] p-2"
-              >
-                <Menu className="w-4 h-4 mr-2" />
-                All
-              </Button>
-              <span className="hover:text-[#ff9900] cursor-pointer">
-                Fashion
-              </span>
-              <span className="hover:text-[#ff9900] cursor-pointer">
-                Mobiles
-              </span>
-              <span className="hover:text-[#ff9900] cursor-pointer">
-                Gift Ideas
-              </span>
-              <span className="hover:text-[#ff9900] cursor-pointer flex items-center">
-                Prime <ChevronDown className="w-3 h-3 ml-1" />
-              </span>
-              <span className="hover:text-[#ff9900] cursor-pointer">
-                Amazon Pay
-              </span>
-              <span className="hover:text-[#ff9900] cursor-pointer">
-                Gift Cards
-              </span>
-              <span className="hover:text-[#ff9900] cursor-pointer">
-                Sports, Fitness & Outdoors
-              </span>
-              <span className="hover:text-[#ff9900] cursor-pointer">
-                Computers
-              </span>
-              <span className="hover:text-[#ff9900] cursor-pointer">
-                Customer Service
-              </span>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-white font-bold text-lg">CINDRELLA</div>
-              <div className="text-xs">
-                <div className="text-[#ff9900]">JOIN PRIME NOW</div>
-                <div className="text-[#c9cccc]">
-                  *Redirects to PrimeVideo.com
-                </div>
-              </div>
-            </div>
+        <nav className="bg-[#232f3f] px-4 py-2 border-t border-[#3a4553] w-full">
+          <div className="flex items-center justify-around w-full gap-6 text-sm">
+            <Button
+              variant="ghost"
+              className="text-white hover:bg-[#3a4553] p-2"
+            >
+              <Menu className="w-4 h-4 mr-2" />
+              All
+            </Button>
+            <span className="hover:text-[#ff9900] cursor-pointer">Fashion</span>
+            <span className="hover:text-[#ff9900] cursor-pointer">Mobiles</span>
+            <span className="hover:text-[#ff9900] cursor-pointer">
+              Gift Ideas
+            </span>
+            <span className="hover:text-[#ff9900] cursor-pointer flex items-center">
+              Prime <ChevronDown className="w-3 h-3 ml-1" />
+            </span>
+            <span className="hover:text-[#ff9900] cursor-pointer">
+              Amazon Pay
+            </span>
+            <span className="hover:text-[#ff9900] cursor-pointer">
+              Gift Cards
+            </span>
+            <span className="hover:text-[#ff9900] cursor-pointer">
+              Sports, Fitness & Outdoors
+            </span>
+            <span className="hover:text-[#ff9900] cursor-pointer">
+              Computers
+            </span>
+            <span className="hover:text-[#ff9900] cursor-pointer">
+              Customer Service
+            </span>
           </div>
         </nav>
       </header>

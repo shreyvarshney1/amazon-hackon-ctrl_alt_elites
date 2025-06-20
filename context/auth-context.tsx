@@ -8,6 +8,7 @@ interface User {
   id: string;
   username: string;
   email: string;
+  uba_score?: number;
 }
 
 interface AuthContextType {
@@ -25,16 +26,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    const userData = localStorage.getItem("user_data");
+    const checkAuthStatus = async () => {
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        try {
+          const sessionResponse = await fetch("/api/auth/session", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (sessionResponse.ok) {
+            const sessionData = await sessionResponse.json();
+            const userData = JSON.parse(localStorage.getItem("user_data") || "{}");
+            const updatedUserData = {
+              ...userData,
+              uba_score: sessionData.user_data.uba_score,
+            };
+            localStorage.setItem("user_data", JSON.stringify(updatedUserData));
+            setUser(updatedUserData);
+          } else {
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("user_data");
+            setUser({ id: "guest", username: "Guest", email: "" });
+          }
+        } catch (error) {
+          console.error("Failed to fetch session data", error);
+          localStorage.removeItem("auth_token");
+          localStorage.removeItem("user_data");
+          setUser({ id: "guest", username: "Guest", email: "" });
+        }
+      } else {
+        setUser({ id: "guest", username: "Guest", email: "" });
+      }
+      setIsLoading(false);
+    };
 
-    if (token && userData) {
-      setUser(JSON.parse(userData));
-    } else {
-      // Set a guest user if no token is found
-      setUser({ id: "guest", username: "Guest", email: "" });
-    }
-    setIsLoading(false);
+    checkAuthStatus();
   }, []);
 
   const login = async (email: string, username?: string) => {
@@ -69,11 +96,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }),
       );
 
-      setUser({
-        id: decodedToken.user_id,
-        username: finalUsername,
-        email,
+      const sessionResponse = await fetch("/api/auth/session", {
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+        },
       });
+      if (!sessionResponse.ok) {
+        throw new Error("Failed to fetch session data");
+      }
+      const sessionData = await sessionResponse.json();
+      const userData = {
+        id: decodedToken.user_id,
+        email,
+        username: finalUsername,
+        uba_score: sessionData.user_data.uba_score,
+      };
+      localStorage.setItem("user_data", JSON.stringify(userData));
+      setUser(userData);
     } catch (error) {
       console.error("Login error:", error);
       // Re-throw the error to be caught by the calling component
