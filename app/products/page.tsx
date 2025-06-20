@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/context/auth-context";
 import { useEffect, useState } from "react";
 import {
   Search,
@@ -10,6 +11,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -20,14 +22,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// import Image from "next/image";
-
 import ProductCard from "./product-card";
-// import { mockProducts } from "@/lib/mockData";
 import { getProducts } from "@/lib/api/product";
 import { Product } from "@/types/product";
 
 export default function AmazonSearchPage() {
+  const { user, logout, isLoading } = useAuth();
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
 
   const toggleBrand = (brand: string) => {
@@ -112,10 +112,26 @@ export default function AmazonSearchPage() {
 
           {/* Account & Cart */}
           <div className="flex items-center gap-6 text-sm">
-            <div>
-              <div className="text-xs">Hello, John</div>
-              <div className="font-bold">Accounts & Lists</div>
-            </div>
+            {isLoading ? (
+              <div>Loading...</div>
+            ) : user && user.id !== "guest" ? (
+              <>
+                <div>
+                  <div className="text-xs">Hello, {user.username}</div>
+                  <div className="font-bold">Accounts & Lists</div>
+                </div>
+                <Button
+                  onClick={logout}
+                  className="bg-red-500 hover:bg-red-600"
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link href="/login">
+                <Button>Login</Button>
+              </Link>
+            )}
             <div>
               <div className="text-xs">Returns</div>
               <div className="font-bold">& Orders</div>

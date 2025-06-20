@@ -1,10 +1,32 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
+import { useState } from "react";
 
 export default function Home() {
+  const auth = useAuth();
+  const [email, setEmail] = useState("");
+
+  if (auth.user && auth.user.id !== "guest") {
+    redirect("/");
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await auth.login(email);
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Login failed", error);
+      // Handle login error (e.g., show a message to the user)
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
       {/* Amazon Logo */}
@@ -21,7 +43,7 @@ export default function Home() {
           <h1 className="text-2xl font-normal text-gray-900">Sign in</h1>
         </CardHeader>
         <CardContent className="space-y-4">
-          <form className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label
                 htmlFor="email"
@@ -32,6 +54,8 @@ export default function Home() {
               <Input
                 id="email"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="h-8 border-gray-400 focus:border-orange-400 focus:ring-orange-400 focus:ring-1"
                 required
               />

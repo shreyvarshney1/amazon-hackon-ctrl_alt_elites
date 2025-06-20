@@ -4,6 +4,8 @@
 import { Search, MapPin, ShoppingCart, Menu, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/context/auth-context";
+import Link from "next/link";
 import {
   Select,
   SelectContent,
@@ -24,6 +26,7 @@ interface ProductPageProps {
 }
 
 export default function ProductDetailPage({ params }: ProductPageProps) {
+  const { user, logout, isLoading } = useAuth();
   const resolvedParams = use(params);
   const id = resolvedParams["id-slug"].split("-")[0];
 
@@ -82,10 +85,26 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
           {/* Account & Cart */}
           <div className="flex items-center gap-6 text-sm">
-            <div>
-              <div className="text-xs">Hello, John</div>
-              <div className="font-bold">Accounts & Lists</div>
-            </div>
+            {isLoading ? (
+              <div>Loading...</div>
+            ) : user && user.id !== "guest" ? (
+              <>
+                <div>
+                  <div className="text-xs">Hello, {user.username}</div>
+                  <div className="font-bold">Accounts & Lists</div>
+                </div>
+                <Button
+                  onClick={logout}
+                  className="bg-red-500 hover:bg-red-600"
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link href="/login">
+                <Button>Login</Button>
+              </Link>
+            )}
             <div>
               <div className="text-xs">Returns</div>
               <div className="font-bold">& Orders</div>

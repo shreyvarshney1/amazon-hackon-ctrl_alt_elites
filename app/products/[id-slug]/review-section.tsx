@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/auth-context";
+import Link from "next/link";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import ReviewItem from "./review-item";
@@ -10,6 +12,7 @@ import type { Review } from "@/types/review";
 
 interface ReviewSectionProps {
   reviews: Review[];
+  productId: string;
   onSubmitReview?: (
     review: Omit<
       Review,
@@ -20,13 +23,16 @@ interface ReviewSectionProps {
       | "username"
       | "has_trusted_badge"
     >,
+    productId: string,
   ) => void;
 }
 
 export default function ReviewSection({
   reviews,
+  productId,
   onSubmitReview,
 }: ReviewSectionProps) {
+  const { user } = useAuth();
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [reviewTitle, setReviewTitle] = useState("");
@@ -40,13 +46,16 @@ export default function ReviewSection({
       // authorName.trim() &&
       onSubmitReview
     ) {
-      onSubmitReview({
-        rating,
-        title: reviewTitle,
-        review_text: reviewText,
-        created_at: new Date().toISOString(),
-        is_verified_purchase: true,
-      });
+      onSubmitReview(
+        {
+          rating,
+          title: reviewTitle,
+          review_text: reviewText,
+          created_at: new Date().toISOString(),
+          is_verified_purchase: true,
+        },
+        productId,
+      );
 
       // Reset form
       setRating(0);
@@ -79,62 +88,62 @@ export default function ReviewSection({
       {/* Write a Review Section */}
       <div className="bg-white border border-[#dddddd] rounded-lg p-6 mb-8">
         <h2 className="text-xl font-bold mb-4">Write a customer review</h2>
+        {user && user.id !== "guest" ? (
+          <div className="space-y-4">
+            {/* Rating */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Overall rating
+              </label>
+              <StarRating interactive={true} />
+            </div>
 
-        <div className="space-y-4">
-          {/* Rating */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Overall rating
-            </label>
-            <StarRating interactive={true} />
+            {/* Review Title */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Add a headline
+              </label>
+              <Input
+                value={reviewTitle}
+                onChange={(e) => setReviewTitle(e.target.value)}
+                placeholder="What's most important to know?"
+                className="max-w-md"
+              />
+            </div>
+
+            {/* Review Text */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Add a written review
+              </label>
+              <Textarea
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+                placeholder="What did you like or dislike? What did you use this product for?"
+                className="min-h-[120px]"
+              />
+            </div>
+
+            {/* Submit Button */}
+            <Button
+              onClick={handleSubmitReview}
+              disabled={!rating || !reviewText.trim()}
+              className="bg-[#ff9900] hover:bg-[#f0a742] text-black font-medium px-6"
+            >
+              Submit
+            </Button>
           </div>
-
-          {/* Author Name */}
-          {/* <div>
-            <label className="block text-sm font-medium mb-2">Your name</label>
-            <Input
-              value={authorName}
-              onChange={(e) => setAuthorName(e.target.value)}
-              placeholder="Enter your name"
-              className="max-w-md"
-            />
-          </div> */}
-
-          {/* Review Title */}
+        ) : (
           <div>
-            <label className="block text-sm font-medium mb-2">
-              Add a headline
-            </label>
-            <Input
-              value={reviewTitle}
-              onChange={(e) => setReviewTitle(e.target.value)}
-              placeholder="What's most important to know?"
-              className="max-w-md"
-            />
+            <p>
+              Please{" "}
+              <Link href="/login" className="text-blue-600 hover:underline">
+                log in
+              </Link>{" "}
+              to write a review.
+            </p>
           </div>
-
-          {/* Review Text */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Add a written review
-            </label>
-            <Textarea
-              value={reviewText}
-              onChange={(e) => setReviewText(e.target.value)}
-              placeholder="What did you like or dislike? What did you use this product for?"
-              className="min-h-[120px]"
-            />
-          </div>
-
-          {/* Submit Button */}
-          <Button
-            onClick={handleSubmitReview}
-            disabled={!rating || !reviewText.trim()}
-            className="bg-[#ff9900] hover:bg-[#f0a742] text-black font-medium px-6"
-          >
-            Submit
-          </Button>
-        </div>
+        )}
       </div>
 
       {/* Reviews List */}
