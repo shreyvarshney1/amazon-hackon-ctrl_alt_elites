@@ -30,7 +30,7 @@ export default function LoginPage() {
         localStorage.getItem("redirect_after_login") || "/products";
       localStorage.removeItem("redirect_after_login");
 
-      router.push(redirectUrl);
+      router.replace(redirectUrl);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
