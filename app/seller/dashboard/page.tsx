@@ -22,7 +22,6 @@ function getSlug(productName: string) {
   return productName.toLocaleLowerCase().replace(/\s+/g, "-");
 }
 
-
 export default function SellerDashboard() {
   const { seller, isLoading, logout } = useSellerAuth();
   const router = useRouter();
