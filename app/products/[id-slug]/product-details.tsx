@@ -78,9 +78,17 @@ export default function ProductDetails({ product }: ProductDetailProps) {
   };
 
   const handleBuyNow = (quantity: number) => {
+
     placeOrder(product.id, quantity)
-      .then((order) => console.log(order))
-      .catch((error) => console.error(error));
+      .then((order) => {
+        console.log(order);
+        alert("✅ Order Placed Successfully.")
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsBuyNowPopupOpen(false);
+        alert(`❌ Order Failed. Please try again. Error: ${error}`)
+      });
   };
 
   return (
