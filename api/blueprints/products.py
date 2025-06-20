@@ -32,8 +32,10 @@ def get_products():
                     "listed_at": product.listed_at.isoformat(),
                     "pis_score": product.pis_score,
                     "rating": (
-                        sum(review.rating for review in product.reviews) / len(product.reviews)
-                        if product.reviews else 0
+                        sum(review.rating for review in product.reviews)
+                        / len(product.reviews)
+                        if product.reviews
+                        else 0
                     ),
                     "review_count": len(product.reviews),
                     "last_pis_update": (
