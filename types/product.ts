@@ -9,15 +9,14 @@ export interface Product {
     scs_score: number;
     last_scs_update: string | null;
   };
-  name: string; // changed from title
+  name: string;
   description: string;
   price: number;
   category: string;
   image_urls: string[];
-  pis_score: number; // changed from pis
+  pis_score: number;
   listed_at: string;
   last_pis_update: string;
-  // Remove fields not returned by API or make them optional
   reviews?: Review[];
   rating?: number;
   reviewCount?: string;

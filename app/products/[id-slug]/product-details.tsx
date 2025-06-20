@@ -141,9 +141,6 @@ export default function ProductDetails({ product }: ProductDetailProps) {
 
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[#b12704] text-lg">
-                {-(product.discount ?? 0)}
-              </span>
               <span className="text-3xl font-normal">
                 {(product.currency ?? "₹") + " " + product.price}
               </span>
