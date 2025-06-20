@@ -19,7 +19,7 @@ export interface Product {
   last_pis_update: string;
   reviews?: Review[];
   rating?: number;
-  reviewCount?: string;
+  review_count?: string;
   deliveryDate?: string;
   discount?: number;
   isSponsored?: boolean;
