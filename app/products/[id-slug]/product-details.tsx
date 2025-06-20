@@ -72,16 +72,15 @@ export default function ProductDetails({ product }: ProductDetailProps) {
   };
 
   const handleBuyNow = (quantity: number) => {
-
     placeOrder(product.id, quantity)
       .then((order) => {
         console.log(order);
-        alert("✅ Order Placed Successfully.")
+        alert("✅ Order Placed Successfully.");
       })
       .catch((error) => {
         console.error(error);
         setIsBuyNowPopupOpen(false);
-        alert(`❌ Order Failed. Please try again. Error: ${error}`)
+        alert(`❌ Order Failed. Please try again. Error: ${error}`);
       });
   };
 

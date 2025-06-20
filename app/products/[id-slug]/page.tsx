@@ -22,7 +22,6 @@ import UserAvatar from "../user-avatar";
 import { useAuth } from "@/app/auth-context";
 import Link from "next/link";
 
-
 interface ProductPageProps {
   params: Promise<{ "id-slug": string }>;
 }
