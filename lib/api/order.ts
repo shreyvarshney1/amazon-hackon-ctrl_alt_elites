@@ -10,20 +10,20 @@ export async function placeOrder(product_id : string, quantity : number) : Promi
         throw new Error("Failed to retrieve token!");
     }
 
-    const response = fetch('/api/orders/add-order', {
-        method = "POST",
-        headers = {
-            "Content-Type" : "application/json",
-            "Authorization" : `Bearer ${token}`
+    const response = await fetch('/api/orders/add-order', {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
         },
-        body = {
-            'items' : [
+        body: JSON.stringify({
+            items: [
                 {
-                    product_id,
-                    quantity,
+                    product_id: product_id,
+                    quantity: quantity,
                 }
             ]
-        }
+        })
     })
 
     if (!response.ok) {
