@@ -134,7 +134,11 @@ def cancel_order(user):
         if not data or "order_id" not in data or "product_id" not in data:
             return {"error": "Invalid request data"}, 400
 
-        order = db.session.query(Order).get(data["order_id"])
+        order = (
+            db.session.query(Order)
+            .filter(Order.id == data["order_id"], Order.user_id == user.id)
+            .first()
+        )
         if not order:
             return {"error": "Order not found"}, 404
 
@@ -143,7 +147,6 @@ def cancel_order(user):
             .filter(
                 OrderItem.order_id == order.id,
                 OrderItem.product_id == data["product_id"],
-                OrderItem.user_id == user.id,
             )
             .filter(OrderItem.status != "delivered")
             .first()
