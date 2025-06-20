@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, LogOut, User, Settings } from "lucide-react";
+import { ChevronDown, LogOut, User, Settings, LogIn } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -30,7 +30,7 @@ function SignInButton({ handleSignIn }: { handleSignIn: () => void }) {
       onClick={handleSignIn}
       className="w-full px-4 py-2 text-left text-sm text-[#04b141] hover:bg-[#fef7f7] flex items-center gap-3 font-medium"
     >
-      <LogOut className="w-4 h-4" />
+      <LogIn className="w-4 h-4" />
       Sign In
     </button>
   );
