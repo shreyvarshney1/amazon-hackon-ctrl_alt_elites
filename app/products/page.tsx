@@ -28,6 +28,7 @@ import { getProducts } from "@/lib/api/product";
 import { Product } from "@/types/product";
 import UserAvatar from "./user-avatar";
 import { useAuth } from "../auth-context";
+import Link from "next/link"
 
 export default function AmazonSearchPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -80,7 +81,7 @@ export default function AmazonSearchPage() {
         <div className="flex items-center px-4 py-2 justify-around">
           {/* Amazon Logo */}
           <div className="flex items-center mr-4">
-            <div className="text-white text-xl font-bold">amazon</div>
+            <Link href="/products"  className="text-white text-xl font-bold">amazon</Link>
           </div>
 
           {/* Delivery Location */}

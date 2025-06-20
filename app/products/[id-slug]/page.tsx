@@ -18,6 +18,7 @@ import { getProductById } from "@/lib/api/product";
 import { Product } from "@/types/product";
 import UserAvatar from "../user-avatar";
 import { useAuth } from "@/app/auth-context";
+import Link from "next/link"
 // import { getProductById } from "@/lib/api/product";
 // import Image from "next/image"
 
@@ -50,7 +51,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
         <div className="flex items-center px-4 py-2 justify-around">
           {/* Amazon Logo */}
           <div className="flex items-center mr-4">
-            <div className="text-white text-xl font-bold">amazon</div>
+            <Link href="/products" className="text-white text-xl font-bold">amazon</Link>
           </div>
 
           {/* Delivery Location */}
