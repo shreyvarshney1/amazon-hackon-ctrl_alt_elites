@@ -4,7 +4,6 @@ import { Product } from "@/types/product";
 import { useState } from "react";
 import { Star, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -28,7 +27,6 @@ interface ProductDetailProps {
 export default function ProductDetails({ product }: ProductDetailProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const { executeProtectedAction, isAuthenticated } = useProtectedAction();
-  // const [quantity, setQuantity] = useState(1);
   const [isBuyNowPopupOpen, setIsBuyNowPopupOpen] = useState(false);
 
   const productImages = product.image_urls;
