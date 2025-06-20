@@ -67,7 +67,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
       | "username"
       | "has_trusted_badge"
     >,
-    productId: string
+    productId: string,
   ) => {
     const createdReview = await postReview(newReview, productId);
     setReviews([createdReview, ...reviews]);
@@ -205,7 +205,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
             className="text-white p-2 text-xs inline-block rounded"
             style={{
               backgroundColor: `rgb(${Math.round(
-                255 * (1 - product.pis_score)
+                255 * (1 - product.pis_score),
               )}, ${Math.round(180 * product.pis_score)}, 80)`,
               fontWeight: 500,
             }}
