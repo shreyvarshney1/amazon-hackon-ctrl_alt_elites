@@ -128,7 +128,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
           <div className="flex items-center gap-2 mb-2">
             <StarRating
               rating={product.rating ?? 0}
-              count={product.reviewCount ?? "0"}
+              count={product.review_count ?? "0"}
             />
             {/* <span className="text-[#0052b4] text-sm hover:text-[#ff9900] cursor-pointer">
               Search this page

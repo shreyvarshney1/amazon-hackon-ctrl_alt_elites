@@ -102,7 +102,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="">
           <StarRating
             rating={product.rating ?? 0}
-            count={product.reviewCount ?? "0"}
+            count={product.review_count ?? "0"}
           />
         </div>
 
