@@ -17,6 +17,8 @@ import { VerifiedSellerBadge } from "../product-card";
 import ReviewSection from "./review-section";
 import { Review } from "@/types/review";
 import { postReview } from "@/lib/api/review";
+import { useCart } from "@/context/cart-context";
+import { useRouter } from "next/navigation";
 // import { getReviews } from "@/lib/api/review";
 // import { postReview } from "@/lib/api/review";
 // import { mockReviews } from "@/lib/mockData";
@@ -65,12 +67,13 @@ export default function ProductDetails({ product }: ProductDetailProps) {
       | "username"
       | "has_trusted_badge"
     >,
-    productId: string,
+    productId: string
   ) => {
     const createdReview = await postReview(newReview, productId);
     setReviews([createdReview, ...reviews]);
   };
-
+  const { addToCart } = useCart();
+  const router = useRouter();
   return (
     <div className="flex flex-col gap-8">
       <div className="flex px-4 py-4 gap-8">
@@ -189,17 +192,28 @@ export default function ProductDetails({ product }: ProductDetailProps) {
         </div>
 
         {/* Purchase Options */}
-        <div className="w-80 border border-[#dddddd] rounded p-4 h-fit">
+        <div className="w-80 border border-[#dddddd] rounded p-4 h-fit gap-4 flex flex-col">
           <div className="text-3xl font-normal mb-2">
             {(product.currency ?? "₹") + " " + product.price}
             <sup>00</sup>
           </div>
 
-          <div className="bg-[#232f3f] text-white px-2 py-1 text-xs inline-block rounded mb-2">
+          <div className="bg-[#232f3f] text-white p-2 text-xs inline-block rounded">
             ⚡ Fulfilled
           </div>
+          <div
+            className="text-white p-2 text-xs inline-block rounded"
+            style={{
+              backgroundColor: `rgb(${Math.round(
+                255 * (1 - product.pis_score)
+              )}, ${Math.round(180 * product.pis_score)}, 80)`,
+              fontWeight: 500,
+            }}
+          >
+            ✨ Product Integrity Score : {product.pis_score}
+          </div>
 
-          <div className="text-sm mb-2">
+          <div className="text-sm">
             <span className="text-[#0052b4] font-bold">FREE delivery</span>{" "}
             {product.deliveryDate}.
             {/* <span className="text-[#0052b4] underline cursor-pointer">
@@ -212,9 +226,9 @@ export default function ProductDetails({ product }: ProductDetailProps) {
             <span>Deliver to Athary - Kothri 466114</span>
           </div> */}
 
-          <div className="text-green-700 font-bold text-lg mb-2">In stock</div>
+          <div className="text-green-700 font-bold text-lg">In stock</div>
 
-          <div className="space-y-2 text-sm mb-4">
+          <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span>Ships from</span>
               <span>Amazon</span>
@@ -233,23 +247,21 @@ export default function ProductDetails({ product }: ProductDetailProps) {
             </div>
           </div>
 
-          <Button className="w-full bg-[#ff9900] hover:bg-[#f0a742] text-black font-bold py-2 mb-2">
+          <Button
+            onClick={() => {
+              addToCart(product);
+            }}
+            className="bg-yellow-300 rounded-4xl p-4 my-auto text-sm leading-none text-black hover:bg-yellow-400 transition-colors cursor-pointer w-full"
+          >
             Add to Cart
           </Button>
-
           <Button
-            className="w-full text-black font-bold py-2 mb-2"
-            style={{
-              backgroundColor: `rgb(${Math.round(
-                255 * (1 - product.pis_score),
-              )}, ${Math.round(180 * product.pis_score)}, 80)`,
-              fontWeight: 500,
+            onClick={() => {
+              addToCart(product);
+              router.push("/cart");
             }}
+            className="bg-[#ffa41c] rounded-4xl p-4 my-auto text-sm leading-none text-black hover:bg-[#ff8400] transition-colors cursor-pointer w-full"
           >
-            <p>PIS : {product.pis_score}</p>
-          </Button>
-
-          <Button className="w-full bg-[#ff9900] hover:bg-[#f0a742] text-black font-bold py-2 mb-4">
             Buy Now
           </Button>
 
@@ -264,7 +276,6 @@ export default function ProductDetails({ product }: ProductDetailProps) {
         </div>
       </div>
 
-      {/* Reviews Section */}
       <div className="px-4 py-2">
         <ReviewSection
           reviews={reviews}

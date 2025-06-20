@@ -96,10 +96,10 @@ export default function Navbar() {
             </Select>
             <Input
               className="flex-1 border-0 rounded-none bg-white text-black"
-              defaultValue="Phone"
+              placeholder="Search Amazon"
             />
-            <Button className="bg-[#ff9900] hover:bg-[#f0a742] border-0 rounded-r-md rounded-l-none px-4">
-              <Search className="w-5 h-5" />
+            <Button className="bg-[#febd69] hover:bg-[#f3a847] border-0 rounded-r-sm rounded-l-none px-4">
+              <Search className="text-[#2d2f32]" />
             </Button>
           </div>
         </div>

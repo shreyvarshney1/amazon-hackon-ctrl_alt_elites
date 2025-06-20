@@ -111,7 +111,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p
             style={{
               color: `rgb(${Math.round(
-                255 * (1 - product.pis_score),
+                255 * (1 - product.pis_score)
               )}, ${Math.round(180 * product.pis_score)}, 80)`,
               fontWeight: 500,
             }}
@@ -164,7 +164,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               addToCart(product);
               router.push("/cart");
             }}
-            className="bg-yellow-300 rounded-4xl p-4 my-auto text-sm leading-none text-black hover:bg-yellow-400 transition-colors cursor-pointer"
+            className="bg-[#ffa41c] rounded-4xl p-4 my-auto text-sm leading-none text-black hover:bg-[#ff8400] transition-colors cursor-pointer"
           >
             Buy Now
           </Button>
