@@ -233,7 +233,9 @@ const OrdersPage = () => {
       <h1 className="text-3xl font-bold mb-6">Your Orders</h1>
       {orders.length === 0 ? (
         <div className="text-center border-2 border-dashed rounded-lg p-12">
-          <p className="text-gray-500">You haven&apos;t placed any orders yet.</p>
+          <p className="text-gray-500">
+            You haven&apos;t placed any orders yet.
+          </p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -299,7 +301,8 @@ const OrdersPage = () => {
                         </Button>
                       )}
                       {(item.status === "cancelled" ||
-                        item.status === "returned") && (                        <p className="text-xs text-gray-500 italic">
+                        item.status === "returned") && (
+                        <p className="text-xs text-gray-500 italic">
                           Refund pending seller approval.
                         </p>
                       )}
