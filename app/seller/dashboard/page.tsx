@@ -166,10 +166,16 @@ function OrdersTab() {
     );
   };
   const handleRejectRefund = (_orderId: number, _productId: number) => {
-    // This is a placeholder to test refund-rejection functionality.
-    console.log("Rejecting refund for order:", _orderId, "product:", _productId);
-    alert(
-      "Reject refund functionality is not yet connected to an API endpoint.",
+    if (
+      !confirm(
+        "Are you sure you want to reject the refund request? This will reject the refund.",
+      )
+    )
+      return;
+    handleAction(
+      "/api/orders/seller/orders/refund-reject",
+      { order_id: _orderId, product_id: _productId },
+      "Refund has been rejected successfully.",
     );
   };
 
@@ -284,28 +290,28 @@ function OrdersTab() {
                       )}
                       {(item.status === "returned" ||
                         item.status === "cancelled") && (
-                        <>
-                          <Button
-                            size="sm"
-                            className="bg-green-600 hover:bg-green-700"
-                            onClick={() =>
-                              handleAcceptRefund(order.id, item.product_id)
-                            }
-                          >
-                            <CheckCircle className="h-4 w-4 mr-2" /> Accept
-                            Refund
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() =>
-                              handleRejectRefund(order.id, item.product_id)
-                            }
-                          >
-                            <XCircle className="h-4 w-4 mr-2" /> Reject Refund
-                          </Button>
-                        </>
-                      )}
+                          <>
+                            <Button
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700"
+                              onClick={() =>
+                                handleAcceptRefund(order.id, item.product_id)
+                              }
+                            >
+                              <CheckCircle className="h-4 w-4 mr-2" /> Accept
+                              Refund
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() =>
+                                handleRejectRefund(order.id, item.product_id)
+                              }
+                            >
+                              <XCircle className="h-4 w-4 mr-2" /> Reject Refund
+                            </Button>
+                          </>
+                        )}
                     </div>
                   </div>
                 </div>
@@ -585,21 +591,19 @@ export default function SellerDashboard() {
           <nav className="-mb-px flex space-x-6" aria-label="Tabs">
             <button
               onClick={() => setActiveTab("products")}
-              className={`${
-                activeTab === "products"
-                  ? "border-orange-500 text-orange-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+              className={`${activeTab === "products"
+                ? "border-orange-500 text-orange-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
             >
               Products
             </button>
             <button
               onClick={() => setActiveTab("orders")}
-              className={`${
-                activeTab === "orders"
-                  ? "border-orange-500 text-orange-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+              className={`${activeTab === "orders"
+                ? "border-orange-500 text-orange-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
             >
               Orders
             </button>

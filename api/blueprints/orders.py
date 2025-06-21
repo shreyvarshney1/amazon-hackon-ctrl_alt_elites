@@ -489,3 +489,47 @@ def process_refund_request(seller):
     except Exception as e:
         db.session.rollback()
         return {"error": str(e)}, 500
+
+
+@orders_bp.route("/seller/orders/refund-reject", methods=["POST"])
+@check_auth_seller
+def reject_refund_request(seller):
+    try:
+        data = request.get_json()
+        if not data or "order_id" not in data or "product_id" not in data:
+            return {"error": "Invalid request data"}, 400
+
+        order = (
+            db.session.query(Order)
+            .join(OrderItem)
+            .join(Product)
+            .filter(Order.id == data["order_id"], Product.seller_id == seller.id)
+            .first()
+        )
+
+        if not order:
+            return {"error": "Order not found"}, 404
+
+        order_item = (
+            db.session.query(OrderItem)
+            .filter(
+                OrderItem.order_id == order.id,
+                OrderItem.product_id == data["product_id"],
+            )
+            .first()
+        )
+        if not order_item:
+            return {"error": "Order item not found"}, 404
+
+        order_item.status = "refund_rejected"
+        db.session.commit()
+
+        requests.post(
+            url_for("services.trigger_scs_calculation", _external=True),
+            json={"seller_id": seller.id},
+            timeout=5,
+        )
+        return {"message": "Refund request rejected successfully"}, 200
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
