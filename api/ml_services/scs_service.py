@@ -4,7 +4,7 @@ Service layer for calculating Seller Credibility Score (SCS).
 
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-from sqlalchemy import func
+from sqlalchemy import func, true
 from api.models import db, Seller, Product, OrderItem, Review, Order
 
 WEIGHTS = {
@@ -30,10 +30,10 @@ def calculate_scs_score(seller_id: int) -> Optional[float]:
     # --- P1: Order Fulfillment Rate ---
     if total_items > 3:
         on_time_count = order_items_query.filter(
-            OrderItem.delivered_on_time is True
+            OrderItem.delivered_on_time == true()
         ).count()
         cancelled_by_seller_count = order_items_query.filter(
-            OrderItem.cancelled_by_seller is True
+            OrderItem.cancelled_by_seller == true()
         ).count()
 
         on_time_rate = on_time_count / total_items if total_items > 0 else 1.0
