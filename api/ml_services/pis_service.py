@@ -1,17 +1,16 @@
 """
 Service layer for calculating Product Integrity Score (PIS) and cascading
-updates to the Seller Credibility Score (SCS). (Robust Version)
+updates to the Seller Credibility Score (SCS).
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
-from api.models import db, Product, Review, Return, OrderItem, User
+from sqlalchemy import func
+from api.models import db, Product, Review, Return, OrderItem
 from api.ml_services.analysis_utils import (
     analyze_product_description,
     analyze_image_authenticity,
 )
-
-# Important: Import scs_service to trigger the cascade
 from api.ml_services import scs_service
 
 WEIGHTS = {
@@ -35,64 +34,60 @@ def _calculate_pis_score(product_id: int) -> Optional[float]:
     ]
     p1_score = 1 - description_risk
 
-    # --- P2: Price Point Deviation (using Median for robustness) ---
-    prices = (
-        db.session.query(Product.price)
+    # --- P2: Price Point Deviation ---
+    avg_price_result = (
+        db.session.query(func.avg(Product.price))
         .filter(Product.category == product.category, Product.id != product.id)
-        .all()
+        .scalar()
     )
-    if prices:
-        price_list = sorted([p[0] for p in prices])
-        median_price = price_list[len(price_list) // 2]
-        deviation = (
-            abs(product.price - median_price) / median_price if median_price > 0 else 0
-        )
+
+    if avg_price_result:
+        avg_category_price = float(avg_price_result)
+        deviation = abs(product.price - avg_category_price) / avg_category_price
         p2_score = 1 - min(deviation, 1.0)
     else:
-        p2_score = 0.75  # Neutral score if no comparable products
+        p2_score = 0.75
 
     # --- P3: Image Authenticity ---
-    image_risk = analyze_image_authenticity(product.image_urls)["image_risk"]
+    image_risk = analyze_image_authenticity(product.image_urls or [])["image_risk"]
     p3_score = 1 - image_risk
 
-    # --- P4: Aggregated Review Sentiment (CRITICAL: Weighted by User UBA Score) ---
-    reviews = Review.query.filter_by(product_id=product_id).join(User).all()
+    # --- P4: Aggregated Review Sentiment (Weighted by User UBA Score) ---
+    reviews = (
+        Review.query.filter_by(product_id=product_id)
+        .options(db.joinedload(Review.user))
+        .all()
+    )
     if reviews:
         weighted_score_sum = 0
         total_weight = 0
         for review in reviews:
-            # A trusted user's review has more weight. A suspicious user's review is down-weighted.
-            # Squaring the UBA gives more power to trusted users (0.9^2=0.81) vs bots (0.2^2=0.04).
-            uba_weight = (review.author.uba_score or 0.7) ** 2
-            # Normalize rating from [1, 5] to [-1, 1] for a signed score
-            normalized_rating = (review.rating - 3) / 2.0
-            weighted_score_sum += normalized_rating * uba_weight
+            uba_weight = review.user.uba_score or 0.7
+            weighted_score_sum += review.rating * uba_weight
             total_weight += uba_weight
-        # Final score is a weighted average, normalized back to [0, 1]
         p4_score = (
-            (weighted_score_sum / total_weight + 1) / 2 if total_weight > 0 else 0.5
+            (weighted_score_sum / total_weight) / 5.0 if total_weight > 0 else 0.5
         )
     else:
-        p4_score = 0.7  # Neutral score for new products with no reviews
+        p4_score = 0.7
 
-    # --- P5: Return Reason Analysis (Categorized) ---
-    items_sold_count = OrderItem.query.filter(
-        OrderItem.product_id == product_id
-    ).count()
+    # --- P5: Return Reason Analysis ---
+    # FIX: Changed to the .count() method.
+    items_sold_count = OrderItem.query.filter_by(product_id=product_id).count()
     if items_sold_count > 0:
+        # FIX: Changed to the .count() method.
         integrity_returns = (
             Return.query.join(OrderItem)
-            .filter(OrderItem.product_id == product_id)
             .filter(
-                Return.reason_category.in_(["counterfeit", "fake", "not_as_described"])
+                OrderItem.product_id == product_id,
+                Return.reason_category.in_(["counterfeit", "fake", "not_as_described"]),
             )
             .count()
         )
         rate_of_integrity_returns = integrity_returns / items_sold_count
-        # Penalize heavily for even a small rate of integrity-related returns
         p5_score = 1 - min(rate_of_integrity_returns * 5.0, 1.0)
     else:
-        p5_score = 1.0  # Perfect score if no items sold/returned
+        p5_score = 1.0
 
     # --- Final Weighted Score ---
     final_pis = (
@@ -104,27 +99,18 @@ def _calculate_pis_score(product_id: int) -> Optional[float]:
     )
 
     product.pis_score = final_pis
-    product.last_pis_update = datetime.utcnow()
-    print(f"PIS score for product {product_id} calculated as: {final_pis:.2f}")
+    product.last_pis_update = datetime.now(timezone.utc)
     return final_pis
 
 
 def recalculate_pis_and_cascade_scs(product_id: int):
     """
     A transactional function that updates a product's PIS and then triggers
-    an SCS update for the corresponding seller. The calling route is responsible
-    for committing the database session.
+    an SCS update for the corresponding seller.
     """
     product = Product.query.get(product_id)
     if not product:
         return
 
-    # Step 1: Recalculate the PIS for this product
     _calculate_pis_score(product_id)
-
-    # Step 2: Cascade the change by recalculating the SCS for the seller
     scs_service.calculate_scs_score(product.seller_id)
-
-    print(
-        f"--- Event Cascade Complete for Product {product_id} -> Seller {product.seller_id} ---"
-    )

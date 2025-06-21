@@ -5,6 +5,7 @@ from flask import request, jsonify
 import jwt
 
 from api.models import db, User, UserSessionLog
+from api.ml_services.uba_service import calculate_uba_score
 
 JWT_SECRET = os.getenv("JWT_SECRET")
 BASE_ROUTE = "/api/auth"
@@ -89,4 +90,15 @@ def get_session(user):
         ]
         return jsonify({"user_data": user_data, "sessions": session_data}), 200
     except Exception as e:
+        return jsonify({"message": "An error occurred", "error": str(e)}), 500
+
+
+@auth_bp.route("/<int:user_id>/recalculate-uba", methods=["POST"])
+def recalculate_uba(user_id):
+    try:
+        calculate_uba_score(user_id)
+        db.session.commit()
+        return jsonify({"message": "UBA score recalculated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
         return jsonify({"message": "An error occurred", "error": str(e)}), 500

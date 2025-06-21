@@ -15,7 +15,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=text("now()"))
 
     # UBA Score - The core output of Microservice 1
-    uba_score = db.Column(db.Float, nullable=True, default=1.0)
+    uba_score = db.Column(db.Float, nullable=True, default=0.5)
     # Example: 1.0 if phone/address verified
     profile_completeness_score = db.Column(db.Float, default=0.5)
     last_uba_update = db.Column(db.DateTime(timezone=True))
@@ -29,9 +29,10 @@ class Seller(db.Model):
     __tablename__ = "sellers"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
+    dispute_rate = db.Column(db.Float, nullable=True, default=0.0)
     created_at = db.Column(db.DateTime(timezone=True), server_default=text("now()"))
 
-    scs_score = db.Column(db.Float, nullable=True, default=1.0)
+    scs_score = db.Column(db.Float, nullable=True, default=0.5)
     last_scs_update = db.Column(db.DateTime(timezone=True))
 
     products = db.relationship("Product", back_populates="seller", lazy=True)
@@ -76,6 +77,7 @@ class Review(db.Model):
     linguistic_authenticity_score = db.Column(db.Float)
 
     user = db.relationship("User", back_populates="reviews")
+    author = db.relationship("User", foreign_keys=[user_id], overlaps="user,reviews")
     product = db.relationship("Product", back_populates="reviews")
 
 
@@ -84,11 +86,7 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=text("now()"))
-    # e.g., pending, shipped, delivered, cancelled
-    status = db.Column(db.String(50), default="pending")
-
-    # For Seller's Order Fulfillment Rate (Parameter P1 of SCS)
-    shipped_on_time = db.Column(db.Boolean, nullable=True)
+    total_amount = db.Column(db.Float, nullable=False)
 
     user = db.relationship("User", back_populates="orders")
     items = db.relationship("OrderItem", back_populates="order", lazy=True)
@@ -101,6 +99,11 @@ class OrderItem(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price_at_purchase = db.Column(db.Float, nullable=False)
+    status = db.Column(
+        db.String(50), default="pending"
+    )  # e.g., pending, shipped, delivered, cancelled, returned, refunded
+    cancelled_by_seller = db.Column(db.Boolean, default=False)
+    delivered_on_time = db.Column(db.Boolean, nullable=True)
 
     order = db.relationship("Order", back_populates="items")
     product = db.relationship("Product", back_populates="order_items", lazy=True)

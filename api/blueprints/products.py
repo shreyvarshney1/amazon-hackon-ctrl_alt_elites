@@ -1,5 +1,6 @@
 from flask_smorest import Blueprint
-from flask import request
+from flask import request, url_for
+import requests
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import joinedload
 from flask_cors import CORS
@@ -30,7 +31,18 @@ def get_products():
                     "image_urls": product.image_urls,
                     "listed_at": product.listed_at.isoformat(),
                     "pis_score": product.pis_score,
-                    "last_pis_update": product.last_pis_update.isoformat(),
+                    "rating": (
+                        sum(review.rating for review in product.reviews)
+                        / len(product.reviews)
+                        if product.reviews
+                        else 0
+                    ),
+                    "review_count": len(product.reviews),
+                    "last_pis_update": (
+                        product.last_pis_update.isoformat()
+                        if product.last_pis_update
+                        else None
+                    ),
                     "seller": {
                         "id": product.seller.id,
                         "name": product.seller.name,
@@ -74,6 +86,12 @@ def get_product(product_id):
             "image_urls": product.image_urls,
             "listed_at": product.listed_at.isoformat(),
             "pis_score": product.pis_score,
+            "rating": (
+                sum(review.rating for review in product.reviews) / len(product.reviews)
+                if product.reviews
+                else 0
+            ),
+            "review_count": len(product.reviews),
             "last_pis_update": (
                 product.last_pis_update.isoformat() if product.last_pis_update else None
             ),
@@ -153,7 +171,7 @@ def add_review(user, product_id):
             .filter(
                 Order.user_id == user.id,
                 OrderItem.product_id == product_id,
-                Order.status.in_(["delivered", "returned"]),
+                OrderItem.status.in_(["delivered", "returned"]),
             )
             .all()
         )
@@ -169,6 +187,33 @@ def add_review(user, product_id):
         )
         db.session.add(review)
         db.session.commit()
+
+        requests.post(
+            url_for(
+                "services.trigger_uba_calculation",
+                _external=True,
+            ),
+            json={"user_id": user.id},
+            timeout=5,
+        )
+
+        requests.post(
+            url_for(
+                "services.trigger_pis_calculation",
+                _external=True,
+            ),
+            json={"product_id": product_id},
+            timeout=5,
+        )
+
+        requests.post(
+            url_for(
+                "services.trigger_scs_calculation",
+                _external=True,
+            ),
+            json={"seller_id": product.seller_id},
+            timeout=5,
+        )
 
         # return {"message": "Review added successfully", "review" : review}, 201
 
@@ -222,6 +267,15 @@ def add_product(seller):
         db.session.add(product)
         db.session.commit()
 
+        requests.post(
+            url_for(
+                "services.trigger_pis_calculation",
+                _external=True,
+            ),
+            json={"product_id": product.id},
+            timeout=5,
+        )
+
         return {"message": "Product added successfully", "product_id": product.id}, 201
     except Exception as e:
         db.session.rollback()
@@ -251,6 +305,15 @@ def update_product(seller, product_id):
             product.image_urls = data["image_urls"]
 
         db.session.commit()
+
+        requests.post(
+            url_for(
+                "services.trigger_pis_calculation",
+                _external=True,
+            ),
+            json={"product_id": product.id},
+            timeout=5,
+        )
 
         return {"message": "Product updated successfully"}, 200
     except Exception as e:
