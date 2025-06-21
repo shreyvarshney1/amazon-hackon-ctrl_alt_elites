@@ -86,7 +86,7 @@ function OrdersTab() {
       setOrders(data.orders || []);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "An unknown error occurred."
+        err instanceof Error ? err.message : "An unknown error occurred.",
       );
     } finally {
       setLoadingOrders(false);
@@ -104,7 +104,7 @@ function OrdersTab() {
   const handleAction = async (
     url: string,
     body: Record<string, any>,
-    successMessage: string
+    successMessage: string,
   ) => {
     try {
       const token = localStorage.getItem("seller_auth_token");
@@ -131,48 +131,48 @@ function OrdersTab() {
   const handleDeliver = (
     orderId: number,
     productId: number,
-    orderItemId: number
+    orderItemId: number,
   ) => {
     const delivered_on_time = onTimeDeliveryStatus[orderItemId] ?? false;
     handleAction(
       "/api/orders/seller/orders/deliver-product",
       { order_id: orderId, product_id: productId, delivered_on_time },
-      "Product marked as delivered!"
+      "Product marked as delivered!",
     );
   };
 
   const handleCancel = (orderId: number, productId: number) => {
     if (
       !confirm(
-        "Are you sure you want to cancel this item? This cannot be undone."
+        "Are you sure you want to cancel this item? This cannot be undone.",
       )
     )
       return;
     handleAction(
       "/api/orders/seller/orders/cancel-product",
       { order_id: orderId, product_id: productId },
-      "Order item has been cancelled."
+      "Order item has been cancelled.",
     );
   };
 
   const handleAcceptRefund = (orderId: number, productId: number) => {
     if (
       !confirm(
-        "Are you sure you want to accept the refund request? This will process the refund."
+        "Are you sure you want to accept the refund request? This will process the refund.",
       )
     )
       return;
     handleAction(
       "/api/orders/seller/orders/refund-process",
       { order_id: orderId, product_id: productId },
-      "Refund has been processed successfully."
+      "Refund has been processed successfully.",
     );
   };
 
   const handleRejectRefund = (orderId: number, productId: number) => {
     // This is a placeholder to test refund-rejection functionality.
     alert(
-      "Reject refund functionality is not yet connected to an API endpoint."
+      "Reject refund functionality is not yet connected to an API endpoint.",
     );
   };
 
@@ -285,7 +285,8 @@ function OrdersTab() {
                           </Button>
                         </>
                       )}
-                      {(item.status === "returned" || item.status === "cancelled" ) && (
+                      {(item.status === "returned" ||
+                        item.status === "cancelled") && (
                         <>
                           <Button
                             size="sm"
@@ -353,7 +354,7 @@ export default function SellerDashboard() {
       if (response.ok) {
         const data = await response.json();
         const sellerProducts = data.products.filter(
-          (product: Product) => product.seller.id === seller?.id
+          (product: Product) => product.seller.id === seller?.id,
         );
         setProducts(sellerProducts);
       }
@@ -371,7 +372,7 @@ export default function SellerDashboard() {
   }, [seller]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -489,7 +490,7 @@ export default function SellerDashboard() {
     } catch (error) {
       console.error("Delete error:", error);
       alert(
-        error instanceof Error ? error.message : "Failed to delete product"
+        error instanceof Error ? error.message : "Failed to delete product",
       );
     }
   };
@@ -572,7 +573,7 @@ export default function SellerDashboard() {
                         <p>
                           Updated:{" "}
                           {new Date(
-                            seller.last_scs_update
+                            seller.last_scs_update,
                           ).toLocaleDateString()}
                         </p>
                       )}
@@ -688,7 +689,7 @@ export default function SellerDashboard() {
                                   </span>
                                   <p className="text-gray-900">
                                     {new Date(
-                                      product.listed_at
+                                      product.listed_at,
                                     ).toLocaleDateString()}
                                   </p>
                                 </div>
@@ -833,8 +834,8 @@ export default function SellerDashboard() {
                   {formLoading
                     ? "Saving..."
                     : editingProduct
-                    ? "Update Product"
-                    : "Add Product"}
+                      ? "Update Product"
+                      : "Add Product"}
                 </Button>
               </div>
             </form>

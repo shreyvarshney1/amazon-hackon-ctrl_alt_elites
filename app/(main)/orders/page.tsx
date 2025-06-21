@@ -167,7 +167,7 @@ const OrdersPage = () => {
   const handleAction = async (
     url: string,
     body: Record<string, any>,
-    successMessage: string
+    successMessage: string,
   ) => {
     setLoading(true);
     try {
@@ -199,7 +199,7 @@ const OrdersPage = () => {
     handleAction(
       "/api/orders/cancel-order",
       { order_id: orderId, product_id: productId },
-      "Item cancelled successfully. A refund will be processed if applicable."
+      "Item cancelled successfully. A refund will be processed if applicable.",
     );
   };
 
@@ -212,7 +212,7 @@ const OrdersPage = () => {
     handleAction(
       "/api/orders/return-product",
       { product_id: productId, reason: reason, order_id: orderId },
-      "Return initiated successfully. The seller will review your request."
+      "Return initiated successfully. The seller will review your request.",
     );
   };
 
@@ -293,7 +293,9 @@ const OrdersPage = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleReturnItem(item.product_id, order.id)}
+                          onClick={() =>
+                            handleReturnItem(item.product_id, order.id)
+                          }
                           disabled={loading}
                         >
                           {loading ? "Processing..." : "Return Item"}
