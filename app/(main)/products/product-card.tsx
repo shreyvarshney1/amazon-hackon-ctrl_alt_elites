@@ -79,7 +79,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p
             style={{
               color: `rgb(${Math.round(
-                255 * (1 - product.pis_score)
+                255 * (1 - product.pis_score),
               )}, ${Math.round(180 * product.pis_score)}, 80)`,
               fontWeight: 500,
             }}
