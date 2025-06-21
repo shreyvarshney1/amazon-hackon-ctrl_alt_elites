@@ -103,7 +103,7 @@
 // export default OrdersPage;
 
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/context/auth-context";
 // It's good practice to have shared types. Assuming these are updated.
 import { Order, OrderItem } from "@/types/order";
@@ -131,8 +131,7 @@ const OrdersPage = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     const token = localStorage.getItem("auth_token");
     if (!token || !user || user.id === "guest") {
       setLoading(false);
@@ -158,15 +157,13 @@ const OrdersPage = () => {
     } finally {
       setLoading(false);
     }
-  };
-
+  }, [user]);
   useEffect(() => {
     fetchOrders();
-  }, [user]);
-
+  }, [user, fetchOrders]);
   const handleAction = async (
     url: string,
-    body: Record<string, any>,
+    body: Record<string, string | number>,
     successMessage: string,
   ) => {
     setLoading(true);
@@ -236,7 +233,7 @@ const OrdersPage = () => {
       <h1 className="text-3xl font-bold mb-6">Your Orders</h1>
       {orders.length === 0 ? (
         <div className="text-center border-2 border-dashed rounded-lg p-12">
-          <p className="text-gray-500">You haven't placed any orders yet.</p>
+          <p className="text-gray-500">You haven&apos;t placed any orders yet.</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -302,8 +299,7 @@ const OrdersPage = () => {
                         </Button>
                       )}
                       {(item.status === "cancelled" ||
-                        item.status === "returned") && (
-                        <p className="text-xs text-gray-500 italic">
+                        item.status === "returned") && (                        <p className="text-xs text-gray-500 italic">
                           Refund pending seller approval.
                         </p>
                       )}

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSellerAuth } from "@/context/seller-auth-context";
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,8 @@ import {
   Edit,
   Plus,
   X,
-  Package,
   PackageCheck,
   Ban,
-  Undo2,
   CheckCircle,
   XCircle,
 } from "lucide-react";
@@ -100,10 +98,9 @@ function OrdersTab() {
   const handleOnTimeToggle = (orderItemId: number, checked: boolean) => {
     setOnTimeDeliveryStatus((prev) => ({ ...prev, [orderItemId]: checked }));
   };
-
   const handleAction = async (
     url: string,
-    body: Record<string, any>,
+    body: Record<string, string | number | boolean>,
     successMessage: string,
   ) => {
     try {
@@ -168,9 +165,9 @@ function OrdersTab() {
       "Refund has been processed successfully.",
     );
   };
-
-  const handleRejectRefund = (orderId: number, productId: number) => {
+  const handleRejectRefund = (_orderId: number, _productId: number) => {
     // This is a placeholder to test refund-rejection functionality.
+    console.log("Rejecting refund for order:", _orderId, "product:", _productId);
     alert(
       "Reject refund functionality is not yet connected to an API endpoint.",
     );
@@ -347,8 +344,7 @@ export default function SellerDashboard() {
       router.push("/seller/login");
     }
   }, [seller, isLoading, router]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const response = await fetch("/api/products/all");
       if (response.ok) {
@@ -363,13 +359,12 @@ export default function SellerDashboard() {
     } finally {
       setLoadingProducts(false);
     }
-  };
-
+  }, [seller?.id]);
   useEffect(() => {
     if (seller && seller.id !== "guest") {
       fetchProducts();
     }
-  }, [seller]);
+  }, [seller, fetchProducts]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
