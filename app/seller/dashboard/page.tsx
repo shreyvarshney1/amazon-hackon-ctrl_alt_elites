@@ -167,7 +167,12 @@ function OrdersTab() {
   };
   const handleRejectRefund = (_orderId: number, _productId: number) => {
     // This is a placeholder to test refund-rejection functionality.
-    console.log("Rejecting refund for order:", _orderId, "product:", _productId);
+    console.log(
+      "Rejecting refund for order:",
+      _orderId,
+      "product:",
+      _productId,
+    );
     alert(
       "Reject refund functionality is not yet connected to an API endpoint.",
     );
