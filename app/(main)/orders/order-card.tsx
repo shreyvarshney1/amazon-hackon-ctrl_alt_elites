@@ -15,7 +15,7 @@ export default function OrderCard({ order, onActionSuccess }: OrderCardProps) {
       <CardHeader className="bg-gray-100 flex flex-row justify-between items-center p-4">
         <div className="text-sm">
           <p className="uppercase text-gray-600">Order Placed</p>
-          <p>{new Date(order.created_at).toLocaleDateString('en-GB')}</p>
+          <p>{new Date(order.created_at).toLocaleDateString("en-GB")}</p>
         </div>
         <div className="text-sm">
           <p className="uppercase text-gray-600">Total</p>
@@ -26,12 +26,12 @@ export default function OrderCard({ order, onActionSuccess }: OrderCardProps) {
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        {order.items.map(item => (
-          <OrderItem 
-            key={item.id} 
-            item={item} 
-            orderId={order.id} 
-            onActionSuccess={onActionSuccess} 
+        {order.items.map((item) => (
+          <OrderItem
+            key={item.id}
+            item={item}
+            orderId={order.id}
+            onActionSuccess={onActionSuccess}
           />
         ))}
       </CardContent>

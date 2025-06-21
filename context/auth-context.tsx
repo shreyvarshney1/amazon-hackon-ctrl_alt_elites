@@ -1,7 +1,13 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { jwtDecode } from "jwt-decode";
 import { getSession } from "@/lib/api/auth";
 
@@ -54,24 +60,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const sessionData = await getSession(currentToken);
-      const decoded: { user_id: string, username: string } = jwtDecode(currentToken);
+      const decoded: { user_id: string; username: string } =
+        jwtDecode(currentToken);
       const fullUser = {
         id: decoded.user_id.toString(),
         username: sessionData.user_data.username,
         email: sessionData.user_data.email,
         uba_score: sessionData.user_data.uba_score,
       };
-      
+
       localStorage.setItem("user_data", JSON.stringify(fullUser));
       setUser(fullUser);
       setToken(currentToken);
-
     } catch (error) {
       console.error("Session refresh failed, logging out.", error);
       logout();
     }
   }, [logout, user]);
-
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -80,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     };
     checkAuthStatus();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only once on mount
 
   const redirectToLogin = () => {
@@ -90,31 +95,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, username?: string) => {
     try {
-        const response = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, username }),
-        });
-  
-        if (!response.ok) throw new Error("Login failed");
-  
-        const data = await response.json();
-        localStorage.setItem("auth_token", data.token);
-        setToken(data.token);
-        await refreshUser();
-  
-        const redirectPath = sessionStorage.getItem("redirect_path") || "/";
-        sessionStorage.removeItem("redirect_path");
-        router.push(redirectPath);
-      } catch (error) {
-        console.error("Login error:", error);
-        throw error;
-      }
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, username }),
+      });
+
+      if (!response.ok) throw new Error("Login failed");
+
+      const data = await response.json();
+      localStorage.setItem("auth_token", data.token);
+      setToken(data.token);
+      await refreshUser();
+
+      const redirectPath = sessionStorage.getItem("redirect_path") || "/";
+      sessionStorage.removeItem("redirect_path");
+      router.push(redirectPath);
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, token, login, logout, isLoading, redirectToLogin, refreshUser }}
+      value={{
+        user,
+        token,
+        login,
+        logout,
+        isLoading,
+        redirectToLogin,
+        refreshUser,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -9,7 +9,10 @@ export default function Loader({
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 p-8">
-      <Loader2 className="animate-spin text-[#ff9900]" style={{ width: size, height: size }} />
+      <Loader2
+        className="animate-spin text-[#ff9900]"
+        style={{ width: size, height: size }}
+      />
       <p className="text-sm text-gray-600">{text}</p>
     </div>
   );

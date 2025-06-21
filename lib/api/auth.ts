@@ -8,9 +8,9 @@ interface SessionUserData {
 }
 
 interface SessionLog {
-    ip_address: string;
-    device_info: string;
-    timestamp: string;
+  ip_address: string;
+  device_info: string;
+  timestamp: string;
 }
 
 interface SessionResponse {
@@ -29,18 +29,22 @@ interface SessionResponse {
  */
 export const getSession = async (token: string): Promise<SessionResponse> => {
   const response = await fetch(`/api/auth/session`, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
   });
 
   if (!response.ok) {
     // If the token is invalid or expired, the server will likely return a 401 or 403.
     // We can throw an error to be caught by the calling function (e.g., in AuthContext).
-    const errorData = await response.json().catch(() => ({ message: "Failed to fetch session" }));
-    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+    const errorData = await response
+      .json()
+      .catch(() => ({ message: "Failed to fetch session" }));
+    throw new Error(
+      errorData.message || `HTTP error! Status: ${response.status}`,
+    );
   }
 
   return response.json();
@@ -48,35 +52,41 @@ export const getSession = async (token: string): Promise<SessionResponse> => {
 
 // You can also move your login logic here to keep all auth API calls together.
 interface LoginRequest {
-    email: string;
-    username?: string;
+  email: string;
+  username?: string;
 }
 
 interface LoginResponse {
-    message: string;
-    token: string;
+  message: string;
+  token: string;
 }
 
 /**
  * Logs in a user by sending their credentials to the backend.
- * 
+ *
  * @param credentials The user's email and optional username.
  * @returns A promise that resolves to the login response, including the JWT token.
  * @throws An error if the login fails.
  */
-export const loginUser = async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await fetch(`/api/auth/login`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-    });
+export const loginUser = async (
+  credentials: LoginRequest,
+): Promise<LoginResponse> => {
+  const response = await fetch(`/api/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credentials),
+  });
 
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: "Login failed" }));
-        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
-    }
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => ({ message: "Login failed" }));
+    throw new Error(
+      errorData.message || `HTTP error! Status: ${response.status}`,
+    );
+  }
 
-    return response.json();
-}
+  return response.json();
+};

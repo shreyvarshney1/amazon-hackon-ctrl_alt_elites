@@ -86,10 +86,15 @@ export const cancelOrderItem = async (
 };
 
 interface ReturnPayload {
-    order_id: number;
-    product_id: number;
-    reason: string;
-    reason_category?: 'counterfeit' | 'fake' | 'not_as_described' | 'damaged' | 'other';
+  order_id: number;
+  product_id: number;
+  reason: string;
+  reason_category?:
+    | "counterfeit"
+    | "fake"
+    | "not_as_described"
+    | "damaged"
+    | "other";
 }
 
 /**
@@ -105,9 +110,12 @@ export const returnOrderItem = async (
   // Simple logic to categorize the return reason for the backend
   const reasonLower = payload.reason.toLowerCase();
   if (reasonLower.includes("fake") || reasonLower.includes("counterfeit")) {
-    payload.reason_category = 'fake';
-  } else if (reasonLower.includes("described") || reasonLower.includes("different")) {
-    payload.reason_category = 'not_as_described';
+    payload.reason_category = "fake";
+  } else if (
+    reasonLower.includes("described") ||
+    reasonLower.includes("different")
+  ) {
+    payload.reason_category = "not_as_described";
   }
 
   const response = await fetch(`api/orders/return-product`, {

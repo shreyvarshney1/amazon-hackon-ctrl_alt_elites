@@ -25,7 +25,10 @@ export default function OrdersPage() {
     try {
       const fetchedOrders = await getMyOrders(token);
       // Sort orders by most recent first
-      fetchedOrders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      fetchedOrders.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      );
       setOrders(fetchedOrders);
     } catch (err) {
       setError("Failed to fetch your orders. Please try again later.");
@@ -47,24 +50,32 @@ export default function OrdersPage() {
   if (isLoading) {
     return <Loader text="Fetching your orders..." />;
   }
-  
-  if (!token || user?.id === 'guest') {
+
+  if (!token || user?.id === "guest") {
     return (
-        <div className="text-center p-8">
-            <h2 className="text-xl font-semibold mb-4">Please log in to see your orders.</h2>
-            <Button asChild>
-                <Link href="/login">Login</Link>
-            </Button>
-        </div>
-    )
+      <div className="text-center p-8">
+        <h2 className="text-xl font-semibold mb-4">
+          Please log in to see your orders.
+        </h2>
+        <Button asChild>
+          <Link href="/login">Login</Link>
+        </Button>
+      </div>
+    );
   }
 
   if (error) {
     return (
       <div className="text-center text-red-600 p-8">
         <p>{error}</p>
-        <Button onClick={() => { setIsLoading(true); fetchOrders(); }} className="mt-4">
-            Try Again
+        <Button
+          onClick={() => {
+            setIsLoading(true);
+            fetchOrders();
+          }}
+          className="mt-4"
+        >
+          Try Again
         </Button>
       </div>
     );
@@ -84,7 +95,11 @@ export default function OrdersPage() {
       <h1 className="text-2xl md:text-3xl font-bold mb-6">Your Orders</h1>
       <div className="space-y-6">
         {orders.map((order) => (
-          <OrderCard key={order.id} order={order} onActionSuccess={fetchOrders} />
+          <OrderCard
+            key={order.id}
+            order={order}
+            onActionSuccess={fetchOrders}
+          />
         ))}
       </div>
     </main>

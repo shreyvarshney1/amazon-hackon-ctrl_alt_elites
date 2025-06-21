@@ -15,7 +15,7 @@ export default function SearchSidebar() {
 
   const handleBrandToggle = (brand: string) => {
     setSelectedBrands((prev) =>
-      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
     );
   };
 
@@ -29,7 +29,10 @@ export default function SearchSidebar() {
 
       <FilterSection title="Customer Review">
         {[4, 3, 2, 1].map((rating) => (
-          <div key={rating} className="flex items-center text-sm cursor-pointer hover:text-orange-600">
+          <div
+            key={rating}
+            className="flex items-center text-sm cursor-pointer hover:text-orange-600"
+          >
             <StarRating rating={rating} />
             <span className="ml-2 text-gray-700">& Up</span>
           </div>
@@ -44,7 +47,10 @@ export default function SearchSidebar() {
               checked={selectedBrands.includes(brand)}
               onCheckedChange={() => handleBrandToggle(brand)}
             />
-            <label htmlFor={brand} className="ml-2 text-sm cursor-pointer text-gray-800">
+            <label
+              htmlFor={brand}
+              className="ml-2 text-sm cursor-pointer text-gray-800"
+            >
               {brand}
             </label>
           </div>
@@ -59,21 +65,34 @@ export default function SearchSidebar() {
         {osOptions.map((os) => (
           <div key={os} className="flex items-center">
             <Checkbox id={os} />
-            <label htmlFor={os} className="ml-2 text-sm cursor-pointer text-gray-800">
+            <label
+              htmlFor={os}
+              className="ml-2 text-sm cursor-pointer text-gray-800"
+            >
               {os}
             </label>
           </div>
         ))}
       </FilterSection>
-      
+
       <FilterSection title="Price">
-          <div className="space-y-1 text-sm text-blue-600">
-              <div className="cursor-pointer hover:text-orange-600">Under ₹1,000</div>
-              <div className="cursor-pointer hover:text-orange-600">₹1,000 - ₹5,000</div>
-              <div className="cursor-pointer hover:text-orange-600">₹5,000 - ₹10,000</div>
-              <div className="cursor-pointer hover:text-orange-600">₹10,000 - ₹20,000</div>
-              <div className="cursor-pointer hover:text-orange-600">Over ₹20,000</div>
+        <div className="space-y-1 text-sm text-blue-600">
+          <div className="cursor-pointer hover:text-orange-600">
+            Under ₹1,000
           </div>
+          <div className="cursor-pointer hover:text-orange-600">
+            ₹1,000 - ₹5,000
+          </div>
+          <div className="cursor-pointer hover:text-orange-600">
+            ₹5,000 - ₹10,000
+          </div>
+          <div className="cursor-pointer hover:text-orange-600">
+            ₹10,000 - ₹20,000
+          </div>
+          <div className="cursor-pointer hover:text-orange-600">
+            Over ₹20,000
+          </div>
+        </div>
       </FilterSection>
     </aside>
   );

@@ -22,7 +22,10 @@ interface ProductDetailProps {
   onProductUpdate: () => void; // Callback to refresh product data
 }
 
-export default function ProductDetails({ product, onProductUpdate }: ProductDetailProps) {
+export default function ProductDetails({
+  product,
+  onProductUpdate,
+}: ProductDetailProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const { addToCart } = useCart();
   const router = useRouter();
@@ -151,7 +154,6 @@ export default function ProductDetails({ product, onProductUpdate }: ProductDeta
               <div>Buy 2 or more and get 5% off on</div>
             </div>
           </div>
-
         </div>
 
         <div className="w-64 border border-[#dddddd] rounded p-4 h-fit gap-4 flex flex-col">

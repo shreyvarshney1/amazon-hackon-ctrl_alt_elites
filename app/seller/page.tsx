@@ -9,12 +9,12 @@ import Loader from "@/components/loader";
 
 /**
  * A gatekeeper page for the /seller route.
- * 
+ *
  * This page's sole responsibility is to check the seller's authentication status
  * and redirect them to the appropriate page:
  * - The dashboard if they are already logged in.
  * - The login page if they are not.
- * 
+ *
  * It displays a loader while the authentication check is in progress.
  */
 export default function SellerRootPage() {

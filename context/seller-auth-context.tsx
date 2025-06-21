@@ -1,6 +1,12 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { Seller } from "@/types/seller";
 import { getSellerSession, loginSeller } from "@/lib/api/seller";
 
@@ -10,7 +16,7 @@ interface SellerAuthContextType {
   seller: Seller | null;
   token: string | null;
   isLoading: boolean;
-  login: (email: string, username?: string) => Promise<Seller>; 
+  login: (email: string, username?: string) => Promise<Seller>;
   logout: () => void;
   refreshSeller: () => Promise<void>;
 }
@@ -19,7 +25,11 @@ const SellerAuthContext = createContext<SellerAuthContextType | undefined>(
   undefined,
 );
 
-export function SellerAuthProvider({ children }: { children: React.ReactNode }) {
+export function SellerAuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [seller, setSeller] = useState<Seller | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,15 +59,14 @@ export function SellerAuthProvider({ children }: { children: React.ReactNode }) 
     }
   }, [logout]);
 
-
   useEffect(() => {
     const checkAuthStatus = async () => {
-        setIsLoading(true);
-        await refreshSeller();
-        setIsLoading(false);
-    }
+      setIsLoading(true);
+      await refreshSeller();
+      setIsLoading(false);
+    };
     checkAuthStatus();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = async (email: string, username?: string): Promise<Seller> => {
@@ -70,9 +79,8 @@ export function SellerAuthProvider({ children }: { children: React.ReactNode }) 
       const fullSellerData = { ...sessionData, id: sessionData.id };
 
       setSeller(fullSellerData);
-      
-      return fullSellerData;
 
+      return fullSellerData;
     } catch (error) {
       console.error("Seller login error:", error);
       setSeller(null);
@@ -83,7 +91,9 @@ export function SellerAuthProvider({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <SellerAuthContext.Provider value={{ seller, token, login, logout, isLoading, refreshSeller }}>
+    <SellerAuthContext.Provider
+      value={{ seller, token, login, logout, isLoading, refreshSeller }}
+    >
       {children}
     </SellerAuthContext.Provider>
   );

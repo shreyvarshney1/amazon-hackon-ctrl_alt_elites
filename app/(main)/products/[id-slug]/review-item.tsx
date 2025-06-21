@@ -10,7 +10,6 @@ interface ReviewItemProps {
 }
 
 export default function ReviewItem({ review }: ReviewItemProps) {
-
   const getAvatarColor = (id: string) => {
     const colors = [
       "bg-blue-500",

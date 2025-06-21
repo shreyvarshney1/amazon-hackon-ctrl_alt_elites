@@ -45,16 +45,15 @@ export default function ReviewSection({
         title: reviewTitle,
         review_text: reviewText,
       };
-      
+
       await postReview(newReviewData, productId);
-      
+
       setRating(0);
       setReviewTitle("");
       setReviewText("");
-      
-      onReviewSubmitSuccess(); 
-      refreshUser();
 
+      onReviewSubmitSuccess();
+      refreshUser();
     } catch (err) {
       console.error(err);
       setError("Failed to submit review. Please try again.");
@@ -63,10 +62,12 @@ export default function ReviewSection({
     }
   };
 
-  
   // If parent provides new initialReviews, update local state
-  if (reviews.length !== initialReviews.length || (reviews[0] && initialReviews[0] && reviews[0].id !== initialReviews[0].id)) {
-      setReviews(initialReviews);
+  if (
+    reviews.length !== initialReviews.length ||
+    (reviews[0] && initialReviews[0] && reviews[0].id !== initialReviews[0].id)
+  ) {
+    setReviews(initialReviews);
   }
 
   return (
@@ -77,7 +78,9 @@ export default function ReviewSection({
         {user && user.id !== "guest" ? (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Overall rating</label>
+              <label className="block text-sm font-medium mb-2">
+                Overall rating
+              </label>
               <StarRating
                 interactive
                 rating={rating}
@@ -89,7 +92,9 @@ export default function ReviewSection({
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Add a headline</label>
+              <label className="block text-sm font-medium mb-2">
+                Add a headline
+              </label>
               <Input
                 value={reviewTitle}
                 onChange={(e) => setReviewTitle(e.target.value)}
@@ -99,7 +104,9 @@ export default function ReviewSection({
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Add a written review</label>
+              <label className="block text-sm font-medium mb-2">
+                Add a written review
+              </label>
               <Textarea
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
@@ -107,7 +114,7 @@ export default function ReviewSection({
                 className="min-h-[120px]"
               />
             </div>
-            
+
             {error && <p className="text-sm text-red-500">{error}</p>}
 
             <Button
@@ -115,13 +122,21 @@ export default function ReviewSection({
               disabled={!rating || !reviewText.trim() || isSubmitting}
               className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-6"
             >
-              {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {isSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
               {isSubmitting ? "Submitting..." : "Submit"}
             </Button>
           </div>
         ) : (
           <div>
-            <p>Please <Link href="/login" className="text-blue-600 hover:underline">log in</Link> to write a review.</p>
+            <p>
+              Please{" "}
+              <Link href="/login" className="text-blue-600 hover:underline">
+                log in
+              </Link>{" "}
+              to write a review.
+            </p>
           </div>
         )}
       </div>

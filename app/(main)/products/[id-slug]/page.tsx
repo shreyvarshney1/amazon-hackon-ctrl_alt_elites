@@ -41,19 +41,27 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   }, [id]);
 
   if (isLoading) {
-    return <div className="p-8"><Loader text="Loading product details..." /></div>;
+    return (
+      <div className="p-8">
+        <Loader text="Loading product details..." />
+      </div>
+    );
   }
-  
+
   if (error || !product) {
-    return <div className="p-8 text-center text-red-600">{error || "Product not found."}</div>;
+    return (
+      <div className="p-8 text-center text-red-600">
+        {error || "Product not found."}
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <ProductDetails 
+      <ProductDetails
         key={product.last_pis_update || product.id}
-        product={product} 
-        onProductUpdate={fetchProductData} 
+        product={product}
+        onProductUpdate={fetchProductData}
       />
     </div>
   );

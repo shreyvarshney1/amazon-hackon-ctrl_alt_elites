@@ -13,7 +13,7 @@ export default function SellerDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"products" | "orders">("products");
 
-  const isReady = !isAuthLoading && seller !== null && seller.id !== 'guest';
+  const isReady = !isAuthLoading && seller !== null && seller.id !== "guest";
 
   useEffect(() => {
     if (!isAuthLoading && (!seller || seller.id === "guest")) {
@@ -32,17 +32,17 @@ export default function SellerDashboard() {
   if (!isReady) {
     return null;
   }
-  
+
   return (
     <div className="min-h-screen bg-gray-50">
       <SellerHeader seller={seller} />
 
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <DashboardTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-        
+
         <div className="mt-8">
-          {activeTab === 'products' && <ProductsTab isReady={isReady} />}
-          {activeTab === 'orders' && <OrdersTab isReady={isReady} />}
+          {activeTab === "products" && <ProductsTab isReady={isReady} />}
+          {activeTab === "orders" && <OrdersTab isReady={isReady} />}
         </div>
       </main>
     </div>

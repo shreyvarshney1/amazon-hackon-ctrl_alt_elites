@@ -28,7 +28,7 @@ export default function StarRating({
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`transition-colors ${interactive ? 'cursor-pointer' : ''} ${
+            className={`transition-colors ${interactive ? "cursor-pointer" : ""} ${
               star <= displayRating
                 ? "fill-yellow-400 text-yellow-400"
                 : "text-gray-300 hover:text-yellow-400"
@@ -40,7 +40,11 @@ export default function StarRating({
           />
         ))}
       </div>
-      {count && <span className="text-sm text-blue-600 hover:underline cursor-pointer">({count})</span>}
+      {count && (
+        <span className="text-sm text-blue-600 hover:underline cursor-pointer">
+          ({count})
+        </span>
+      )}
     </div>
   );
 }

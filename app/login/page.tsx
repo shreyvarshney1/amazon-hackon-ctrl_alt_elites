@@ -32,9 +32,8 @@ export default function LoginPage() {
       // Get the intended destination from session storage, or default to home.
       const redirectPath = sessionStorage.getItem("redirect_path") || "/";
       sessionStorage.removeItem("redirect_path");
-      
-      router.push(redirectPath);
 
+      router.push(redirectPath);
     } catch (err) {
       console.error("Login failed", err);
       setError(
@@ -90,46 +89,66 @@ export default function LoginPage() {
 
           <div className="text-xs text-gray-800 leading-relaxed pt-4">
             By continuing, you agree to Amazon&apos;s{" "}
-            <a href="#" className="text-blue-600 hover:text-orange-600 hover:underline">
+            <a
+              href="#"
+              className="text-blue-600 hover:text-orange-600 hover:underline"
+            >
               Conditions of Use
             </a>{" "}
             and{" "}
-            <a href="#" className="text-blue-600 hover:text-orange-600 hover:underline">
+            <a
+              href="#"
+              className="text-blue-600 hover:text-orange-600 hover:underline"
+            >
               Privacy Notice
-            </a>.
+            </a>
+            .
           </div>
         </CardContent>
       </Card>
 
       <div className="relative w-full max-w-sm my-6">
         <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t"></span>
+          <span className="w-full border-t"></span>
         </div>
         <div className="relative flex justify-center text-xs">
-            <span className="bg-white px-2 text-gray-500">New to Amazon?</span>
+          <span className="bg-white px-2 text-gray-500">New to Amazon?</span>
         </div>
       </div>
 
-      <Button asChild variant="outline" className="w-full max-w-sm h-9 border-gray-300 shadow-sm font-normal">
+      <Button
+        asChild
+        variant="outline"
+        className="w-full max-w-sm h-9 border-gray-300 shadow-sm font-normal"
+      >
         <Link href="/signup">Create your Amazon account</Link>
       </Button>
 
       <div className="w-full max-w-sm mt-4 text-center">
-        <Link href="/seller/login" className="text-sm text-blue-600 hover:text-orange-600 hover:underline">
+        <Link
+          href="/seller/login"
+          className="text-sm text-blue-600 hover:text-orange-600 hover:underline"
+        >
           Sign in as a seller instead
         </Link>
       </div>
 
       <footer className="w-full border-t mt-8 pt-6">
         <div className="max-w-5xl mx-auto text-center">
-            <div className="flex items-center justify-center space-x-6 text-xs text-blue-600 mb-2">
-                <a href="#" className="hover:text-orange-600 hover:underline">Conditions of Use</a>
-                <a href="#" className="hover:text-orange-600 hover:underline">Privacy Notice</a>
-                <a href="#" className="hover:text-orange-600 hover:underline">Help</a>
-            </div>
-            <div className="text-xs text-gray-500">
-                © 1996-2025, Amazon.com, Inc. or its affiliates
-            </div>
+          <div className="flex items-center justify-center space-x-6 text-xs text-blue-600 mb-2">
+            <a href="#" className="hover:text-orange-600 hover:underline">
+              Conditions of Use
+            </a>
+            <a href="#" className="hover:text-orange-600 hover:underline">
+              Privacy Notice
+            </a>
+            <a href="#" className="hover:text-orange-600 hover:underline">
+              Help
+            </a>
+          </div>
+          <div className="text-xs text-gray-500">
+            © 1996-2025, Amazon.com, Inc. or its affiliates
+          </div>
         </div>
       </footer>
     </div>

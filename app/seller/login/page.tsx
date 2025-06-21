@@ -41,7 +41,7 @@ export default function SellerLogin() {
       setError(
         error instanceof Error
           ? error.message
-          : "Login failed. Please try again."
+          : "Login failed. Please try again.",
       );
     } finally {
       setIsLoading(false);
@@ -154,14 +154,20 @@ export default function SellerLogin() {
       </div>
       <footer className="w-full border-t mt-8 pt-6">
         <div className="max-w-5xl mx-auto text-center">
-            <div className="flex items-center justify-center space-x-6 text-xs text-blue-600 mb-2">
-                <a href="#" className="hover:text-orange-600 hover:underline">Conditions of Use</a>
-                <a href="#" className="hover:text-orange-600 hover:underline">Privacy Notice</a>
-                <a href="#" className="hover:text-orange-600 hover:underline">Help</a>
-            </div>
-            <div className="text-xs text-gray-500">
-                © 1996-2025, Amazon.com, Inc. or its affiliates
-            </div>
+          <div className="flex items-center justify-center space-x-6 text-xs text-blue-600 mb-2">
+            <a href="#" className="hover:text-orange-600 hover:underline">
+              Conditions of Use
+            </a>
+            <a href="#" className="hover:text-orange-600 hover:underline">
+              Privacy Notice
+            </a>
+            <a href="#" className="hover:text-orange-600 hover:underline">
+              Help
+            </a>
+          </div>
+          <div className="text-xs text-gray-500">
+            © 1996-2025, Amazon.com, Inc. or its affiliates
+          </div>
         </div>
       </footer>
     </div>

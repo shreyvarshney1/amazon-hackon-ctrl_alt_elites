@@ -36,7 +36,7 @@ export default function Navbar() {
     <header className="text-white flex flex-col items-center justify-center">
       <nav className="bg-[#131921] flex items-center p-2 w-full gap-4 leading-none justify-around">
         <Link href="/" className="text-white text-xl font-bold">
-          <AmazonLogo className="w-30 h-8" color="#fff"/>
+          <AmazonLogo className="w-30 h-8" color="#fff" />
         </Link>
         <div className="flex-1 max-w-2xl mx-4">
           <div className="flex">

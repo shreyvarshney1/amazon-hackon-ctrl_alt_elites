@@ -44,22 +44,31 @@ export default function SellerHeader({ seller }: SellerHeaderProps) {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div>
-                <span className="text-sm font-medium text-gray-500">Business Name</span>
-                <p className="text-lg font-semibold text-gray-900">{seller.name}</p>
+                <span className="text-sm font-medium text-gray-500">
+                  Business Name
+                </span>
+                <p className="text-lg font-semibold text-gray-900">
+                  {seller.name}
+                </p>
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-500">Email</span>
                 <p className="text-lg text-gray-900">{seller.email}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-gray-500">Seller Credibility Score</span>
+                <span className="text-sm font-medium text-gray-500">
+                  Seller Credibility Score
+                </span>
                 <div className="flex items-center space-x-2">
                   <p className="text-2xl font-bold text-green-600">
                     {seller.scs_score ? seller.scs_score.toFixed(2) : "N/A"}
                   </p>
                   <div className="text-xs text-gray-400">
                     {seller.last_scs_update && (
-                      <p>Updated: {new Date(seller.last_scs_update).toLocaleDateString()}</p>
+                      <p>
+                        Updated:{" "}
+                        {new Date(seller.last_scs_update).toLocaleDateString()}
+                      </p>
                     )}
                   </div>
                 </div>

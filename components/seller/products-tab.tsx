@@ -23,10 +23,10 @@ export default function ProductsTab({ isReady }: ProductsTabProps) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const fetchProducts = useCallback(async () => {
-    if (!token || !seller || seller.id === 'guest') {
+    if (!token || !seller || seller.id === "guest") {
       return;
     }
-    
+
     setIsLoading(true);
     setError(null);
 
@@ -56,18 +56,21 @@ export default function ProductsTab({ isReady }: ProductsTabProps) {
     setEditingProduct(product);
     setIsFormOpen(true);
   };
-  
+
   const handleDelete = async (productId: string) => {
-    if (!token || !confirm("Are you sure you want to delete this product?")) return;
+    if (!token || !confirm("Are you sure you want to delete this product?"))
+      return;
     try {
-        await deleteProduct(token, Number(productId));
-        await fetchProducts();
-        refreshSeller();
+      await deleteProduct(token, Number(productId));
+      await fetchProducts();
+      refreshSeller();
     } catch (error) {
-        alert(error instanceof Error ? error.message : "Failed to delete product");
+      alert(
+        error instanceof Error ? error.message : "Failed to delete product",
+      );
     }
   };
-  
+
   const handleFormSuccess = () => {
     setIsFormOpen(false);
     setEditingProduct(null);
@@ -82,25 +85,32 @@ export default function ProductsTab({ isReady }: ProductsTabProps) {
     if (error) {
       return (
         <div className="text-center py-8 text-red-500">
-            <p>{error}</p>
-            <Button onClick={fetchProducts} variant="outline" className="mt-4">Try Again</Button>
+          <p>{error}</p>
+          <Button onClick={fetchProducts} variant="outline" className="mt-4">
+            Try Again
+          </Button>
         </div>
       );
     }
     if (products.length === 0) {
       return (
         <div className="text-center py-8 text-gray-500">
-            You have no products listed. Add your first product to get started!
+          You have no products listed. Add your first product to get started!
         </div>
       );
     }
     return (
       <div className="space-y-4">
         {products.map((product) => (
-          <div key={product.id} className="border rounded-lg p-4 bg-white flex justify-between items-start gap-4">
+          <div
+            key={product.id}
+            className="border rounded-lg p-4 bg-white flex justify-between items-start gap-4"
+          >
             <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
               <div>
-                <span className="text-sm font-medium text-gray-500">Product Name</span>
+                <span className="text-sm font-medium text-gray-500">
+                  Product Name
+                </span>
                 <p className="font-semibold text-gray-900">{product.name}</p>
               </div>
               <div>
@@ -108,19 +118,35 @@ export default function ProductsTab({ isReady }: ProductsTabProps) {
                 <p className="text-gray-800">₹{product.price.toFixed(2)}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-gray-500">Category</span>
+                <span className="text-sm font-medium text-gray-500">
+                  Category
+                </span>
                 <p className="text-gray-800">{product.category}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-gray-500">PIS Score</span>
-                <p className="text-lg font-bold text-blue-600">{product.pis_score.toFixed(2)}</p>
+                <span className="text-sm font-medium text-gray-500">
+                  PIS Score
+                </span>
+                <p className="text-lg font-bold text-blue-600">
+                  {product.pis_score.toFixed(2)}
+                </p>
               </div>
             </div>
             <div className="flex space-x-2 ml-4">
-              <Button onClick={() => handleEditClick(product)} variant="outline" size="icon" aria-label="Edit Product">
+              <Button
+                onClick={() => handleEditClick(product)}
+                variant="outline"
+                size="icon"
+                aria-label="Edit Product"
+              >
                 <Edit className="h-4 w-4" />
               </Button>
-              <Button onClick={() => handleDelete(product.id)} variant="destructive" size="icon" aria-label="Delete Product">
+              <Button
+                onClick={() => handleDelete(product.id)}
+                variant="destructive"
+                size="icon"
+                aria-label="Delete Product"
+              >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -136,18 +162,17 @@ export default function ProductsTab({ isReady }: ProductsTabProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>My Products</CardTitle>
           <Button onClick={handleAddClick}>
-            <Plus className="h-4 w-4 mr-2" />Add Product
+            <Plus className="h-4 w-4 mr-2" />
+            Add Product
           </Button>
         </CardHeader>
-        <CardContent>
-          {renderContent()}
-        </CardContent>
+        <CardContent>{renderContent()}</CardContent>
       </Card>
       {isFormOpen && (
-        <ProductForm 
-            product={editingProduct}
-            onClose={() => setIsFormOpen(false)}
-            onSuccess={handleFormSuccess}
+        <ProductForm
+          product={editingProduct}
+          onClose={() => setIsFormOpen(false)}
+          onSuccess={handleFormSuccess}
         />
       )}
     </>

@@ -31,10 +31,10 @@ export interface Product {
 
 // Add the form data type here
 export interface ProductFormData {
-    name: string;
-    slug: string;
-    description: string;
-    price: number;
-    category: string;
-    image_urls: string[];
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  category: string;
+  image_urls: string[];
 }
