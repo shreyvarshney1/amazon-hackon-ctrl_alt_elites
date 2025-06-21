@@ -2,7 +2,7 @@
 Service layer for calculating Seller Credibility Score (SCS).
 """
 
-from datetime import datetime, timedelta, timezone  # <-- Import timezone
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from sqlalchemy import func
 from api.models import db, Seller, Product, OrderItem, Review, Order
@@ -25,9 +25,9 @@ def calculate_scs_score(seller_id: int) -> Optional[float]:
     order_items_query = OrderItem.query.join(Product).filter(
         Product.seller_id == seller_id
     )
+    total_items = order_items_query.count()
 
     # --- P1: Order Fulfillment Rate ---
-    total_items = order_items_query.count()
     if total_items > 3:
         on_time_count = order_items_query.filter(
             OrderItem.delivered_on_time is True
@@ -46,11 +46,9 @@ def calculate_scs_score(seller_id: int) -> Optional[float]:
         p1_score = 0.7
 
     # --- P2: Seller History & Sales Velocity Anomaly ---
-    # FIX: Use timezone-aware datetime for calculation
     days_as_seller = (datetime.now(timezone.utc) - seller.created_at).days
     tenure_score = 1 - (1 / (1 + days_as_seller * 0.05))
 
-    # FIX: Use timezone-aware datetime for calculation
     now = datetime.now(timezone.utc)
     sales_last_30d = order_items_query.filter(
         OrderItem.order.has(Order.created_at >= now - timedelta(days=30))
@@ -71,7 +69,7 @@ def calculate_scs_score(seller_id: int) -> Optional[float]:
             if avg_monthly_sales_prev > 0
             else 999
         )
-        if spike_ratio > 4.0:  # A >4x spike is a red flag
+        if spike_ratio > 4.0:
             velocity_risk = min(1.0, (spike_ratio - 4.0) / 10.0)
 
     velocity_score = 1 - velocity_risk
@@ -98,8 +96,20 @@ def calculate_scs_score(seller_id: int) -> Optional[float]:
         p3_score = 0.7
 
     # --- P4: Dispute & Chargeback Rate ---
-    dispute_rate = seller.dispute_rate or 0.0
-    p4_score = 1 - min(dispute_rate * 5.0, 1.0)  # Amplify impact
+    # FIX: Dynamically calculate the dispute rate based on rejected refunds.
+    dispute_rate = 0.0
+    if total_items > 0:
+        # A "dispute" is defined as a refund request that the seller rejected.
+        disputed_items_count = order_items_query.filter(
+            OrderItem.status == "refund_rejected"
+        ).count()
+        dispute_rate = disputed_items_count / total_items
+
+    # Persist the calculated rate back to the seller model for transparency.
+    seller.dispute_rate = dispute_rate
+
+    # The score heavily penalizes any dispute rate.
+    p4_score = 1 - min(dispute_rate * 5.0, 1.0)
 
     # --- P5: Average Product Integrity (Critical Interlink) ---
     avg_pis = (
@@ -119,6 +129,5 @@ def calculate_scs_score(seller_id: int) -> Optional[float]:
     )
 
     seller.scs_score = final_scs
-    # FIX: Use timezone-aware datetime for update
     seller.last_scs_update = datetime.now(timezone.utc)
     return final_scs
