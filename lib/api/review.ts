@@ -25,6 +25,8 @@ export async function postReview(
     | "linguistic_authenticity_score"
     | "username"
     | "has_trusted_badge"
+    | "is_verified_purchase"
+    | "created_at"
     | "product_id"
   >,
   productId: string,
@@ -43,7 +45,6 @@ export async function postReview(
     body: JSON.stringify({
             review_text: review.review_text,
             rating: review.rating,
-            is_verified_purchase: review.is_verified_purchase,
             title: review.title
         })
     })

@@ -1,7 +1,8 @@
 "use client";
 
-import { Star, User, CheckCircle } from "lucide-react";
+import { User, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import StarRating from "@/components/star-rating";
 import type { Review } from "@/types/review";
 
 interface ReviewItemProps {
@@ -9,18 +10,6 @@ interface ReviewItemProps {
 }
 
 export default function ReviewItem({ review }: ReviewItemProps) {
-  const StarRating = ({ rating }: { rating: number }) => (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={`w-4 h-4 ${
-            star <= rating ? "fill-[#ff9900] text-[#ff9900]" : "text-[#c9cccc]"
-          }`}
-        />
-      ))}
-    </div>
-  );
 
   const getAvatarColor = (id: string) => {
     const colors = [
