@@ -17,7 +17,7 @@ def login():
         email = data.get("email")
         if not email:
             return jsonify({"message": "Email is required"}), 400
-        
+
         seller = db.session.query(Seller).filter_by(email=email).first()
         if not seller:
             seller = Seller(name=username, email=email, created_at=db.func.now())
@@ -65,6 +65,7 @@ def get_session(seller):
             {
                 "seller_id": seller.id,
                 "name": seller.name,
+                "email": seller.email,
                 "created_at": seller.created_at.isoformat(),
                 "scs_score": round(seller.scs_score, 4) if seller.scs_score else None,
                 "last_scs_update": (
