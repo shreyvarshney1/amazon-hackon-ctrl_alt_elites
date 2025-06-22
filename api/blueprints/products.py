@@ -194,7 +194,7 @@ def add_review(user, product_id):
                 _external=True,
             ),
             json={"user_id": user.id},
-            timeout=5,
+            timeout=30,
         )
 
         requests.post(
@@ -203,7 +203,7 @@ def add_review(user, product_id):
                 _external=True,
             ),
             json={"product_id": product_id},
-            timeout=5,
+            timeout=30,
         )
 
         requests.post(
@@ -212,7 +212,7 @@ def add_review(user, product_id):
                 _external=True,
             ),
             json={"seller_id": product.seller_id},
-            timeout=5,
+            timeout=30,
         )
 
         # return {"message": "Review added successfully", "review" : review}, 201
@@ -273,7 +273,7 @@ def add_product(seller):
                 _external=True,
             ),
             json={"product_id": product.id},
-            timeout=5,
+            timeout=30,
         )
 
         return {"message": "Product added successfully", "product_id": product.id}, 201
@@ -312,7 +312,7 @@ def update_product(seller, product_id):
                 _external=True,
             ),
             json={"product_id": product.id},
-            timeout=5,
+            timeout=30,
         )
 
         return {"message": "Product updated successfully"}, 200
