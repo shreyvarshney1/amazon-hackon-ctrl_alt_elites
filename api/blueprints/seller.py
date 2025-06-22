@@ -17,12 +17,10 @@ def login():
         email = data.get("email")
         if not email:
             return jsonify({"message": "Email is required"}), 400
-        if not username:
-            username = email.split("@")[0]
-
-        seller = db.session.query(Seller).filter_by(name=username).first()
+        
+        seller = db.session.query(Seller).filter_by(email=email).first()
         if not seller:
-            seller = Seller(name=username, created_at=db.func.now())
+            seller = Seller(name=username, email=email, created_at=db.func.now())
             db.session.add(seller)
             db.session.commit()
 
