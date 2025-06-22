@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 import { Search, Menu, ChevronDown, ShoppingCart } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/cart-context";
@@ -40,8 +47,16 @@ export default function Navbar() {
         </Link>
         <div className="flex-1 max-w-2xl mx-4">
           <div className="flex">
+             <Select defaultValue="all">
+              <SelectTrigger className="w-16 bg-[#f3f3f3] text-black border-0 rounded-l-md rounded-r-none focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-orange-500">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+              </SelectContent>
+            </Select>
             <Input
-              className="flex-1 border-0 rounded-l-md rounded-r-none bg-white text-black focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-orange-500"
+              className="flex-1 border-0 rounded-l-md rounded-none bg-white text-black focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-orange-500"
               placeholder="Search Amazon"
             />
             <Button className="bg-[#febd69] hover:bg-[#f3a847] border-0 rounded-r-md rounded-l-none px-4">
