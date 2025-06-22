@@ -6,7 +6,7 @@ interface StatusBadgeProps {
 
 export default function StatusBadge({ item }: StatusBadgeProps) {
   if (!item) {
-    return null; 
+    return null;
   }
   const { status, cancelled_by_seller } = item;
 
@@ -23,8 +23,12 @@ export default function StatusBadge({ item }: StatusBadgeProps) {
       className = "bg-green-100 text-green-800";
       break;
     case "returned":
-      text = cancelled_by_seller ? "Cancelled by Seller" : "Return/Cancel Requested";
-      className = cancelled_by_seller ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800";
+      text = cancelled_by_seller
+        ? "Cancelled by Seller"
+        : "Return/Cancel Requested";
+      className = cancelled_by_seller
+        ? "bg-red-100 text-red-800"
+        : "bg-blue-100 text-blue-800";
       break;
     case "refunded":
       text = "Refunded";
@@ -35,13 +39,15 @@ export default function StatusBadge({ item }: StatusBadgeProps) {
       className = "bg-pink-200 text-pink-800";
       break;
     case "cancelled":
-        text = "Cancelled";
-        className = "bg-red-100 text-red-800";
-        break;
+      text = "Cancelled";
+      className = "bg-red-100 text-red-800";
+      break;
   }
 
   return (
-    <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${className}`}>
+    <span
+      className={`px-2.5 py-1 text-xs font-medium rounded-full ${className}`}
+    >
       {text}
     </span>
   );

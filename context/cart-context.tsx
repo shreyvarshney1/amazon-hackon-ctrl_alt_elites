@@ -58,7 +58,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         return prevItems.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
-            : item
+            : item,
         );
       } else {
         // If item doesn't exist, add it to the cart
@@ -69,7 +69,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const removeFromCart = (productId: string) => {
     setCartItems((prevItems) =>
-      prevItems.filter((item) => item.id !== productId)
+      prevItems.filter((item) => item.id !== productId),
     );
   };
 
@@ -80,8 +80,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       setCartItems((prevItems) =>
         prevItems.map((item) =>
-          item.id === productId ? { ...item, quantity } : item
-        )
+          item.id === productId ? { ...item, quantity } : item,
+        ),
       );
     }
   };
@@ -94,7 +94,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const cartTotal = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
-    0
+    0,
   );
 
   const itemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);

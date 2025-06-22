@@ -50,7 +50,7 @@ export const getSellerProducts = async (
   token: string,
   sellerId: string,
 ): Promise<Product[]> => {
-  const response = await fetch(`/api/seller/products`,{
+  const response = await fetch(`/api/seller/products`, {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export const getSellerProducts = async (
     throw new Error("Invalid product data format from API");
   }
 
-  return data.products
+  return data.products;
 };
 
 export const addProduct = async (
