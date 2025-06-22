@@ -16,6 +16,7 @@ import ReviewSection from "./review-section";
 import { useCart } from "@/context/cart-context";
 import { useRouter } from "next/navigation";
 import StarRating from "@/components/star-rating";
+import { ScoreTooltip } from "@/components/score-tooltip";
 
 interface ProductDetailProps {
   product: Product;
@@ -115,16 +116,19 @@ export default function ProductDetails({
           </div>
           <div className="text-sm">Inclusive of all taxes</div>
 
-          <p
-            className="text-white p-2 text-sm inline-block rounded font-medium tracking-wider"
-            style={{
-              backgroundColor: `rgb(${Math.round(
-                255 * (1 - product.pis_score),
-              )}, ${Math.round(180 * product.pis_score)}, 80)`,
-            }}
-          >
-            ✨ Product Integrity Score: {product.pis_score.toFixed(2)}
-          </p>
+          <ScoreTooltip scoreType="PIS" scoreValue={product.pis_score}>
+            <p
+              className="text-white p-2 text-sm inline-block rounded font-medium tracking-wider"
+              style={{
+                backgroundColor: `rgb(${Math.round(
+                  255 * (1 - product.pis_score)
+                )}, ${Math.round(180 * product.pis_score)}, 80)`,
+              }}
+            >
+              ✨ Product Integrity Score: {product.pis_score.toFixed(2)}
+            </p>
+          </ScoreTooltip>
+
           <div className="bg-[#ff9900] text-black px-2 py-1 text-sm inline-block rounded">
             Coupon: Apply ₹20 coupon{" "}
             <span className="text-[#0052b4] underline">Terms</span> |{" "}
@@ -193,17 +197,20 @@ export default function ProductDetails({
             </svg>
             Fulfilled
           </div>
-          <div
-            className="text-white p-2 text-sm inline-block rounded tracking-wider"
-            style={{
-              backgroundColor: `rgb(${Math.round(
-                255 * (1 - product.pis_score),
-              )}, ${Math.round(180 * product.pis_score)}, 80)`,
-              fontWeight: 500,
-            }}
-          >
-            ✨ PIS : {product.pis_score.toFixed(2)}
-          </div>
+
+          <ScoreTooltip scoreType="PIS" scoreValue={product.pis_score}>
+            <div
+              className="text-white p-2 text-sm inline-block rounded tracking-wider"
+              style={{
+                backgroundColor: `rgb(${Math.round(
+                  255 * (1 - product.pis_score)
+                )}, ${Math.round(180 * product.pis_score)}, 80)`,
+                fontWeight: 500,
+              }}
+            >
+              ✨ PIS : {product.pis_score.toFixed(2)}
+            </div>
+          </ScoreTooltip>
 
           <div className="text-sm">
             <span className="text-[#0052b4] font-bold">FREE delivery</span>{" "}

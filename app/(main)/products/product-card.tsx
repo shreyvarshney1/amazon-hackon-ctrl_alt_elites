@@ -9,6 +9,7 @@ import { useCart } from "@/context/cart-context";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import StarRating from "@/components/star-rating";
+import { ScoreTooltip } from "@/components/score-tooltip";
 
 interface ProductCardProps {
   product: Product;
@@ -75,18 +76,21 @@ export default function ProductCard({ product }: ProductCardProps) {
           rating={product.rating ?? 0}
           count={product.review_count ?? "0"}
         />
-        <div>
-          <p
-            style={{
-              color: `rgb(${Math.round(
-                255 * (1 - product.pis_score),
-              )}, ${Math.round(180 * product.pis_score)}, 80)`,
-              fontWeight: 500,
-            }}
-          >
-            Product Integrity Score (PIS) : {product.pis_score.toFixed(2)}
-          </p>
-        </div>
+
+        <ScoreTooltip scoreType="PIS" scoreValue={product.pis_score}>
+          <div>
+            <p
+              style={{
+                color: `rgb(${Math.round(
+                  255 * (1 - product.pis_score)
+                )}, ${Math.round(180 * product.pis_score)}, 80)`,
+                fontWeight: 500,
+              }}
+            >
+              Product Integrity Score (PIS) : {product.pis_score.toFixed(2)}
+            </p>
+          </div>
+        </ScoreTooltip>
 
         <div className="flex items-center gap-2 mb-2 flex-wrap">
           <span className="text-2xl font-bold text-[#b12704]">

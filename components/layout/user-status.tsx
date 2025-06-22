@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
+import { ScoreTooltip } from "../score-tooltip";
 
 export default function UserStatus({
   user,
@@ -18,9 +19,12 @@ export default function UserStatus({
       <div className="flex items-center gap-4">
         <div>
           <div className="text-xs">Hello, {user.username}</div>
+          <ScoreTooltip scoreType="UBA" scoreValue={user.uba_score ?? 0.5}>
           <div className="font-bold">
             Accounts & Lists (UBA: {user.uba_score?.toFixed(2) ?? "N/A"})
           </div>
+
+          </ScoreTooltip>
         </div>
         <Button
           onClick={logout}
