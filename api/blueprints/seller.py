@@ -2,7 +2,7 @@ from flask_smorest import Blueprint
 from flask import request, jsonify
 import jwt
 
-from api.models import db, Seller
+from api.models import db, Seller, Product
 from .auth import JWT_SECRET
 
 BASE_ROUTE = "/api/seller"
@@ -78,3 +78,36 @@ def get_session(seller):
         ),
         200,
     )
+
+
+@seller_bp.route("/products", methods=["GET"])
+@check_auth_seller
+def get_products(seller):
+    products = db.session.query(Product).filter_by(seller_id=seller.id).all()
+    product_list = [
+        {
+                    "id": product.id,
+                    "slug": product.slug,
+                    "name": product.name,
+                    "description": product.description,
+                    "price": product.price,
+                    "category": product.category,
+                    "image_urls": product.image_urls,
+                    "listed_at": product.listed_at.isoformat(),
+                    "pis_score": product.pis_score,
+                    "rating": (
+                        sum(review.rating for review in product.reviews)
+                        / len(product.reviews)
+                        if product.reviews
+                        else 0
+                    ),
+                    "review_count": len(product.reviews),
+                    "last_pis_update": (
+                        product.last_pis_update.isoformat()
+                        if product.last_pis_update
+                        else None
+                    ),
+        }
+        for product in products
+    ]
+    return jsonify({"products": product_list}), 200
