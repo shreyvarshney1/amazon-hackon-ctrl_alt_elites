@@ -5,7 +5,7 @@ export type ScoreType = "PIS" | "SCS" | "UBA";
 interface ScoreInsightLevel {
   threshold: number;
   flag: string;
-  flagColor: string; 
+  flagColor: string;
   insight: string;
 }
 
@@ -42,7 +42,7 @@ export const scoreInsights: Record<ScoreType, ScoreConfig> = {
         insight:
           "This product has a good integrity score, indicating it is likely authentic and accurately described.",
       },
-       {
+      {
         threshold: 0.8,
         flag: "Excellent",
         flagColor: "bg-blue-500 text-white",
@@ -77,7 +77,7 @@ export const scoreInsights: Record<ScoreType, ScoreConfig> = {
         insight:
           "This seller has a strong track record of reliability and customer satisfaction.",
       },
-       {
+      {
         threshold: 0.9,
         flag: "Top Seller",
         flagColor: "bg-blue-500 text-white",
@@ -112,7 +112,7 @@ export const scoreInsights: Record<ScoreType, ScoreConfig> = {
         insight:
           "User behavior appears to be normal and within expected patterns.",
       },
-       {
+      {
         threshold: 0.8,
         flag: "Trusted User",
         flagColor: "bg-blue-500 text-white",

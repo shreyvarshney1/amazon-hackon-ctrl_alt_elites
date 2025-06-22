@@ -121,7 +121,7 @@ export default function ProductDetails({
               className="text-white p-2 text-sm inline-block rounded font-medium tracking-wider"
               style={{
                 backgroundColor: `rgb(${Math.round(
-                  255 * (1 - product.pis_score)
+                  255 * (1 - product.pis_score),
                 )}, ${Math.round(180 * product.pis_score)}, 80)`,
               }}
             >
@@ -203,7 +203,7 @@ export default function ProductDetails({
               className="text-white p-2 text-sm inline-block rounded tracking-wider"
               style={{
                 backgroundColor: `rgb(${Math.round(
-                  255 * (1 - product.pis_score)
+                  255 * (1 - product.pis_score),
                 )}, ${Math.round(180 * product.pis_score)}, 80)`,
                 fontWeight: 500,
               }}

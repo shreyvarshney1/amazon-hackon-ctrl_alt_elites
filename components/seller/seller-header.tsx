@@ -70,7 +70,7 @@ export default function SellerHeader({ seller }: SellerHeaderProps) {
                         <p>
                           Updated:{" "}
                           {new Date(
-                            seller.last_scs_update
+                            seller.last_scs_update,
                           ).toLocaleDateString()}
                         </p>
                       )}
