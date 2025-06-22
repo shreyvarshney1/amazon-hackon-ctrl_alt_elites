@@ -1,9 +1,5 @@
 "use client";
 import { Product } from "@/types/product";
-
-import { useState } from "react";
-import { Star, Share } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -11,83 +7,52 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useState } from "react";
+import { Share } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { VerifiedSellerBadge } from "../product-card";
 import ReviewSection from "./review-section";
-import { Review } from "@/types/review";
-import { postReview } from "@/lib/api/review";
 import { useCart } from "@/context/cart-context";
 import { useRouter } from "next/navigation";
+import StarRating from "@/components/star-rating";
 
 interface ProductDetailProps {
   product: Product;
+  onProductUpdate: () => void; // Callback to refresh product data
 }
 
-export default function ProductDetails({ product }: ProductDetailProps) {
+export default function ProductDetails({
+  product,
+  onProductUpdate,
+}: ProductDetailProps) {
   const [selectedImage, setSelectedImage] = useState(0);
-  // const [quantity, setQuantity] = useState(1)
-
-  const productImages = product.image_urls;
-
-  const StarRating = ({
-    rating,
-    count,
-  }: {
-    rating: number;
-    count?: string;
-  }) => (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={`w-4 h-4 ${
-            star <= rating ? "fill-[#ff9900] text-[#ff9900]" : "text-[#c9cccc]"
-          }`}
-        />
-      ))}
-      {count && <span className="text-[#0052b4] text-sm ml-1">({count})</span>}
-    </div>
-  );
-
-  // API Integration
-
-  const [reviews, setReviews] = useState<Review[]>(product.reviews ?? []);
-
-  const handleNewReview = async (
-    newReview: Omit<
-      Review,
-      | "id"
-      | "user_id"
-      | "linguistic_authenticity_score"
-      | "product_id"
-      | "username"
-      | "has_trusted_badge"
-    >,
-    productId: string,
-  ) => {
-    const createdReview = await postReview(newReview, productId);
-    setReviews([createdReview, ...reviews]);
-  };
   const { addToCart } = useCart();
   const router = useRouter();
+
+  const handleReviewSubmissionSuccess = () => {
+    onProductUpdate();
+  };
+
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex px-4 py-4 gap-8">
+      <div className="flex flex-wrap px-4 py-4 gap-8">
+        {/* Image Section */}
         <div className="flex gap-4">
           <div className="flex flex-col gap-2">
-            {productImages.map((image, index) => (
+            {product.image_urls.map((image, index) => (
               <div
                 key={index}
                 className={`w-12 h-12 border-2 cursor-pointer rounded ${
                   selectedImage === index
                     ? "border-[#ff9900]"
-                    : "border-[#dddddd]"
+                    : "border-transparent"
                 }`}
-                onClick={() => setSelectedImage(index)}
+                onMouseEnter={() => setSelectedImage(index)}
               >
                 <Image
                   src={image || "/placeholder.svg"}
-                  alt={`Product ${index + 1}`}
+                  alt={`Product thumbnail ${index + 1}`}
                   width={48}
                   height={48}
                   className="object-contain rounded"
@@ -95,47 +60,29 @@ export default function ProductDetails({ product }: ProductDetailProps) {
               </div>
             ))}
           </div>
-
-          <div className="relative">
-            <div className="w-[500px] h-[500px] border border-[#dddddd] rounded bg-white flex items-center justify-center">
-              <Image
-                src={product.image_urls[selectedImage]}
-                alt="Zemic UV Umbrella"
-                width={450}
-                height={450}
-                className="object-contain"
-              />
-              <Share className="absolute top-4 right-4 w-6 h-6 text-[#565959] cursor-pointer" />
-            </div>
+          <div className="relative w-[500px] h-[500px] border border-gray-200 rounded flex items-center justify-center">
+            <Image
+              src={product.image_urls[selectedImage]}
+              alt={product.name}
+              fill
+              className="object-contain p-4"
+            />
+            <Share className="absolute top-4 right-4 w-6 h-6 text-gray-500 cursor-pointer" />
           </div>
         </div>
 
+        {/* Product Info Section */}
         <div className="flex-1 max-w-md gap-2 flex flex-col">
           <h1 className="text-2xl font-normal leading-tight">{product.name}</h1>
-
-          <div className="flex items-center gap-2">
-            <StarRating
-              rating={product.rating ?? 0}
-              count={product.review_count ?? "0"}
-            />
-            {/* <span className="text-[#0052b4] text-sm hover:text-[#ff9900] cursor-pointer">
-              Search this page
-            </span> */}
-          </div>
-
-          {/* <div className="text-sm text-[#565959] mb-4">
-            500+ bought in past month
-          </div> */}
-
+          <StarRating
+            rating={product.rating ?? 0}
+            count={product.review_count ?? "0"}
+          />
           <div className="flex items-center gap-2">
             <span className="text-3xl font-normal">
               {(product.currency ?? "₹") + " " + product.price}
             </span>
           </div>
-          {/* <div className="text-sm text-[#565959]">
-              M.R.P.: <span className="line-through">₹2,500</span>
-            </div> */}
-
           <div className="bg-[#3e4650] text-white p-2 text-xs rounded flex items-center gap-1 tracking-wide w-fit">
             <svg
               height="10"
@@ -168,6 +115,16 @@ export default function ProductDetails({ product }: ProductDetailProps) {
           </div>
           <div className="text-sm">Inclusive of all taxes</div>
 
+          <p
+            className="text-white p-2 text-sm inline-block rounded font-medium tracking-wider"
+            style={{
+              backgroundColor: `rgb(${Math.round(
+                255 * (1 - product.pis_score),
+              )}, ${Math.round(180 * product.pis_score)}, 80)`,
+            }}
+          >
+            ✨ Product Integrity Score: {product.pis_score.toFixed(2)}
+          </p>
           <div className="bg-[#ff9900] text-black px-2 py-1 text-sm inline-block rounded">
             Coupon: Apply ₹20 coupon{" "}
             <span className="text-[#0052b4] underline">Terms</span> |{" "}
@@ -199,8 +156,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
           </div>
         </div>
 
-        {/* Purchase Options */}
-        <div className="w-80 border border-[#dddddd] rounded p-4 h-fit gap-4 flex flex-col">
+        <div className="w-64 border border-[#dddddd] rounded p-4 h-fit gap-4 flex flex-col">
           <div className="text-3xl font-normal">
             <sup className="text-base">₹</sup>
             {product.price}
@@ -246,7 +202,7 @@ export default function ProductDetails({ product }: ProductDetailProps) {
               fontWeight: 500,
             }}
           >
-            ✨ Product Integrity Score : {product.pis_score}
+            ✨ PIS : {product.pis_score.toFixed(2)}
           </div>
 
           <div className="text-sm">
@@ -317,9 +273,9 @@ export default function ProductDetails({ product }: ProductDetailProps) {
 
       <div className="px-4 py-2">
         <ReviewSection
-          reviews={reviews}
+          initialReviews={product.reviews ?? []}
           productId={product.id.toString()}
-          onSubmitReview={handleNewReview}
+          onReviewSubmitSuccess={handleReviewSubmissionSuccess}
         />
       </div>
     </div>

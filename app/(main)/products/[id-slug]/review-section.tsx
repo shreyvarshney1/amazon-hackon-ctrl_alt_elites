@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 import Link from "next/link";
@@ -9,96 +8,89 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import ReviewItem from "./review-item";
 import type { Review } from "@/types/review";
+import StarRating from "@/components/star-rating";
+import { postReview } from "@/lib/api/review";
+import { Loader2 } from "lucide-react";
 
 interface ReviewSectionProps {
-  reviews: Review[];
+  initialReviews: Review[];
   productId: string;
-  onSubmitReview?: (
-    review: Omit<
-      Review,
-      | "id"
-      | "user_id"
-      | "linguistic_authenticity_score"
-      | "product_id"
-      | "username"
-      | "has_trusted_badge"
-    >,
-    productId: string,
-  ) => void;
+  onReviewSubmitSuccess: () => void;
 }
 
 export default function ReviewSection({
-  reviews,
+  initialReviews,
   productId,
-  onSubmitReview,
+  onReviewSubmitSuccess,
 }: ReviewSectionProps) {
-  const { user } = useAuth();
+  const { user, token, refreshUser } = useAuth();
+  const [reviews, setReviews] = useState(initialReviews);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewText, setReviewText] = useState("");
-  // const [authorName, setAuthorName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmitReview = () => {
-    if (
-      rating > 0 &&
-      reviewText.trim() &&
-      // authorName.trim() &&
-      onSubmitReview
-    ) {
-      onSubmitReview(
-        {
-          rating,
-          title: reviewTitle,
-          review_text: reviewText,
-          created_at: new Date().toISOString(),
-          is_verified_purchase: true,
-        },
-        productId,
-      );
+  const handleSubmitReview = async () => {
+    if (!token || !rating || !reviewText.trim() || isSubmitting) {
+      return;
+    }
 
-      // Reset form
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const newReviewData = {
+        rating,
+        title: reviewTitle,
+        review_text: reviewText,
+      };
+
+      await postReview(newReviewData, productId);
+
       setRating(0);
       setReviewTitle("");
       setReviewText("");
-      // setAuthorName("");
+
+      onReviewSubmitSuccess();
+      refreshUser();
+    } catch (err) {
+      console.error(err);
+      setError("Failed to submit review. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const StarRating = ({ interactive = false }: { interactive?: boolean }) => (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={`w-6 h-6 cursor-pointer transition-colors ${
-            star <= (interactive ? hoveredRating || rating : rating)
-              ? "fill-[#ff9900] text-[#ff9900]"
-              : "text-[#c9cccc] hover:text-[#ff9900]"
-          }`}
-          onClick={interactive ? () => setRating(star) : undefined}
-          onMouseEnter={interactive ? () => setHoveredRating(star) : undefined}
-          onMouseLeave={interactive ? () => setHoveredRating(0) : undefined}
-        />
-      ))}
-    </div>
-  );
+  // If parent provides new initialReviews, update local state
+  if (
+    reviews.length !== initialReviews.length ||
+    (reviews[0] && initialReviews[0] && reviews[0].id !== initialReviews[0].id)
+  ) {
+    setReviews(initialReviews);
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Write a Review Section */}
-      <div className="bg-white border border-[#dddddd] rounded-lg p-6 mb-8">
+      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
         <h2 className="text-xl font-bold mb-4">Write a customer review</h2>
         {user && user.id !== "guest" ? (
           <div className="space-y-4">
-            {/* Rating */}
             <div>
               <label className="block text-sm font-medium mb-2">
                 Overall rating
               </label>
-              <StarRating interactive={true} />
+              <StarRating
+                interactive
+                rating={rating}
+                onRatingChange={setRating}
+                hoveredRating={hoveredRating}
+                onHoverChange={setHoveredRating}
+                starSize={24}
+              />
             </div>
 
-            {/* Review Title */}
             <div>
               <label className="block text-sm font-medium mb-2">
                 Add a headline
@@ -111,7 +103,6 @@ export default function ReviewSection({
               />
             </div>
 
-            {/* Review Text */}
             <div>
               <label className="block text-sm font-medium mb-2">
                 Add a written review
@@ -119,18 +110,22 @@ export default function ReviewSection({
               <Textarea
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
-                placeholder="What did you like or dislike? What did you use this product for?"
+                placeholder="What did you like or dislike?"
                 className="min-h-[120px]"
               />
             </div>
 
-            {/* Submit Button */}
+            {error && <p className="text-sm text-red-500">{error}</p>}
+
             <Button
               onClick={handleSubmitReview}
-              disabled={!rating || !reviewText.trim()}
-              className="bg-[#ff9900] hover:bg-[#f0a742] text-black font-medium px-6"
+              disabled={!rating || !reviewText.trim() || isSubmitting}
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-6"
             >
-              Submit
+              {isSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              {isSubmitting ? "Submitting..." : "Submit"}
             </Button>
           </div>
         ) : (
@@ -149,9 +144,8 @@ export default function ReviewSection({
       {/* Reviews List */}
       <div>
         <h2 className="text-xl font-bold mb-6">Customer reviews</h2>
-
         {reviews.length === 0 ? (
-          <div className="text-center py-8 text-[#565959]">
+          <div className="text-center py-8 text-gray-500">
             <p>No reviews yet. Be the first to review this product!</p>
           </div>
         ) : (

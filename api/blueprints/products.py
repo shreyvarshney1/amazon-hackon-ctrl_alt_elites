@@ -171,7 +171,7 @@ def add_review(user, product_id):
             .filter(
                 Order.user_id == user.id,
                 OrderItem.product_id == product_id,
-                Order.status.in_(["delivered", "returned"]),
+                OrderItem.status.in_(["delivered", "returned"]),
             )
             .all()
         )

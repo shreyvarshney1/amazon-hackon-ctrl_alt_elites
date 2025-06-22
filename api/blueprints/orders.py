@@ -23,7 +23,7 @@ def get_my_orders(user):
                     "created_at": (
                         order.created_at.isoformat() if order.created_at else None
                     ),
-                    "total_amount": order.total_amount,  # @Sat
+                    "total_amount": order.total_amount,
                     "items": [
                         {
                             "id": item.id,
@@ -32,6 +32,12 @@ def get_my_orders(user):
                             "product_description": item.product.description,
                             "product_category": item.product.category,
                             "product_seller": item.product.seller.name,
+                            "product_slug": item.product.slug,
+                            "product_img": (
+                                item.product.image_urls[0]
+                                if item.product.image_urls
+                                else None
+                            ),
                             "quantity": item.quantity,
                             "price_at_purchase": item.price_at_purchase,
                             "status": item.status,
@@ -178,7 +184,7 @@ def return_product(user):
             or "reason" not in data
             or "product_id" not in data
             or "order_id" not in data
-        ):  # @Sat
+        ):
             # if not data or "reason" not in data or "product_id" not in data:
             return {"error": "Invalid request data"}, 400
 
@@ -190,7 +196,7 @@ def return_product(user):
             .filter(
                 OrderItem.product_id == product.id,
                 OrderItem.order_id == data["order_id"],
-            )  # @Sat
+            )
             # .filter(OrderItem.product_id == product.id, OrderItem.order_id == user.id)
             .filter(OrderItem.status == "delivered")
             .first()
@@ -199,7 +205,7 @@ def return_product(user):
         if not order_item:
             return {"error": "No matching order item found"}, 404
 
-        order_item.status = "returned"  # @Sat
+        order_item.status = "returned"
 
         return_record = Return(
             order_item_id=order_item.id,
@@ -268,7 +274,7 @@ def get_seller_orders(seller):
                             "delivered_on_time": item.delivered_on_time,
                         }
                         for item in order.items
-                        if item.product.seller_id == seller.id  # @Sat
+                        if item.product.seller_id == seller.id
                     ],
                 }
                 for order in orders
