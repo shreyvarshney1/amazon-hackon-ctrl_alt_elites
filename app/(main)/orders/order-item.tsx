@@ -139,7 +139,7 @@ export default function OrderItem({
         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
         <p className="text-sm">Price: ₹{item.price_at_purchase.toFixed(2)}</p>
       </div>
-      <div className="flex flex-col justify-between items-end w-56 gap-4">
+      <div className="flex flex-col justify-evenly items-center w-56 gap-4">
         {renderActionUI()}
         <StatusBadge item={item} />
         {(item.status === "cancelled" || item.status === "returned") && (

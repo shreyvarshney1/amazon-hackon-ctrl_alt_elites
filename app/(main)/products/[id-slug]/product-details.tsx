@@ -234,9 +234,9 @@ export default function ProductDetails({
             </div>
             <div className="flex justify-between">
               <span>Sold by</span>
-              <div className="text-[#0052b4] flex gap-2  text-sm hover:text-[#ff9900] cursor-pointer">
-                {product.seller.name}
+              <div className="text-[#0052b4] flex-col gap-2  text-sm hover:text-[#ff9900] cursor-pointer">
                 {product.seller.scs_score > 0.8 && <VerifiedSellerBadge />}
+                {product.seller.name}
               </div>
             </div>
             <div className="flex justify-between">
