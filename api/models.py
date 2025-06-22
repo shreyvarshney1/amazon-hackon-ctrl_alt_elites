@@ -29,6 +29,7 @@ class Seller(db.Model):
     __tablename__ = "sellers"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     dispute_rate = db.Column(db.Float, nullable=True, default=0.0)
     created_at = db.Column(db.DateTime(timezone=True), server_default=text("now()"))
 
@@ -41,7 +42,7 @@ class Seller(db.Model):
 class Product(db.Model):
     __tablename__ = "products"
     id = db.Column(db.Integer, primary_key=True)
-    slug = db.Column(db.String(255), unique=True, nullable=False)
+    slug = db.Column(db.String(255), nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey("sellers.id"), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=False)
