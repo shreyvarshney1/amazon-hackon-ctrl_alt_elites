@@ -42,7 +42,7 @@ export default function SellerHeader({ seller }: SellerHeaderProps) {
             <CardTitle>Seller Information</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="flex flex-col md:flex-row gap-6 w-full items-center justify-between">
               <div>
                 <span className="text-sm font-medium text-gray-500">
                   Business Name

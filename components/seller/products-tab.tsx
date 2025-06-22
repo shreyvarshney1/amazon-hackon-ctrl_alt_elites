@@ -106,8 +106,8 @@ export default function ProductsTab({ isReady }: ProductsTabProps) {
             key={product.id}
             className="border rounded-lg p-4 bg-white flex justify-between items-start gap-4"
           >
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-              <div>
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
+              <div className="col-span-1 md:col-span-3 space-y-1">
                 <span className="text-sm font-medium text-gray-500">
                   Product Name
                 </span>

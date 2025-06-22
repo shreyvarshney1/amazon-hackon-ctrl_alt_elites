@@ -11,11 +11,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/auth-context";
 import { cancelOrderItem, returnOrderItem } from "@/lib/api/orders";
+import StatusBadge from "@/components/status-badge";
 
 interface OrderItemProps {
   item: OrderItemType;
   orderId: number;
-  onActionSuccess: () => void; // Callback to refresh the entire orders list
+  onActionSuccess: () => void;
 }
 
 export default function OrderItem({
@@ -24,7 +25,6 @@ export default function OrderItem({
   onActionSuccess,
 }: OrderItemProps) {
   const { token } = useAuth();
-  // State to manage the loading status and type of the current action
   const [actionState, setActionState] = useState<{
     type: "cancelling" | "returning" | null;
     loading: boolean;
@@ -35,93 +35,80 @@ export default function OrderItem({
   const [returnReason, setReturnReason] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const handleCancel = async () => {
+  const handleAction = async (
+    action: () => Promise<any>,
+    type: "cancelling" | "returning"
+  ) => {
     if (!token) return;
-    setActionState({ type: "cancelling", loading: true });
+    setActionState({ type, loading: true });
     setError(null);
     try {
-      await cancelOrderItem(token, orderId, item.product_id);
-      onActionSuccess(); // Trigger a refresh of the orders list
+      await action();
+      onActionSuccess();
     } catch (err) {
-      console.error("Failed to cancel item:", err);
-      setError("Cancellation failed. Please try again.");
+      console.error(`Action ${type} failed:`, err);
+      setError(
+        `${
+          type === "cancelling" ? "Cancellation" : "Return"
+        } failed. Please try again.`
+      );
     } finally {
       setActionState({ type: null, loading: false });
     }
   };
 
-  const handleReturn = async () => {
-    if (!token || !returnReason.trim()) return;
-    setActionState({ type: "returning", loading: true });
-    setError(null);
-    try {
-      await returnOrderItem(token, {
-        order_id: orderId,
-        product_id: item.product_id,
-        reason: returnReason,
-      });
-      onActionSuccess(); // Trigger a refresh of the orders list
-    } catch (err) {
-      console.error("Failed to return item:", err);
-      setError("Return request failed. Please try again.");
-    } finally {
-      setActionState({ type: null, loading: false });
+  const onCancel = () =>
+    handleAction(
+      () => cancelOrderItem(token!, orderId, item.product_id),
+      "cancelling"
+    );
+  const onReturn = () => {
+    if (!returnReason.trim()) {
+      setError("Please provide a reason for the return.");
+      return;
     }
+    handleAction(
+      () =>
+        returnOrderItem(token!, {
+          order_id: orderId,
+          product_id: item.product_id,
+          reason: returnReason,
+        }),
+      "returning"
+    );
   };
 
   const renderActionUI = () => {
     switch (item.status) {
-      case "pending":
+      case 'pending':
         return (
-          <Button
-            size="sm"
-            onClick={handleCancel}
-            disabled={actionState.loading}
-          >
-            {actionState.type === "cancelling" ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              "Cancel Item"
-            )}
+          <Button size="sm" onClick={() => handleAction(() => cancelOrderItem(token!, orderId, item.product_id), 'cancelling')} disabled={actionState.loading} variant="outline">
+            {actionState.loading ? <Loader2 className="animate-spin" /> : 'Request Cancellation'}
           </Button>
         );
-      case "delivered":
-        return (
-          <div className="w-full space-y-2">
-            <Textarea
-              placeholder="Reason for return (e.g., 'item is fake', 'not as described')."
-              value={returnReason}
-              onChange={(e) => setReturnReason(e.target.value)}
-              disabled={actionState.loading}
-            />
-            <Button
-              size="sm"
-              className="w-full"
-              onClick={handleReturn}
-              disabled={actionState.loading || !returnReason.trim()}
-            >
-              {actionState.type === "returning" ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "Request Return"
-              )}
-            </Button>
-          </div>
-        );
-      case "cancelled":
-        return <p className="text-sm font-semibold text-red-600">Cancelled</p>;
-      case "returned":
-        return (
-          <p className="text-sm font-semibold text-blue-600">
-            Return Requested
-          </p>
-        );
-      case "refunded":
-        return <p className="text-sm font-semibold text-green-600">Refunded</p>;
-      case "refund_rejected":
-        return (
-          <p className="text-sm font-semibold text-red-700">Return Rejected</p>
-        );
+      case 'delivered':
+      return (
+        <div className="w-full space-y-2">
+          <Textarea
+            placeholder="Reason for return..."
+            value={returnReason}
+            onChange={(e) => setReturnReason(e.target.value)}
+            disabled={actionState.loading}
+          />
+          <Button
+            size="sm"
+            className="w-full"
+            onClick={onReturn}
+            disabled={actionState.loading || !returnReason.trim()}
+          >
+            {actionState.type === "returning" ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Request Return"
+            )}
+          </Button>
+        </div>
+      );
       default:
         return null;
     }
@@ -145,14 +132,13 @@ export default function OrderItem({
         </Link>
         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
         <p className="text-sm">Price: ₹{item.price_at_purchase.toFixed(2)}</p>
-        <p className="text-sm font-medium">
-          Status:{" "}
-          <span className="capitalize">{item.status.replace("_", " ")}</span>
-        </p>
       </div>
-      <div className="flex flex-col gap-2 items-end w-56">
+      <div className="flex flex-col justify-between items-end w-56">
         {renderActionUI()}
-        {error && <p className="text-xs text-red-500 text-right">{error}</p>}
+        <StatusBadge item={item} />
+        {error && (
+          <p className="text-xs text-red-500 text-right mt-1">{error}</p>
+        )}
       </div>
     </div>
   );

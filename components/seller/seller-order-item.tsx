@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Loader2, PackageCheck, Ban, CheckCircle, XCircle } from "lucide-react";
-import StatusBadge from "./status-badge";
+import StatusBadge from "@/components/status-badge";
 
 interface SellerOrderItemProps {
   item: OrderItemType;
@@ -32,21 +32,18 @@ export default function SellerOrderItem({
   const [actionType, setActionType] = useState<ActionType | null>(null);
   const [onTime, setOnTime] = useState(false);
 
-  const handleAction = async (
-    action: () => Promise<void>,
-    type: ActionType,
-  ) => {
+  const handleAction = async (action: () => Promise<any>, type: ActionType) => {
     if (!token) return;
     setIsLoading(true);
     setActionType(type);
     try {
       await action();
       onActionSuccess();
-      refreshSeller(); // Refresh seller to get latest SCS score
+      refreshSeller();
     } catch (error) {
       console.error(`Action ${type} failed:`, error);
       alert(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
       );
     } finally {
       setIsLoading(false);
@@ -57,28 +54,113 @@ export default function SellerOrderItem({
   const onDeliver = () =>
     handleAction(
       () => deliverOrderItem(token!, orderId, item.product_id, onTime),
-      "deliver",
+      "deliver"
     );
-  const onCancel = () => {
-    if (confirm("Are you sure?"))
+  const onSellerCancel = () => {
+    if (
+      confirm(
+        "Are you sure you want to cancel this item? This will automatically queue a refund."
+      )
+    ) {
       handleAction(
         () => cancelSellerOrderItem(token!, orderId, item.product_id),
-        "cancel",
+        "cancel"
       );
+    }
   };
   const onAcceptRefund = () => {
-    if (confirm("Are you sure?"))
+    if (confirm("Are you sure you want to process this refund?"))
       handleAction(
         () => processRefund(token!, orderId, item.product_id),
-        "accept_refund",
+        "accept_refund"
       );
   };
   const onRejectRefund = () => {
-    if (confirm("Are you sure?"))
+    if (confirm("Are you sure you want to reject this refund request?"))
       handleAction(
         () => rejectRefund(token!, orderId, item.product_id),
-        "reject_refund",
+        "reject_refund"
       );
+  };
+
+  const renderSellerActions = () => {
+    switch (item.status) {
+      case "pending":
+        return (
+          <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`on-time-${item.id}`}
+                onCheckedChange={(c) => setOnTime(!!c)}
+                disabled={isLoading}
+              />
+              <Label htmlFor={`on-time-${item.id}`} className="text-sm">
+                On-time
+              </Label>
+            </div>
+            <Button
+              size="icon"
+              onClick={onDeliver}
+              disabled={isLoading}
+              aria-label="Deliver"
+            >
+              {isLoading && actionType === "deliver" ? (
+                <Loader2 className="animate-spin h-4 w-4" />
+              ) : (
+                <PackageCheck className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              size="icon"
+              variant="destructive"
+              onClick={onSellerCancel}
+              disabled={isLoading}
+              aria-label="Cancel Item"
+            >
+              {isLoading && actionType === "cancel" ? (
+                <Loader2 className="animate-spin h-4 w-4" />
+              ) : (
+                <Ban className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        );
+      // UNIFIED REFUND LOGIC
+      case "returned":
+        return (
+          <>
+            <Button
+              size="sm"
+              className="bg-green-600 hover:bg-green-700 w-full"
+              onClick={onAcceptRefund}
+              disabled={isLoading}
+            >
+              {isLoading && actionType === "accept_refund" ? (
+                <Loader2 className="animate-spin h-4 w-4 mr-2" />
+              ) : (
+                <CheckCircle className="h-4 w-4 mr-1" />
+              )}
+              Process Refund
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              className="w-full"
+              onClick={onRejectRefund}
+              disabled={isLoading}
+            >
+              {isLoading && actionType === "reject_refund" ? (
+                <Loader2 className="animate-spin h-4 w-4 mr-2" />
+              ) : (
+                <XCircle className="h-4 w-4 mr-1" />
+              )}
+              Reject Refund
+            </Button>
+          </>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -90,70 +172,8 @@ export default function SellerOrderItem({
         </p>
       </div>
       <div className="flex flex-col items-end space-y-2 w-64">
-        <StatusBadge status={item.status} />
-        <div className="flex items-center space-x-2">
-          {item.status === "pending" && (
-            <>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={`on-time-${item.id}`}
-                  onCheckedChange={(c) => setOnTime(!!c)}
-                  disabled={isLoading}
-                />
-                <Label htmlFor={`on-time-${item.id}`} className="text-sm">
-                  On-time
-                </Label>
-              </div>
-              <Button size="sm" onClick={onDeliver} disabled={isLoading}>
-                {isLoading && actionType === "deliver" ? (
-                  <Loader2 className="animate-spin h-4 w-4" />
-                ) : (
-                  <PackageCheck className="h-4 w-4" />
-                )}
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={onCancel}
-                disabled={isLoading}
-              >
-                {isLoading && actionType === "cancel" ? (
-                  <Loader2 className="animate-spin h-4 w-4" />
-                ) : (
-                  <Ban className="h-4 w-4" />
-                )}
-              </Button>
-            </>
-          )}
-          {item.status === "returned" && (
-            <>
-              <Button
-                size="sm"
-                className="bg-green-600 hover:bg-green-700"
-                onClick={onAcceptRefund}
-                disabled={isLoading}
-              >
-                {isLoading && actionType === "accept_refund" ? (
-                  <Loader2 className="animate-spin h-4 w-4" />
-                ) : (
-                  <CheckCircle className="h-4 w-4" />
-                )}
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={onRejectRefund}
-                disabled={isLoading}
-              >
-                {isLoading && actionType === "reject_refund" ? (
-                  <Loader2 className="animate-spin h-4 w-4" />
-                ) : (
-                  <XCircle className="h-4 w-4" />
-                )}
-              </Button>
-            </>
-          )}
-        </div>
+          <StatusBadge item={item} /> 
+        {renderSellerActions()}
       </div>
     </div>
   );

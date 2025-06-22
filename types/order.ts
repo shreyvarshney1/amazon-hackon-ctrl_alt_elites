@@ -10,6 +10,7 @@ export interface OrderItem {
   quantity: number;
   price_at_purchase: number;
   status: string;
+  cancelled_by_seller: boolean;
 }
 
 export interface Order {
