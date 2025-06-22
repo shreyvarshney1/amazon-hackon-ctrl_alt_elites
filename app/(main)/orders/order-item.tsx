@@ -37,7 +37,7 @@ export default function OrderItem({
 
   const handleAction = async (
     action: () => Promise<any>,
-    type: "cancelling" | "returning"
+    type: "cancelling" | "returning",
   ) => {
     if (!token) return;
     setActionState({ type, loading: true });
@@ -50,7 +50,7 @@ export default function OrderItem({
       setError(
         `${
           type === "cancelling" ? "Cancellation" : "Return"
-        } failed. Please try again.`
+        } failed. Please try again.`,
       );
     } finally {
       setActionState({ type: null, loading: false });
@@ -60,7 +60,7 @@ export default function OrderItem({
   const onCancel = () =>
     handleAction(
       () => cancelOrderItem(token!, orderId, item.product_id),
-      "cancelling"
+      "cancelling",
     );
   const onReturn = () => {
     if (!returnReason.trim()) {
@@ -74,7 +74,7 @@ export default function OrderItem({
           product_id: item.product_id,
           reason: returnReason,
         }),
-      "returning"
+      "returning",
     );
   };
 
@@ -87,7 +87,7 @@ export default function OrderItem({
             onClick={() =>
               handleAction(
                 () => cancelOrderItem(token!, orderId, item.product_id),
-                "cancelling"
+                "cancelling",
               )
             }
             disabled={actionState.loading}
