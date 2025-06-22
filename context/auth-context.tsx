@@ -1,8 +1,15 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { jwtDecode } from "jwt-decode";
+import { getSession } from "@/lib/api/auth";
 
 interface User {
   id: string;
@@ -13,70 +20,73 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   isLoading: boolean;
   login: (email: string, username?: string) => Promise<void>;
   logout: () => void;
   redirectToLogin: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window === "undefined") {
-      return null;
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("auth_token");
     }
-    try {
-      const userData = localStorage.getItem("user_data");
-      return userData
-        ? JSON.parse(userData)
-        : { id: "guest", username: "Guest", email: "" };
-    } catch (error) {
-      console.error("Failed to parse user data from localStorage", error);
-      return { id: "guest", username: "Guest", email: "" };
-    }
+    return null;
   });
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
 
+  const logout = useCallback(() => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user_data");
+    setToken(null);
+    setUser({ id: "guest", username: "Guest", email: "" });
+    // Optionally redirect to home or login page after logout
+    // router.push('/');
+  }, [router]);
+
+  const refreshUser = useCallback(async () => {
+    const currentToken = localStorage.getItem("auth_token");
+    if (!currentToken) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const sessionData = await getSession(currentToken);
+      const decoded: { user_id: string; username: string } =
+        jwtDecode(currentToken);
+      const fullUser = {
+        id: decoded.user_id.toString(),
+        username: sessionData.user_data.username,
+        email: sessionData.user_data.email,
+        uba_score: sessionData.user_data.uba_score,
+      };
+
+      localStorage.setItem("user_data", JSON.stringify(fullUser));
+      setUser(fullUser);
+      setToken(currentToken);
+    } catch (error) {
+      console.error("Session refresh failed, logging out.", error);
+      logout();
+    }
+  }, [logout, user]);
+
   useEffect(() => {
     const checkAuthStatus = async () => {
       setIsLoading(true);
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        try {
-          const sessionResponse = await fetch("/api/auth/session", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (sessionResponse.ok) {
-            const sessionData = await sessionResponse.json();
-            const userData = JSON.parse(
-              localStorage.getItem("user_data") || "{}",
-            );
-            const updatedUserData = {
-              ...userData,
-              uba_score: sessionData.user_data.uba_score,
-            };
-            localStorage.setItem("user_data", JSON.stringify(updatedUserData));
-            setUser(updatedUserData);
-          } else {
-            logout();
-          }
-        } catch (error) {
-          console.error("Failed to fetch session data", error);
-          logout();
-        }
-      } else {
-        setUser({ id: "guest", username: "Guest", email: "" });
-      }
+      await refreshUser();
       setIsLoading(false);
     };
-
     checkAuthStatus();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount
 
   const redirectToLogin = () => {
     sessionStorage.setItem("redirect_path", pathname);
@@ -87,43 +97,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, username }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          message: "Login failed with non-JSON response",
-        }));
-        throw new Error(
-          `Login failed: ${errorData.message || "Unknown error"}`,
-        );
-      }
+      if (!response.ok) throw new Error("Login failed");
 
       const data = await response.json();
       localStorage.setItem("auth_token", data.token);
-      const decodedToken: { user_id: string } = jwtDecode(data.token);
-      const finalUsername = username || email.split("@")[0];
-
-      const sessionResponse = await fetch("/api/auth/session", {
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
-      });
-      if (!sessionResponse.ok) {
-        throw new Error("Failed to fetch session data");
-      }
-      const sessionData = await sessionResponse.json();
-      const userData = {
-        id: decodedToken.user_id,
-        email,
-        username: finalUsername,
-        uba_score: sessionData.user_data.uba_score,
-      };
-      localStorage.setItem("user_data", JSON.stringify(userData));
-      setUser(userData);
+      setToken(data.token);
+      await refreshUser();
 
       const redirectPath = sessionStorage.getItem("redirect_path") || "/";
       sessionStorage.removeItem("redirect_path");
@@ -134,15 +117,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user_data");
-    setUser({ id: "guest", username: "Guest", email: "" });
-  };
-
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, isLoading, redirectToLogin }}
+      value={{
+        user,
+        token,
+        login,
+        logout,
+        isLoading,
+        redirectToLogin,
+        refreshUser,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,45 +1,70 @@
 "use client";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import Link from "next/link";
 import { useAuth } from "@/context/auth-context";
-import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import AmazonLogo from "@/components/layout/amazon-logo";
 
-export default function Home() {
+export default function LoginPage() {
   const auth = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) return;
+
+    setIsLoading(true);
+    setError("");
+
     try {
+      // The auth.login function will update the context and throw an error on failure.
+      // On success, we can navigate.
       await auth.login(email);
-    } catch (error) {
-      console.error("Login failed", error);
+
+      // Get the intended destination from session storage, or default to home.
+      const redirectPath = sessionStorage.getItem("redirect_path") || "/";
+      sessionStorage.removeItem("redirect_path");
+
+      router.push(redirectPath);
+    } catch (err) {
+      console.error("Login failed", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Login failed. Please check your credentials and try again.",
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
-      <Link
-        href="/"
-        className="mb-8 text-3xl font-bold text-gray-900 tracking-tight"
-      >
-        amazon
+    <div className="min-h-screen bg-white flex flex-col items-center pt-8 p-4">
+      <Link href="/" className="mb-4">
+        <AmazonLogo className="w-32 h-auto" color="#000" />
       </Link>
 
-      <Card className="w-full max-w-sm border border-gray-300 shadow-sm">
-        <CardHeader className="pb-4">
-          <h1 className="text-2xl font-normal text-gray-900">Sign in</h1>
+      <Card className="w-full max-w-sm border border-gray-300 shadow-none">
+        <CardHeader className="pb-2">
+          <h1 className="text-3xl font-normal text-gray-900">Sign in</h1>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label
-                htmlFor="email"
-                className="text-sm font-bold text-gray-900"
-              >
+            {error && (
+              <div className="p-3 text-sm text-red-700 bg-red-100 border border-red-300 rounded-md">
+                {error}
+              </div>
+            )}
+            <div className="space-y-1">
+              <Label htmlFor="email" className="text-sm font-medium">
                 Email or mobile phone number
               </Label>
               <Input
@@ -47,21 +72,23 @@ export default function Home() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-8 border-gray-400 focus:border-orange-400 focus:ring-orange-400 focus:ring-1"
+                className="h-9 border-gray-400 focus:border-orange-500 focus:ring-orange-500 focus:ring-1"
                 required
+                disabled={isLoading}
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full h-8 bg-gradient-to-b from-yellow-200 to-yellow-400 hover:from-yellow-300 hover:to-yellow-500 text-black border border-yellow-600 shadow-sm font-normal cursor-pointer transition-colors duration-200 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+              disabled={isLoading || !email}
+              className="w-full h-9 bg-[#FFD814] hover:bg-[#F7CA00] border-[#FCD200] border text-black shadow-sm font-normal disabled:opacity-50"
             >
-              Continue
+              {isLoading ? <Loader2 className="animate-spin" /> : "Continue"}
             </Button>
           </form>
 
-          <div className="text-xs text-gray-600 leading-4">
-            By continuing, you agree to Amazon&#39;s{" "}
+          <div className="text-xs text-gray-800 leading-relaxed pt-4">
+            By continuing, you agree to Amazon&apos;s{" "}
             <a
               href="#"
               className="text-blue-600 hover:text-orange-600 hover:underline"
@@ -77,39 +104,53 @@ export default function Home() {
             </a>
             .
           </div>
-
-          <div className="pt-4 border-t border-gray-300">
-            <div className="text-xs text-gray-600 mb-2">
-              <span className="font-bold">New to Amazon?</span>
-            </div>
-            <Link href="/signup">
-              <Button
-                variant="outline"
-                className="w-full h-8 border-gray-400 font-normal cursor-pointer transition-colors duration-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
-              >
-                Create your Amazon account
-              </Button>
-            </Link>
-          </div>
         </CardContent>
       </Card>
 
-      <div className="mt-8 text-center">
-        <div className="flex items-center justify-center space-x-4 text-xs text-blue-600 mb-4">
-          <a href="#" className="hover:text-orange-600 hover:underline">
-            Conditions of Use
-          </a>
-          <a href="#" className="hover:text-orange-600 hover:underline">
-            Privacy Notice
-          </a>
-          <a href="#" className="hover:text-orange-600 hover:underline">
-            Help
-          </a>
+      <div className="relative w-full max-w-sm my-6">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t"></span>
         </div>
-        <div className="text-xs text-gray-600">
-          © 1996-2025, Amazon.com, Inc. or its affiliates
+        <div className="relative flex justify-center text-xs">
+          <span className="bg-white px-2 text-gray-500">New to Amazon?</span>
         </div>
       </div>
+
+      <Button
+        asChild
+        variant="outline"
+        className="w-full max-w-sm h-9 border-gray-300 shadow-sm font-normal"
+      >
+        <Link href="/signup">Create your Amazon account</Link>
+      </Button>
+
+      <div className="w-full max-w-sm mt-4 text-center">
+        <Link
+          href="/seller/login"
+          className="text-sm text-blue-600 hover:text-orange-600 hover:underline"
+        >
+          Sign in as a seller instead
+        </Link>
+      </div>
+
+      <footer className="w-full border-t mt-8 pt-6">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="flex items-center justify-center space-x-6 text-xs text-blue-600 mb-2">
+            <a href="#" className="hover:text-orange-600 hover:underline">
+              Conditions of Use
+            </a>
+            <a href="#" className="hover:text-orange-600 hover:underline">
+              Privacy Notice
+            </a>
+            <a href="#" className="hover:text-orange-600 hover:underline">
+              Help
+            </a>
+          </div>
+          <div className="text-xs text-gray-500">
+            © 1996-2025, Amazon.com, Inc. or its affiliates
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

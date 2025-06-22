@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Amazon Clone",
+  title: "Amazon",
   description: "A clone of the Amazon website built with Next.js and React.",
 };
 

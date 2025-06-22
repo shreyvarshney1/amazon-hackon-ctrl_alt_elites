@@ -3,37 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookmarkCheck, Star } from "lucide-react";
+import { BookmarkCheck } from "lucide-react";
 import { Product } from "@/types/product";
 import { useCart } from "@/context/cart-context";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import StarRating from "@/components/star-rating";
+import { ScoreTooltip } from "@/components/score-tooltip";
 
 interface ProductCardProps {
   product: Product;
 }
-
-const StarRating = ({ rating, count }: { rating: number; count: string }) => {
-  return (
-    <div className="flex items-center gap-1">
-      <div className="flex">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            className={`w-4 h-4 ${
-              star <= rating
-                ? "fill-yellow-400 text-yellow-400"
-                : "fill-gray-200 text-gray-200"
-            }`}
-          />
-        ))}
-      </div>
-      <span className="text-sm text-blue-600 hover:underline cursor-pointer">
-        {count}
-      </span>
-    </div>
-  );
-};
 
 export const VerifiedSellerBadge = () => {
   return (
@@ -52,10 +32,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-IN").format(price);
   };
-
-  // const savings = product.originalPrice
-  //   ? product.originalPrice - product.currentPrice
-  //   : 0;
 
   return (
     <Card className="flex flex-row gap-4 p-4 border border-[#dddddd] rounded hover:shadow-md transition-shadow duration-200">
@@ -90,37 +66,32 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.name}
         </Link>
 
-        <div className="mb-2">
-          <div className="flex items-center gap-1">
-            <span>by</span>
-            <span>{product.seller.name}</span>
-            {product.seller.scs_score > 0.8 && <VerifiedSellerBadge />}
+        <div className="flex items-center gap-1">
+          <span>by</span>
+          <span>{product.seller.name}</span>
+          {product.seller.scs_score > 0.8 && <VerifiedSellerBadge />}
+        </div>
+
+        <StarRating
+          rating={product.rating ?? 0}
+          count={product.review_count ?? "0"}
+        />
+
+        <ScoreTooltip scoreType="PIS" scoreValue={product.pis_score}>
+          <div>
+            <p
+              style={{
+                color: `rgb(${Math.round(
+                  255 * (1 - product.pis_score),
+                )}, ${Math.round(180 * product.pis_score)}, 80)`,
+                fontWeight: 500,
+              }}
+            >
+              Product Integrity Score (PIS) : {product.pis_score.toFixed(2)}
+            </p>
           </div>
-        </div>
+        </ScoreTooltip>
 
-        {/* Rating */}
-        <div className="">
-          <StarRating
-            rating={product.rating ?? 0}
-            count={product.review_count ?? "0"}
-          />
-        </div>
-
-        {/* PIS Score */}
-        <div>
-          <p
-            style={{
-              color: `rgb(${Math.round(
-                255 * (1 - product.pis_score),
-              )}, ${Math.round(180 * product.pis_score)}, 80)`,
-              fontWeight: 500,
-            }}
-          >
-            Product Integrity Score (PIS) : {product.pis_score.toFixed(2)}
-          </p>
-        </div>
-
-        {/* Price Section */}
         <div className="flex items-center gap-2 mb-2 flex-wrap">
           <span className="text-2xl font-bold text-[#b12704]">
             {product.currency}
@@ -142,15 +113,15 @@ export default function ProductCard({ product }: ProductCardProps) {
               )} */}
         </div>
 
-        {/* Delivery Information */}
+        {/* Delivery Information
         <div className="text-sm mb-1">
           Get it by <span className="font-bold">{product.deliveryDate}</span>
-        </div>
+        </div> */}
 
         {product.isFreeDelivery && (
           <div className="text-sm text-[#565959]">FREE Delivery by Amazon</div>
         )}
-        <div className="flex items-start gap-4 mt-4">
+        <div className="flex items-start gap-4">
           <Button
             onClick={() => {
               addToCart(product);

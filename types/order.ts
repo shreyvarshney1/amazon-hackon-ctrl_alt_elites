@@ -5,9 +5,12 @@ export interface OrderItem {
   product_description: string;
   product_category: string;
   product_seller: string;
+  product_img: string;
+  product_slug: string;
   quantity: number;
   price_at_purchase: number;
   status: string;
+  cancelled_by_seller: boolean;
 }
 
 export interface Order {

@@ -1,326 +1,107 @@
-// "use client";
-// import React, { useEffect, useState } from "react";
-// import { useAuth } from "@/context/auth-context";
-// import { Order, OrderItem } from "@/types/order";
-
-// const OrdersPage = () => {
-//   const { user } = useAuth();
-//   const [orders, setOrders] = useState<Order[]>([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState<string | null>(null);
-
-//   useEffect(() => {
-//     const fetchOrders = async () => {
-//       const token = localStorage.getItem("auth_token");
-//       if (!token || !user || user.id === "guest") {
-//         setLoading(false);
-//         return;
-//       }
-
-//       try {
-//         const response = await fetch("/api/orders/my-orders", {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         });
-
-//         if (!response.ok) {
-//           throw new Error("Failed to fetch orders");
-//         }
-
-//         const data = await response.json();
-//         setOrders(data.orders);
-//       } catch (error) {
-//         console.error("Error fetching orders:", error);
-//         setError("Failed to fetch orders. Please try again.");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchOrders();
-//   }, [user]);
-
-//   if (loading) {
-//     return <p>Loading...</p>;
-//   }
-
-//   if (error) {
-//     return <p className="text-red-500">{error}</p>;
-//   }
-
-//   return (
-//     <div className="container mx-auto p-4">
-//       <h1 className="text-2xl font-bold mb-4">Your Orders</h1>
-//       {orders.length === 0 ? (
-//         <p>You have no orders.</p>
-//       ) : (
-//         <div>
-//           {orders.map((order) => (
-//             <div key={order.id} className="border-b py-4">
-//               <div className="flex justify-between">
-//                 <div>
-//                   <p>
-//                     <span className="font-bold">Order ID:</span> {order.id}
-//                   </p>
-//                   <p>
-//                     <span className="font-bold">Date:</span>{" "}
-//                     {new Date(order.created_at).toLocaleDateString()}
-//                   </p>
-//                 </div>
-//                 <div>
-//                   <p>
-//                     <span className="font-bold">Status:</span> {order.status}
-//                   </p>
-//                 </div>
-//               </div>
-//               <div className="mt-4">
-//                 {order.items.map((item: OrderItem) => (
-//                   <div key={item.id} className="flex items-center gap-4 mt-2">
-//                     <div>
-//                       <p className="font-bold">{item.product_name}</p>
-//                       <p>Quantity: {item.quantity}</p>
-//                     </div>
-//                     <div className="ml-auto">
-//                       <p>
-//                         {new Intl.NumberFormat("en-IN", {
-//                           style: "currency",
-//                           currency: "INR",
-//                         }).format(item.price_at_purchase)}
-//                       </p>
-//                     </div>
-//                   </div>
-//                 ))}
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default OrdersPage;
+// app/orders/page.tsx
 
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/context/auth-context";
-// It's good practice to have shared types. Assuming these are updated.
-import { Order, OrderItem } from "@/types/order";
-import { Button } from "@/components/ui/button"; // Assuming use of shadcn/ui
-import { Badge } from "@/components/ui/badge"; // Assuming use of shadcn/ui
+import { getMyOrders } from "@/lib/api/orders";
+import { Order } from "@/types/order";
+import Loader from "@/components/loader";
+import OrderCard from "@/app/(main)/orders/order-card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-// Helper component for displaying status with colors
-const StatusBadge = ({ status }: { status: OrderItem["status"] }) => {
-  const statusStyles: Record<OrderItem["status"], string> = {
-    pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
-    delivered: "bg-green-100 text-green-800 border-green-300",
-    cancelled: "bg-red-100 text-red-800 border-red-300",
-    returned: "bg-blue-100 text-blue-800 border-blue-300",
-    refunded: "bg-gray-200 text-gray-800 border-gray-400",
-  };
-  return (
-    <Badge variant="outline" className={`${statusStyles[status]} text-xs`}>
-      {status.charAt(0).toUpperCase() + status.slice(1)}
-    </Badge>
-  );
-};
-
-const OrdersPage = () => {
-  const { user } = useAuth();
+export default function OrdersPage() {
+  const { user, token } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const fetchOrders = useCallback(async () => {
-    const token = localStorage.getItem("auth_token");
-    if (!token || !user || user.id === "guest") {
-      setLoading(false);
-      return;
-    }
-
+    if (!token) return;
+    // Don't set loading true for refetches, to avoid screen flashing
+    // setIsLoading(true);
+    setError(null);
     try {
-      const response = await fetch("/api/orders/my-orders", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch orders");
-      }
-
-      const data = await response.json();
-      setOrders(data.orders);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      setError("Failed to fetch orders. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-  useEffect(() => {
-    fetchOrders();
-  }, [user, fetchOrders]);
-  const handleAction = async (
-    url: string,
-    body: Record<string, string | number>,
-    successMessage: string,
-  ) => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("auth_token");
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Action failed");
-      }
-      alert(successMessage);
-      await fetchOrders(); // Refresh orders to show updated status
+      const fetchedOrders = await getMyOrders(token);
+      // Sort orders by most recent first
+      fetchedOrders.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      );
+      setOrders(fetchedOrders);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "An error occurred");
+      setError("Failed to fetch your orders. Please try again later.");
+      console.error(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  };
+  }, [token]);
 
-  const handleCancelItem = (orderId: number, productId: number) => {
-    if (!confirm("Are you sure you want to cancel this item?")) return;
-    handleAction(
-      "/api/orders/cancel-order",
-      { order_id: orderId, product_id: productId },
-      "Item cancelled successfully. A refund will be processed if applicable.",
-    );
-  };
-
-  const handleReturnItem = (productId: number, orderId: number) => {
-    const reason = prompt("Please provide a reason for returning this item:");
-    if (!reason) {
-      alert("A reason is required to initiate a return.");
-      return;
+  useEffect(() => {
+    if (token) {
+      setIsLoading(true);
+      fetchOrders();
+    } else {
+      setIsLoading(false);
     }
-    handleAction(
-      "/api/orders/return-product",
-      { product_id: productId, reason: reason, order_id: orderId },
-      "Return initiated successfully. The seller will review your request.",
-    );
-  };
+  }, [token, fetchOrders]);
 
-  if (loading && orders.length === 0) {
+  if (isLoading) {
+    return <Loader text="Fetching your orders..." />;
+  }
+
+  if (!token || user?.id === "guest") {
     return (
-      <div className="container mx-auto p-4 text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-        <p className="mt-4">Loading your orders...</p>
+      <div className="text-center p-8">
+        <h2 className="text-xl font-semibold mb-4">
+          Please log in to see your orders.
+        </h2>
+        <Button asChild>
+          <Link href="/login">Login</Link>
+        </Button>
       </div>
     );
   }
 
   if (error) {
     return (
-      <p className="container mx-auto p-4 text-red-500 text-center">{error}</p>
+      <div className="text-center text-red-600 p-8">
+        <p>{error}</p>
+        <Button
+          onClick={() => {
+            setIsLoading(true);
+            fetchOrders();
+          }}
+          className="mt-4"
+        >
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="text-center text-gray-600 p-8">
+        <h2 className="text-xl font-semibold">You have no past orders.</h2>
+        <p className="mt-2">Start shopping to see your orders here.</p>
+      </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6">
-      <h1 className="text-3xl font-bold mb-6">Your Orders</h1>
-      {orders.length === 0 ? (
-        <div className="text-center border-2 border-dashed rounded-lg p-12">
-          <p className="text-gray-500">
-            You haven&apos;t placed any orders yet.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {orders.map((order) => (
-            <div key={order.id} className="border rounded-lg shadow-sm">
-              <div className="bg-gray-50 p-4 rounded-t-lg border-b flex justify-between items-center">
-                <div>
-                  <p className="font-bold text-lg">Order #{order.id}</p>
-                  <p className="text-sm text-gray-600">
-                    Placed on: {new Date(order.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <p className="font-bold text-lg">
-                  {new Intl.NumberFormat("en-IN", {
-                    style: "currency",
-                    currency: "INR",
-                  }).format(order.total_amount)}
-                </p>
-              </div>
-              <div className="p-4 space-y-4">
-                {order.items.map((item: OrderItem) => (
-                  <div
-                    key={item.id}
-                    className="flex flex-col sm:flex-row items-start sm:items-center gap-4 py-2 border-b last:border-b-0"
-                  >
-                    <div className="flex-1">
-                      <p className="font-bold text-md">{item.product_name}</p>
-                      <p className="text-sm text-gray-500">
-                        Quantity: {item.quantity}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Price:{" "}
-                        {new Intl.NumberFormat("en-IN", {
-                          style: "currency",
-                          currency: "INR",
-                        }).format(item.price_at_purchase)}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-start sm:items-end gap-2">
-                      <StatusBadge status={item.status} />
-                      {item.status === "pending" && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() =>
-                            handleCancelItem(order.id, item.product_id)
-                          }
-                          disabled={loading}
-                        >
-                          {loading ? "Processing..." : "Cancel Item"}
-                        </Button>
-                      )}
-                      {item.status === "delivered" && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            handleReturnItem(item.product_id, order.id)
-                          }
-                          disabled={loading}
-                        >
-                          {loading ? "Processing..." : "Return Item"}
-                        </Button>
-                      )}
-                      {(item.status === "cancelled" ||
-                        item.status === "returned") && (
-                        <p className="text-xs text-gray-500 italic">
-                          Refund pending seller approval.
-                        </p>
-                      )}
-                      {item.status === "refunded" && (
-                        <p className="text-xs text-green-600 italic">
-                          Refund processed.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    <main className="max-w-5xl mx-auto p-4 md:p-8">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6">Your Orders</h1>
+      <div className="space-y-6">
+        {orders.map((order) => (
+          <OrderCard
+            key={order.id}
+            order={order}
+            onActionSuccess={fetchOrders}
+          />
+        ))}
+      </div>
+    </main>
   );
-};
-
-export default OrdersPage;
+}
