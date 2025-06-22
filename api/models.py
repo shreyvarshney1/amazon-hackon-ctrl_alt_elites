@@ -42,7 +42,7 @@ class Seller(db.Model):
 class Product(db.Model):
     __tablename__ = "products"
     id = db.Column(db.Integer, primary_key=True)
-    slug = db.Column(db.String(255), unique=True, nullable=False)
+    slug = db.Column(db.String(255), nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey("sellers.id"), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=False)
