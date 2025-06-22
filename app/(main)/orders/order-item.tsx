@@ -37,7 +37,7 @@ export default function OrderItem({
 
   const handleAction = async (
     action: () => Promise<any>,
-    type: "cancelling" | "returning",
+    type: "cancelling" | "returning"
   ) => {
     if (!token) return;
     setActionState({ type, loading: true });
@@ -50,7 +50,7 @@ export default function OrderItem({
       setError(
         `${
           type === "cancelling" ? "Cancellation" : "Return"
-        } failed. Please try again.`,
+        } failed. Please try again.`
       );
     } finally {
       setActionState({ type: null, loading: false });
@@ -60,7 +60,7 @@ export default function OrderItem({
   const onCancel = () =>
     handleAction(
       () => cancelOrderItem(token!, orderId, item.product_id),
-      "cancelling",
+      "cancelling"
     );
   const onReturn = () => {
     if (!returnReason.trim()) {
@@ -74,7 +74,7 @@ export default function OrderItem({
           product_id: item.product_id,
           reason: returnReason,
         }),
-      "returning",
+      "returning"
     );
   };
 
@@ -87,7 +87,7 @@ export default function OrderItem({
             onClick={() =>
               handleAction(
                 () => cancelOrderItem(token!, orderId, item.product_id),
-                "cancelling",
+                "cancelling"
               )
             }
             disabled={actionState.loading}
@@ -147,9 +147,22 @@ export default function OrderItem({
         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
         <p className="text-sm">Price: ₹{item.price_at_purchase.toFixed(2)}</p>
       </div>
-      <div className="flex flex-col justify-between items-end w-56">
+      <div className="flex flex-col justify-between items-end w-56 gap-4">
         {renderActionUI()}
         <StatusBadge item={item} />
+        {(item.status === "cancelled" || item.status === "returned") && (
+          <p className="text-xs text-gray-500 italic">
+            Refund pending seller approval.
+          </p>
+        )}
+        {item.status === "refunded" && (
+          <p className="text-xs text-green-600 italic">Refund processed.</p>
+        )}
+        {item.status === "refund_rejected" && (
+          <p className="text-xs text-red-600 italic">
+            Seller rejected the refund for this product.
+          </p>
+        )}
         {error && (
           <p className="text-xs text-red-500 text-right mt-1">{error}</p>
         )}

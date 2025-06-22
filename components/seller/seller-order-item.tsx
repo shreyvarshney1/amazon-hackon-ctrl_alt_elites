@@ -125,13 +125,12 @@ export default function SellerOrderItem({
             </Button>
           </div>
         );
-      // UNIFIED REFUND LOGIC
       case "returned":
         return (
-          <>
+          <div className="flex w-full gap-2 justify-end">
             <Button
               size="sm"
-              className="bg-green-600 hover:bg-green-700 w-full"
+              className="bg-green-600 hover:bg-green-700"
               onClick={onAcceptRefund}
               disabled={isLoading}
             >
@@ -140,12 +139,11 @@ export default function SellerOrderItem({
               ) : (
                 <CheckCircle className="h-4 w-4 mr-1" />
               )}
-              Process Refund
+              Refund
             </Button>
             <Button
               size="sm"
               variant="destructive"
-              className="w-full"
               onClick={onRejectRefund}
               disabled={isLoading}
             >
@@ -154,9 +152,9 @@ export default function SellerOrderItem({
               ) : (
                 <XCircle className="h-4 w-4 mr-1" />
               )}
-              Reject Refund
+              Reject
             </Button>
-          </>
+          </div>
         );
       default:
         return null;
