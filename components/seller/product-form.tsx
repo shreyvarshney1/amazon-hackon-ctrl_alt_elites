@@ -1,9 +1,7 @@
-// components/seller/product-form.tsx
-
 "use client";
 import { useState, useEffect } from "react";
 import { useSellerAuth } from "@/context/seller-auth-context";
-import { Product, ProductFormData } from "@/types/product"; // Import both types
+import { Product, ProductFormData } from "@/types/product";
 import { addProduct, updateProduct } from "@/lib/api/seller";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,7 +82,6 @@ export default function ProductForm({
 
     try {
       if (product) {
-        // Convert string ID to number for the API call
         await updateProduct(token, Number(product.id), dataToSubmit);
       } else {
         await addProduct(token, dataToSubmit);

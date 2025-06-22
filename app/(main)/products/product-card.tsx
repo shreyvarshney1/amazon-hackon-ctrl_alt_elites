@@ -82,7 +82,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <p
               style={{
                 color: `rgb(${Math.round(
-                  255 * (1 - product.pis_score),
+                  255 * (1 - product.pis_score)
                 )}, ${Math.round(180 * product.pis_score)}, 80)`,
                 fontWeight: 500,
               }}
@@ -92,10 +92,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </ScoreTooltip>
 
-        <div className="flex items-center gap-2 mb-2 flex-wrap">
+        <div className="flex items-center gap-4 mb-2 flex-wrap">
           <span className="text-2xl font-bold text-[#b12704]">
-            {product.currency}
-            {formatPrice(product.price)}
+            {(product.currency ?? "₹") + " " + formatPrice(product.price)}
           </span>
           {/* {product.originalPrice && (
               <>
