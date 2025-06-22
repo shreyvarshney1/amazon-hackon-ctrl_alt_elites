@@ -220,17 +220,17 @@ def return_product(user):
         requests.post(
             url_for("services.trigger_uba_calculation", _external=True),
             json={"user_id": user.id},
-            timeout=5,
+            timeout=30,
         )
         requests.post(
             url_for("services.trigger_pis_calculation", _external=True),
             json={"product_id": product.id},
-            timeout=5,
+            timeout=30,
         )
         requests.post(
             url_for("services.trigger_scs_calculation", _external=True),
             json={"seller_id": product.seller_id},
-            timeout=5,
+            timeout=30,
         )
 
         return {"message": "Product return initiated successfully"}, 200
@@ -363,12 +363,12 @@ def deliver_order(seller):
         requests.post(
             url_for("services.trigger_pis_calculation", _external=True),
             json={"product_id": order_item.product.id},
-            timeout=5,
+            timeout=30,
         )
         requests.post(
             url_for("services.trigger_scs_calculation", _external=True),
             json={"seller_id": seller.id},
-            timeout=5,
+            timeout=30,
         )
         return {"message": "Order delivered successfully"}, 200
     except Exception as e:
@@ -410,7 +410,7 @@ def cancel_seller_order(seller):
         requests.post(
             url_for("services.trigger_scs_calculation", _external=True),
             json={"seller_id": seller.id},
-            timeout=5,
+            timeout=30,
         )
         return {"message": "Order cancelled successfully"}, 200
     except Exception as e:
@@ -489,7 +489,7 @@ def process_refund_request(seller):
         requests.post(
             url_for("services.trigger_scs_calculation", _external=True),
             json={"seller_id": seller.id},
-            timeout=5,
+            timeout=30,
         )
         return {"message": "Refund processed successfully"}, 200
     except Exception as e:
@@ -533,7 +533,7 @@ def reject_refund_request(seller):
         requests.post(
             url_for("services.trigger_scs_calculation", _external=True),
             json={"seller_id": seller.id},
-            timeout=5,
+            timeout=30,
         )
         return {"message": "Refund request rejected successfully"}, 200
     except Exception as e:
