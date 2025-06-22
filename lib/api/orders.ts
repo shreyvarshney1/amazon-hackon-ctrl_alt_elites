@@ -9,7 +9,7 @@ import { Order } from "@/types/order";
  * @returns A promise that resolves to an array of orders.
  */
 export const getMyOrders = async (token: string): Promise<Order[]> => {
-  const response = await fetch(`api/orders/my-orders`, {
+  const response = await fetch(`/api/orders/my-orders`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
