@@ -46,9 +46,7 @@ export const getSellerSession = async (token: string): Promise<Seller> => {
 
 // --- Product Actions ---
 
-export const getSellerProducts = async (
-  token: string,
-): Promise<Product[]> => {
+export const getSellerProducts = async (token: string): Promise<Product[]> => {
   const response = await fetch(`/api/seller/products`, {
     headers: {
       Authorization: `Bearer ${token}`,

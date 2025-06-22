@@ -32,7 +32,10 @@ export default function SellerOrderItem({
   const [actionType, setActionType] = useState<ActionType | null>(null);
   const [onTime, setOnTime] = useState(false);
 
-  const handleAction = async (action: () => Promise<unknown>, type: ActionType) => {
+  const handleAction = async (
+    action: () => Promise<unknown>,
+    type: ActionType,
+  ) => {
     if (!token) return;
     setIsLoading(true);
     setActionType(type);
@@ -43,7 +46,7 @@ export default function SellerOrderItem({
     } catch (error) {
       console.error(`Action ${type} failed:`, error);
       alert(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     } finally {
       setIsLoading(false);
@@ -54,17 +57,17 @@ export default function SellerOrderItem({
   const onDeliver = () =>
     handleAction(
       () => deliverOrderItem(token!, orderId, item.product_id, onTime),
-      "deliver"
+      "deliver",
     );
   const onSellerCancel = () => {
     if (
       confirm(
-        "Are you sure you want to cancel this item? This will automatically queue a refund."
+        "Are you sure you want to cancel this item? This will automatically queue a refund.",
       )
     ) {
       handleAction(
         () => cancelSellerOrderItem(token!, orderId, item.product_id),
-        "cancel"
+        "cancel",
       );
     }
   };
@@ -72,14 +75,14 @@ export default function SellerOrderItem({
     if (confirm("Are you sure you want to process this refund?"))
       handleAction(
         () => processRefund(token!, orderId, item.product_id),
-        "accept_refund"
+        "accept_refund",
       );
   };
   const onRejectRefund = () => {
     if (confirm("Are you sure you want to reject this refund request?"))
       handleAction(
         () => rejectRefund(token!, orderId, item.product_id),
-        "reject_refund"
+        "reject_refund",
       );
   };
 

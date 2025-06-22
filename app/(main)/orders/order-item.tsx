@@ -62,16 +62,13 @@ export default function OrderItem({
       setError("Please provide a reason for the return.");
       return;
     }
-    handleAction(
-      async () => {
-        await returnOrderItem(token!, {
-          order_id: orderId,
-          product_id: item.product_id,
-          reason: returnReason,
-        });
-      },
-      "returning",
-    );
+    handleAction(async () => {
+      await returnOrderItem(token!, {
+        order_id: orderId,
+        product_id: item.product_id,
+        reason: returnReason,
+      });
+    }, "returning");
   };
 
   const renderActionUI = () => {
@@ -81,12 +78,9 @@ export default function OrderItem({
           <Button
             size="sm"
             onClick={() =>
-              handleAction(
-                async () => {
-                  await cancelOrderItem(token!, orderId, item.product_id);
-                },
-                "cancelling",
-              )
+              handleAction(async () => {
+                await cancelOrderItem(token!, orderId, item.product_id);
+              }, "cancelling")
             }
             disabled={actionState.loading}
             variant="outline"
