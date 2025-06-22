@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSellerAuth } from "@/context/seller-auth-context";
 import { Seller } from "@/types/seller";
+import { ScoreTooltip } from "../score-tooltip";
 
 interface SellerHeaderProps {
   seller: Seller;
@@ -59,19 +60,23 @@ export default function SellerHeader({ seller }: SellerHeaderProps) {
                 <span className="text-sm font-medium text-gray-500">
                   Seller Credibility Score
                 </span>
-                <div className="flex items-center space-x-2">
-                  <p className="text-2xl font-bold text-green-600">
-                    {seller.scs_score ? seller.scs_score.toFixed(2) : "N/A"}
-                  </p>
-                  <div className="text-xs text-gray-400">
-                    {seller.last_scs_update && (
-                      <p>
-                        Updated:{" "}
-                        {new Date(seller.last_scs_update).toLocaleDateString()}
-                      </p>
-                    )}
+                <ScoreTooltip scoreType="SCS" scoreValue={seller.scs_score}>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-2xl font-bold text-green-600">
+                      {seller.scs_score ? seller.scs_score.toFixed(2) : "N/A"}
+                    </p>
+                    <div className="text-xs text-gray-400">
+                      {seller.last_scs_update && (
+                        <p>
+                          Updated:{" "}
+                          {new Date(
+                            seller.last_scs_update
+                          ).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </ScoreTooltip>
               </div>
             </div>
           </CardContent>
