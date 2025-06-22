@@ -58,7 +58,7 @@ const CartPage = () => {
             Your cart is currently empty.
           </h2>
           <p className="text-gray-500 mt-2">
-            Looks like you haven't added anything to your cart yet.
+            Looks like you haven&apos;t added anything to your cart yet.
           </p>
           <Button asChild className="mt-6">
             <Link href="/">Start Shopping</Link>

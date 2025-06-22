@@ -31,7 +31,7 @@ export default function ProductsTab({ isReady }: ProductsTabProps) {
     setError(null);
 
     try {
-      const sellerProducts = await getSellerProducts(token, seller.id);
+      const sellerProducts = await getSellerProducts(token);
       setProducts(sellerProducts);
     } catch (err) {
       console.error("Failed to fetch seller products:", err);

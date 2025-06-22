@@ -36,7 +36,7 @@ export default function OrderItem({
   const [error, setError] = useState<string | null>(null);
 
   const handleAction = async (
-    action: () => Promise<any>,
+    action: () => Promise<void>,
     type: "cancelling" | "returning",
   ) => {
     if (!token) return;
@@ -57,23 +57,19 @@ export default function OrderItem({
     }
   };
 
-  const onCancel = () =>
-    handleAction(
-      () => cancelOrderItem(token!, orderId, item.product_id),
-      "cancelling",
-    );
   const onReturn = () => {
     if (!returnReason.trim()) {
       setError("Please provide a reason for the return.");
       return;
     }
     handleAction(
-      () =>
-        returnOrderItem(token!, {
+      async () => {
+        await returnOrderItem(token!, {
           order_id: orderId,
           product_id: item.product_id,
           reason: returnReason,
-        }),
+        });
+      },
       "returning",
     );
   };
@@ -86,7 +82,9 @@ export default function OrderItem({
             size="sm"
             onClick={() =>
               handleAction(
-                () => cancelOrderItem(token!, orderId, item.product_id),
+                async () => {
+                  await cancelOrderItem(token!, orderId, item.product_id);
+                },
                 "cancelling",
               )
             }

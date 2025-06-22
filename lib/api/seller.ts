@@ -48,7 +48,6 @@ export const getSellerSession = async (token: string): Promise<Seller> => {
 
 export const getSellerProducts = async (
   token: string,
-  sellerId: string,
 ): Promise<Product[]> => {
   const response = await fetch(`/api/seller/products`, {
     headers: {
